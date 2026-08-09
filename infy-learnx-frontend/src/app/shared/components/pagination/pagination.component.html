@@ -1,0 +1,32 @@
+<div class="pagination">
+  <span class="pagination__summary">{{ summaryText }}</span>
+
+  <div class="pagination__controls">
+    <label class="pagination__size-label" for="pagination-size-select">Rows per page</label>
+    <select
+      id="pagination-size-select"
+      class="pagination__size-select"
+      [value]="pageSize"
+      (change)="onPageSizeChange($event)"
+    >
+      <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+    </select>
+
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="isPreviousDisabled"
+      (click)="onPrevious()"
+    >
+      Previous
+    </button>
+    <button
+      type="button"
+      class="pagination__button"
+      [disabled]="isNextDisabled"
+      (click)="onNext()"
+    >
+      Next
+    </button>
+  </div>
+</div>

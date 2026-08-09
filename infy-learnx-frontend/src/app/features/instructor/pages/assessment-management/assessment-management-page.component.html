@@ -1,0 +1,38 @@
+<app-page-header pageTitle="Assessment Management"></app-page-header>
+
+<div class="assessment-management__toolbar">
+  <label class="assessment-management__filter">
+    Status
+    <select [value]="status" (change)="onStatusChange($any($event.target).value)">
+      <option value="">All</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <a [routerLink]="assessmentCreateRoute" class="assessment-management__new-button">New Assessment</a>
+</div>
+
+<div *ngIf="errorMessage" class="assessment-management__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-data-table
+  *ngIf="!errorMessage"
+  [columns]="columns"
+  [rows]="visibleAssessments"
+  [isLoading]="isLoading"
+  emptyMessage="No assessments found."
+  [currentSort]="currentSort"
+  [totalElements]="totalElements"
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  (sortChange)="onSortChange($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+>
+  <ng-template let-row>
+    <a [routerLink]="assessmentEditRoute(row.assessmentId)">Edit</a>
+  </ng-template>
+</app-data-table>

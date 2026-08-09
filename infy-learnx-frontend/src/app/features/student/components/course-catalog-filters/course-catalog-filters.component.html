@@ -1,0 +1,37 @@
+<div class="catalog-filters">
+  <div class="catalog-filters__search">
+    <label for="catalog-search" class="catalog-filters__label">Search courses</label>
+    <div class="catalog-filters__search-row">
+      <input
+        id="catalog-search"
+        #searchInput
+        type="text"
+        [value]="searchValue"
+        class="catalog-filters__search-input"
+        (keydown.enter)="onSearchSubmit(searchInput.value)"
+        [attr.aria-describedby]="searchError ? 'catalog-search-error' : null"
+      />
+      <button type="button" class="catalog-filters__search-button" (click)="onSearchSubmit(searchInput.value)">
+        Search
+      </button>
+    </div>
+    <p *ngIf="searchError" id="catalog-search-error" class="catalog-filters__error" role="alert">
+      {{ searchError }}
+    </p>
+  </div>
+
+  <div class="catalog-filters__status">
+    <label for="catalog-status" class="catalog-filters__label">Status</label>
+    <select
+      id="catalog-status"
+      class="catalog-filters__status-select"
+      [value]="status"
+      (change)="onStatusChange($any($event.target).value)"
+    >
+      <option value="">All</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </div>
+
+  <button type="button" class="catalog-filters__clear" (click)="onClear()">Clear Filters</button>
+</div>

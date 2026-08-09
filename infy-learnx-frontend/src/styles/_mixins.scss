@@ -1,0 +1,89 @@
+@use 'breakpoints' as bp;
+
+// Mobile-first responsive helper per frontend-constitution.md Section 12.4.4:
+// media queries must use min-width. Usage: @include respond-above(tablet) { ... }
+@mixin respond-above($breakpoint) {
+  @if $breakpoint == tablet {
+    @media (min-width: bp.$breakpoint-tablet) {
+      @content;
+    }
+  } @else if $breakpoint == desktop {
+    @media (min-width: bp.$breakpoint-desktop) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint `#{$breakpoint}`. Use `tablet` or `desktop`.";
+  }
+}
+
+// Shared shell for the three role-specific layout components (student,
+// instructor, admin — frontend-tasks.md D-02): sidebar + header bar
+// (hamburger, app name, user identity, logout) + content outlet. Identical
+// markup/BEM classes across all three, so the ruleset lives here once
+// instead of being copy-pasted into three component .scss files.
+@mixin layout-shell {
+  .layout {
+    display: flex;
+    min-height: 100vh;
+
+    &__main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-4);
+      padding: var(--spacing-3) var(--spacing-5);
+      border-bottom: 1px solid var(--color-border);
+      background-color: var(--color-background);
+    }
+
+    &__hamburger {
+      padding: var(--spacing-1);
+      border: none;
+      background: transparent;
+      font-size: var(--font-size-xl);
+      color: var(--color-text-primary);
+
+      @include respond-above(tablet) {
+        display: none;
+      }
+    }
+
+    &__app-name {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary);
+    }
+
+    &__user {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin-left: auto;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    &__logout {
+      padding: var(--spacing-2) var(--spacing-4);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+
+      &:hover {
+        background-color: var(--color-surface-hover);
+      }
+    }
+
+    &__content {
+      flex: 1;
+      padding: var(--spacing-6);
+    }
+  }
+}

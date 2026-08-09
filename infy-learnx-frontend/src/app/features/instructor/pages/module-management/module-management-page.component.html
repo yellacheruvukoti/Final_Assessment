@@ -1,0 +1,57 @@
+<app-page-header
+  [pageTitle]="'Modules – ' + (courseTitle || '…')"
+  [breadcrumbs]="[{ label: 'Course Management', route: '/instructor/courses' }, { label: courseTitle || 'Modules' , route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoadingCourse" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoadingCourse && courseError" class="module-management__error">
+  <p>{{ courseError }}</p>
+  <button type="button" (click)="retryCourse()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoadingCourse && !courseError">
+  <p class="module-management__note">
+    Modules added in this browser session are shown below. Existing modules from prior sessions cannot be
+    listed — there is no backend endpoint for that yet.
+  </p>
+
+  <app-module-list [modules]="modules"></app-module-list>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="module-management__form">
+    <h2 class="module-management__form-title">Add Module</h2>
+
+    <div *ngIf="formErrors.length > 0" class="module-management__error" role="alert">
+      <p *ngFor="let message of formErrors">{{ message }}</p>
+    </div>
+
+    <label class="module-management__field">
+      Title
+      <input type="text" formControlName="title" />
+      <span
+        *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+        class="module-management__field-error"
+      >
+        {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+      </span>
+    </label>
+
+    <label class="module-management__field">
+      Module Order
+      <input type="number" formControlName="moduleOrder" />
+      <span
+        *ngIf="form.get('moduleOrder')?.invalid && form.get('moduleOrder')?.touched"
+        class="module-management__field-error"
+      >
+        {{ form.get('moduleOrder')?.errors?.['serverError'] || 'Module order must be a positive whole number.' }}
+      </span>
+    </label>
+
+    <div class="module-management__form-actions">
+      <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Adding…' : 'Add Module' }}</button>
+      <button type="button" (click)="onCancel()">Cancel</button>
+    </div>
+  </form>
+
+  <a [routerLink]="contentUploadRoute()" class="module-management__materials-link">Manage Materials</a>
+</ng-container>

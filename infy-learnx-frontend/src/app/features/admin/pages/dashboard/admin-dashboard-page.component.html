@@ -1,0 +1,55 @@
+<app-page-header pageTitle="Admin Dashboard"></app-page-header>
+
+<div class="admin-dashboard__cards">
+  <section class="admin-dashboard__card">
+    <h2 class="admin-dashboard__card-title">Total Users</h2>
+    <app-skeleton-loader *ngIf="totalUsersCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!totalUsersCard.isLoading">
+      <p *ngIf="!totalUsersCard.hasError" class="admin-dashboard__card-value">{{ totalUsersCard.value }}</p>
+      <div *ngIf="totalUsersCard.hasError" class="admin-dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryTotalUsers()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="admin-dashboard__card">
+    <h2 class="admin-dashboard__card-title">Total Students</h2>
+    <app-skeleton-loader *ngIf="totalStudentsCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!totalStudentsCard.isLoading">
+      <p *ngIf="!totalStudentsCard.hasError" class="admin-dashboard__card-value">{{ totalStudentsCard.value }}</p>
+      <div *ngIf="totalStudentsCard.hasError" class="admin-dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryTotalStudents()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="admin-dashboard__card">
+    <h2 class="admin-dashboard__card-title">Total Instructors</h2>
+    <app-skeleton-loader *ngIf="totalInstructorsCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!totalInstructorsCard.isLoading">
+      <p *ngIf="!totalInstructorsCard.hasError" class="admin-dashboard__card-value">
+        {{ totalInstructorsCard.value }}
+      </p>
+      <div *ngIf="totalInstructorsCard.hasError" class="admin-dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryTotalInstructors()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="admin-dashboard__card">
+    <h2 class="admin-dashboard__card-title">Issued Certificates</h2>
+    <app-skeleton-loader *ngIf="issuedCertificatesCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!issuedCertificatesCard.isLoading">
+      <p *ngIf="!issuedCertificatesCard.hasError" class="admin-dashboard__card-value">
+        {{ issuedCertificatesCard.value }}
+      </p>
+      <div *ngIf="issuedCertificatesCard.hasError" class="admin-dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryIssuedCertificates()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+</div>

@@ -1,0 +1,108 @@
+<app-page-header
+  pageTitle="Edit Quiz"
+  [breadcrumbs]="[{ label: 'Quiz Management', route: '' }, { label: 'Edit Quiz', route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && loadError" class="quiz-edit__error">
+  <p>{{ loadError }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<form *ngIf="!isLoading && !loadError" [formGroup]="form" (ngSubmit)="onSubmit()" class="quiz-edit__form">
+  <div *ngIf="formErrors.length > 0" class="quiz-edit__error" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="quiz-edit__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="quiz-edit__field-error">
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="quiz-edit__field">
+    Status
+    <select formControlName="status">
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <label class="quiz-edit__field">
+    Duration (minutes)
+    <input type="number" formControlName="durationMinutes" />
+    <span
+      *ngIf="form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched"
+      class="quiz-edit__field-error"
+    >
+      {{ form.get('durationMinutes')?.errors?.['serverError'] || 'Duration must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <label class="quiz-edit__field">
+    Total Marks
+    <input type="number" formControlName="totalMarks" />
+    <span
+      *ngIf="form.get('totalMarks')?.invalid && form.get('totalMarks')?.touched"
+      class="quiz-edit__field-error"
+    >
+      {{ form.get('totalMarks')?.errors?.['serverError'] || 'Total marks must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <label class="quiz-edit__field">
+    Scheduled At (optional)
+    <input type="datetime-local" formControlName="scheduledAt" />
+    <span
+      *ngIf="form.get('scheduledAt')?.invalid && form.get('scheduledAt')?.touched"
+      class="quiz-edit__field-error"
+    >
+      {{ form.get('scheduledAt')?.errors?.['serverError'] || 'Scheduled time must be in the future.' }}
+    </span>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Save Changes' }}</button>
+</form>
+
+<section class="quiz-edit__questions" *ngIf="!isLoading && !loadError">
+  <h2 class="quiz-edit__questions-title">Questions</h2>
+
+  <app-skeleton-loader *ngIf="isLoadingQuestions" type="table"></app-skeleton-loader>
+
+  <div *ngIf="!isLoadingQuestions && questionsError" class="quiz-edit__error">
+    <p>{{ questionsError }}</p>
+    <button type="button" (click)="retryQuestions()">Retry</button>
+  </div>
+
+  <ng-container *ngIf="!isLoadingQuestions && !questionsError">
+    <app-empty-state *ngIf="existingQuestions.length === 0" message="No questions yet."></app-empty-state>
+
+    <ul *ngIf="existingQuestions.length > 0" class="quiz-edit__question-list">
+      <li *ngFor="let question of existingQuestions">
+        <strong>{{ question.questionText }}</strong>
+        <span>{{ question.questionType }} — {{ question.marks }} marks</span>
+        <span>Options: {{ question.optionSet }} (correct: {{ question.correctAnswerKey }})</span>
+      </li>
+    </ul>
+
+    <p class="quiz-edit__note">
+      Existing questions cannot be edited or removed — the backend only supports adding new questions.
+    </p>
+
+    <div *ngIf="questionFormErrors.length > 0" class="quiz-edit__error" role="alert">
+      <p *ngFor="let message of questionFormErrors">{{ message }}</p>
+    </div>
+
+    <app-quiz-question-block
+      [questionGroup]="newQuestionGroup"
+      [index]="existingQuestions.length"
+      [showRemoveButton]="false"
+    ></app-quiz-question-block>
+
+    <button type="button" [disabled]="isAddingQuestion" (click)="onAddQuestion()">
+      {{ isAddingQuestion ? 'Adding…' : 'Add Question' }}
+    </button>
+  </ng-container>
+</section>

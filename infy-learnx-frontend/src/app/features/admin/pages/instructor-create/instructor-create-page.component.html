@@ -1,0 +1,36 @@
+<app-page-header
+  pageTitle="Add Instructor"
+  [breadcrumbs]="[{ label: 'User Management', route: '/admin/users' }, { label: 'Add Instructor', route: '' }]"
+></app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="instructor-create__form">
+  <div *ngIf="formErrors.length > 0" class="instructor-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="instructor-create__field">
+    Full Name
+    <input type="text" formControlName="fullName" />
+    <span
+      *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched"
+      class="instructor-create__field-error"
+    >
+      {{ form.get('fullName')?.errors?.['serverError'] || 'Full name is required.' }}
+    </span>
+  </label>
+
+  <label class="instructor-create__field">
+    Email
+    <input type="email" formControlName="email" />
+    <span *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="instructor-create__field-error">
+      {{ form.get('email')?.errors?.['serverError'] || 'A valid email is required.' }}
+    </span>
+  </label>
+
+  <label class="instructor-create__field">
+    Specialization (optional)
+    <input type="text" formControlName="specialization" />
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Adding…' : 'Add Instructor' }}</button>
+</form>

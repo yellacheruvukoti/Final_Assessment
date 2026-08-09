@@ -1,0 +1,100 @@
+.quiz-edit {
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+
+    p {
+      margin: 0;
+      flex: 1;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    max-width: 28rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+
+    input,
+    textarea,
+    select {
+      padding: var(--spacing-2) var(--spacing-3);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      font: inherit;
+    }
+  }
+
+  &__field-error {
+    color: var(--color-error);
+    font-weight: var(--font-weight-normal);
+  }
+
+  button {
+    align-self: flex-start;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  button[type='submit'] {
+    border: 1px solid var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  &__questions {
+    max-width: 36rem;
+    margin-top: var(--spacing-6);
+  }
+
+  &__questions-title {
+    margin: 0 0 var(--spacing-3);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &__question-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    margin: 0 0 var(--spacing-4);
+    padding: 0;
+    list-style: none;
+    font-size: var(--font-size-sm);
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-1);
+      padding: var(--spacing-3) var(--spacing-4);
+      border-radius: var(--radius-md);
+      background-color: var(--color-surface);
+    }
+  }
+
+  &__note {
+    margin: 0 0 var(--spacing-4);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+}

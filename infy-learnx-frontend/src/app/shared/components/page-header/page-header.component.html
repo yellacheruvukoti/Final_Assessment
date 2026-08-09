@@ -1,0 +1,16 @@
+<header class="page-header">
+  <nav
+    *ngIf="breadcrumbs && breadcrumbs.length > 0"
+    class="page-header__breadcrumbs"
+    aria-label="Breadcrumb"
+  >
+    <ol class="page-header__breadcrumb-list">
+      <li *ngFor="let crumb of breadcrumbs; let last = last" class="page-header__breadcrumb-item">
+        <a *ngIf="!last" [routerLink]="crumb.route" class="page-header__breadcrumb-link">{{ crumb.label }}</a>
+        <span *ngIf="last" class="page-header__breadcrumb-current" aria-current="page">{{ crumb.label }}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <h1 class="page-header__title">{{ pageTitle }}</h1>
+</header>

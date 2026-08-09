@@ -1,0 +1,94 @@
+<app-page-header [pageTitle]="'Registration Summary – ' + (batchId || '…')"></app-page-header>
+
+<div class="registration-summary__batch-selector">
+  <label>
+    Batch ID
+    <input
+      type="text"
+      #batchIdField
+      [value]="batchIdInput"
+      (input)="batchIdInput = batchIdField.value"
+      placeholder="Enter a batch id"
+    />
+  </label>
+  <button type="button" (click)="onLoadBatch()">Load</button>
+</div>
+
+<ng-container *ngIf="batchId">
+  <app-summary-tabs [activeTab]="activeTab" (tabChange)="onTabChange($event)"></app-summary-tabs>
+
+  <section *ngIf="activeTab === 'overview'">
+    <app-skeleton-loader *ngIf="isLoadingOverview" type="card"></app-skeleton-loader>
+    <div *ngIf="!isLoadingOverview && overviewError" class="registration-summary__error">
+      <p>{{ overviewError }}</p>
+      <button type="button" (click)="retryOverview()">Retry</button>
+    </div>
+    <div *ngIf="!isLoadingOverview && !overviewError && overview" class="registration-summary__totals">
+      <div class="registration-summary__stat">
+        <span class="registration-summary__stat-label">Total Registered</span>
+        <span class="registration-summary__stat-value">{{ overview.totalRegistered }}</span>
+      </div>
+      <div class="registration-summary__stat">
+        <span class="registration-summary__stat-label">Total Cancelled</span>
+        <span class="registration-summary__stat-value">{{ overview.totalCancelled }}</span>
+      </div>
+      <div class="registration-summary__stat">
+        <span class="registration-summary__stat-label">Generated At</span>
+        <span class="registration-summary__stat-value">{{ overview.generatedAt }}</span>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="activeTab === 'byAssessment'">
+    <app-skeleton-loader *ngIf="isLoadingByAssessment" type="table"></app-skeleton-loader>
+    <div *ngIf="!isLoadingByAssessment && byAssessmentError" class="registration-summary__error">
+      <p>{{ byAssessmentError }}</p>
+      <button type="button" (click)="retryByAssessment()">Retry</button>
+    </div>
+    <ng-container *ngIf="!isLoadingByAssessment && !byAssessmentError">
+      <app-empty-state *ngIf="byAssessment.length === 0" message="No assessments found for this batch."></app-empty-state>
+      <table *ngIf="byAssessment.length > 0" class="registration-summary__table">
+        <thead>
+          <tr>
+            <th scope="col">Assessment</th>
+            <th scope="col">Registered</th>
+            <th scope="col">Cancelled</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of byAssessment">
+            <td>{{ item.assessmentId }}</td>
+            <td>{{ item.totalRegistered }}</td>
+            <td>{{ item.totalCancelled }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+  </section>
+
+  <section *ngIf="activeTab === 'byStatus'">
+    <app-skeleton-loader *ngIf="isLoadingByStatus" type="table"></app-skeleton-loader>
+    <div *ngIf="!isLoadingByStatus && byStatusError" class="registration-summary__error">
+      <p>{{ byStatusError }}</p>
+      <button type="button" (click)="retryByStatus()">Retry</button>
+    </div>
+    <table *ngIf="!isLoadingByStatus && !byStatusError && byStatus" class="registration-summary__table">
+      <thead>
+        <tr>
+          <th scope="col">Status</th>
+          <th scope="col">Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>REGISTERED</td>
+          <td>{{ byStatus.totalRegistered }}</td>
+        </tr>
+        <tr>
+          <td>CANCELLED</td>
+          <td>{{ byStatus.totalCancelled }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</ng-container>

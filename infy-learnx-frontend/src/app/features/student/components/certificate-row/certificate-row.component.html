@@ -1,0 +1,22 @@
+<td>{{ assessmentTitle || certificate.assessmentId }}</td>
+<td>{{ certificate.issuedAt }}</td>
+<td>
+  <span
+    class="certificate-row__badge"
+    [class.certificate-row__badge--revoked]="certificate.status === CertificateStatus.REVOKED"
+  >
+    {{ certificate.status }}
+  </span>
+</td>
+<td>
+  <button
+    *ngIf="certificate.status === CertificateStatus.ISSUED"
+    type="button"
+    class="certificate-row__button"
+    [disabled]="isDownloading"
+    (click)="download.emit()"
+  >
+    {{ isDownloading ? 'Downloading…' : 'Download' }}
+  </button>
+  <span *ngIf="certificate.status !== CertificateStatus.ISSUED" class="certificate-row__none">—</span>
+</td>

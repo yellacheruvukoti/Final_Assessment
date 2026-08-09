@@ -1,0 +1,36 @@
+<app-page-header [pageTitle]="'Quizzes – ' + (courseTitle || '…')"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="quiz-participation__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <app-empty-state
+    *ngIf="quizzes.length === 0"
+    message="No quizzes available for this course."
+  ></app-empty-state>
+
+  <table *ngIf="quizzes.length > 0" class="quiz-participation__table">
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Status</th>
+        <th scope="col">Scheduled At</th>
+        <th scope="col">Duration</th>
+        <th scope="col">Total Marks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quiz of quizzes">
+        <td>{{ quiz.title }}</td>
+        <td><span class="quiz-participation__badge">{{ quiz.status }}</span></td>
+        <td>{{ quiz.scheduledAt || '—' }}</td>
+        <td>{{ quiz.durationMinutes }} min</td>
+        <td>{{ quiz.totalMarks }}</td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

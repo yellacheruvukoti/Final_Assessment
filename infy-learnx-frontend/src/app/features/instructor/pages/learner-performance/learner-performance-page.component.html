@@ -1,0 +1,60 @@
+<app-page-header pageTitle="Learner Performance"></app-page-header>
+
+<p class="learner-performance__note">
+  Shown per course (enrolled learners and average completion) — no backend endpoint returns a
+  per-student breakdown.
+</p>
+
+<app-performance-filters
+  [courseOptions]="courseOptions"
+  [selectedCourseId]="selectedCourseId"
+  (courseChange)="onCourseFilterChange($event)"
+></app-performance-filters>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && errorMessage" class="learner-performance__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <app-empty-state *ngIf="visibleCourses.length === 0" message="No courses found."></app-empty-state>
+
+  <table *ngIf="visibleCourses.length > 0" class="learner-performance__table">
+    <thead>
+      <tr>
+        <th scope="col">Course Title</th>
+        <th scope="col">Enrolled</th>
+        <th scope="col">Avg. Completion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let course of visibleCourses">
+        <td>{{ course.title }}</td>
+        <td>{{ course.enrolledCount }}</td>
+        <td>
+          <div class="learner-performance__progress">
+            <div class="learner-performance__progress-track">
+              <div
+                class="learner-performance__progress-fill"
+                [style.width.%]="course.averageCompletionPercentage"
+              ></div>
+            </div>
+            <span>{{ course.averageCompletionPercentage | number: '1.0-1' }}%</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <app-pagination
+    *ngIf="visibleCourses.length > 0"
+    [totalElements]="totalElements"
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</ng-container>

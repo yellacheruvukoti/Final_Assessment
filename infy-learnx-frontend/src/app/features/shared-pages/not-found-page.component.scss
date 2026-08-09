@@ -1,0 +1,22 @@
+.error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: var(--spacing-4);
+  padding: var(--spacing-6);
+  text-align: center;
+
+  &__title {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  &__link {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+  }
+}

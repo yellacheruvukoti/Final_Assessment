@@ -1,0 +1,63 @@
+<div [formGroup]="questionGroup" class="quiz-question-block">
+  <div class="quiz-question-block__header">
+    <h3 class="quiz-question-block__title">Question {{ index + 1 }}</h3>
+    <button *ngIf="showRemoveButton" type="button" (click)="onRemoveQuestion()">Remove Question</button>
+  </div>
+
+  <label class="quiz-question-block__field">
+    Question Text
+    <textarea formControlName="questionText" rows="2"></textarea>
+    <span
+      *ngIf="questionGroup.get('questionText')?.invalid && questionGroup.get('questionText')?.touched"
+      class="quiz-question-block__field-error"
+    >
+      Question text must be between 5 and 2000 characters.
+    </span>
+  </label>
+
+  <label class="quiz-question-block__field">
+    Question Type
+    <select formControlName="questionType">
+      <option *ngFor="let option of questionTypeOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <label class="quiz-question-block__field">
+    Marks
+    <input type="number" formControlName="marks" />
+    <span
+      *ngIf="questionGroup.get('marks')?.invalid && questionGroup.get('marks')?.touched"
+      class="quiz-question-block__field-error"
+    >
+      Marks must be a positive whole number.
+    </span>
+  </label>
+
+  <div class="quiz-question-block__options" formArrayName="options">
+    <span class="quiz-question-block__options-label">Options</span>
+    <div *ngFor="let option of optionControls; let i = index" class="quiz-question-block__option-row">
+      <input type="text" [formControlName]="i" [placeholder]="'Option ' + (i + 1)" />
+      <button type="button" (click)="removeOption(i)" [disabled]="optionControls.length <= 2">Remove</button>
+    </div>
+    <button type="button" (click)="addOption()">Add Option</button>
+    <span *ngIf="options.invalid && options.touched" class="quiz-question-block__field-error">
+      At least 2 options are required.
+    </span>
+  </div>
+
+  <label class="quiz-question-block__field">
+    Correct Answer
+    <select formControlName="correctAnswerKey">
+      <option value="" disabled>Select the correct option</option>
+      <option *ngFor="let option of optionControls; let i = index" [value]="option.value">
+        Option {{ i + 1 }}: {{ option.value || '(empty)' }}
+      </option>
+    </select>
+    <span
+      *ngIf="questionGroup.errors?.['keyMismatch'] && questionGroup.get('correctAnswerKey')?.touched"
+      class="quiz-question-block__field-error"
+    >
+      Correct answer must match one of the options.
+    </span>
+  </label>
+</div>

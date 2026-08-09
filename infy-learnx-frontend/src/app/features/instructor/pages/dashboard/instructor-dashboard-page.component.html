@@ -1,0 +1,50 @@
+<app-page-header pageTitle="Instructor Dashboard"></app-page-header>
+
+<div class="instructor-dashboard__cards">
+  <app-instructor-summary-card
+    cardTitle="Total Courses"
+    [state]="coursesCard"
+    (retry)="retry()"
+  ></app-instructor-summary-card>
+
+  <app-instructor-summary-card
+    cardTitle="Total Quizzes"
+    [state]="quizzesCard"
+    (retry)="retry()"
+  ></app-instructor-summary-card>
+
+  <app-instructor-summary-card
+    cardTitle="Active Registrations"
+    [state]="registrationsCard"
+    unavailableMessage="Not available — no backend endpoint lists registrations by instructor scope."
+  ></app-instructor-summary-card>
+
+  <app-instructor-summary-card
+    cardTitle="Total Learners"
+    [state]="learnersCard"
+    (retry)="retry()"
+  ></app-instructor-summary-card>
+</div>
+
+<section class="instructor-dashboard__recent">
+  <h2 class="instructor-dashboard__recent-title">Recently Updated Courses</h2>
+
+  <app-skeleton-loader *ngIf="isLoadingRecent" type="card"></app-skeleton-loader>
+
+  <div *ngIf="!isLoadingRecent && recentError" class="instructor-dashboard__recent-error">
+    <p>{{ recentError }}</p>
+    <button type="button" (click)="retry()">Retry</button>
+  </div>
+
+  <app-empty-state
+    *ngIf="!isLoadingRecent && !recentError && recentCourses.length === 0"
+    message="No courses yet."
+  ></app-empty-state>
+
+  <ul *ngIf="!isLoadingRecent && !recentError && recentCourses.length > 0" class="instructor-dashboard__recent-list">
+    <li *ngFor="let course of recentCourses">
+      <a [routerLink]="['/', 'instructor', 'courses', course.courseId, 'edit']">{{ course.title }}</a>
+      <span class="instructor-dashboard__recent-status">{{ course.status }}</span>
+    </li>
+  </ul>
+</section>

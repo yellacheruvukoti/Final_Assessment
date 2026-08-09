@@ -1,0 +1,22 @@
+<div class="progress-row">
+  <button
+    type="button"
+    class="progress-row__header"
+    (click)="toggleExpand.emit()"
+    [attr.aria-expanded]="isExpanded"
+  >
+    <span class="progress-row__title">{{ group.courseTitle }}</span>
+    <div class="progress-row__bar-track">
+      <div class="progress-row__bar-fill" [style.width.%]="group.overallPercentage"></div>
+    </div>
+    <span class="progress-row__percentage">{{ group.overallPercentage }}%</span>
+  </button>
+
+  <ul *ngIf="isExpanded" class="progress-row__modules">
+    <li *ngFor="let module of group.moduleProgress">
+      <span>{{ module.moduleId || 'Course level' }}</span>
+      <span>{{ module.completionPercentage }}%</span>
+      <span class="progress-row__badge">{{ module.progressStatus }}</span>
+    </li>
+  </ul>
+</div>

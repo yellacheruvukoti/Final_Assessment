@@ -1,0 +1,31 @@
+:host {
+  display: table-row;
+}
+
+.registration-row {
+  &__badge {
+    display: inline-block;
+    padding: 2px var(--spacing-2);
+    border-radius: var(--radius-full);
+    background-color: var(--color-surface);
+    font-size: var(--font-size-xs);
+  }
+
+  &__button {
+    padding: var(--spacing-1) var(--spacing-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-background);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__none {
+    color: var(--color-text-disabled);
+  }
+}

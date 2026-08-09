@@ -1,0 +1,119 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:consul:"
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        health-check-path: /actuator/health
+        health-check-interval: 15s
+        prefer-ip-address: true
+      config:
+        enabled: true
+        format: yaml
+        prefix: config
+        default-context: application
+    gateway:
+      # Required for the Angular dev server (a different origin) to call
+      # this gateway from a real browser at all — curl/Postman never
+      # enforce CORS, so this was never exercised until manual browser
+      # testing surfaced it as a `status: 0` failure on every request.
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        # Specific sub-resource overrides MUST precede the general catch-all
+        # routes below — Spring Cloud Gateway evaluates routes in declaration
+        # order, and these three paths are owned by a different service than
+        # their path prefix's general owner (api-contract.md Section 3).
+        - id: registration-service-student-registrations
+          uri: lb://registration-service
+          predicates:
+            - Path=/api/students/*/registrations
+        - id: certification-service-student-certificates
+          uri: lb://certification-service
+          predicates:
+            - Path=/api/students/*/certificates
+        - id: learning-service-instructor-performance
+          uri: lb://learning-service
+          predicates:
+            - Path=/api/instructors/*/performance
+
+        # General catch-all routes, one per owning service.
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**
+        - id: user-service-users
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+        - id: user-service-students
+          uri: lb://user-service
+          predicates:
+            - Path=/api/students/**
+        - id: user-service-instructors
+          uri: lb://user-service
+          predicates:
+            - Path=/api/instructors/**
+        - id: user-service-administrators
+          uri: lb://user-service
+          predicates:
+            - Path=/api/administrators/**
+        - id: learning-service-courses
+          uri: lb://learning-service
+          predicates:
+            - Path=/api/courses/**
+        - id: learning-service-quizzes
+          uri: lb://learning-service
+          predicates:
+            - Path=/api/quizzes/**
+        - id: assessment-service-assessments
+          uri: lb://assessment-service
+          predicates:
+            - Path=/api/assessments/**
+        - id: registration-service-registrations
+          uri: lb://registration-service
+          predicates:
+            - Path=/api/registrations/**
+        - id: summary-service-summaries
+          uri: lb://summary-service
+          predicates:
+            - Path=/api/summaries/**
+        - id: certification-service-certificates
+          uri: lb://certification-service
+          predicates:
+            - Path=/api/certificates/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true

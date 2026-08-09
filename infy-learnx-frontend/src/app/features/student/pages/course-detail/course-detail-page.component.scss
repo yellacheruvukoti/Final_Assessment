@@ -1,0 +1,103 @@
+.course-detail {
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+
+    p {
+      margin: 0;
+      flex: 1;
+    }
+  }
+
+  &__tabs {
+    display: flex;
+    gap: var(--spacing-2);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-5);
+  }
+
+  &__tab {
+    padding: var(--spacing-3) var(--spacing-4);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+
+    &--active {
+      border-bottom-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  &__overview {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--spacing-2) var(--spacing-4);
+
+    dt {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  &__module-group {
+    margin-bottom: var(--spacing-3);
+  }
+
+  &__module-toggle {
+    width: 100%;
+    text-align: left;
+    padding: var(--spacing-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+  }
+
+  &__material-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--spacing-2) var(--spacing-4);
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      padding: var(--spacing-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 2px var(--spacing-2);
+    border-radius: var(--radius-full);
+    background-color: var(--color-surface);
+    font-size: var(--font-size-xs);
+  }
+
+  &__quiz-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: var(--spacing-3);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+}

@@ -1,0 +1,66 @@
+<app-page-header pageTitle="Dashboard"></app-page-header>
+
+<div class="dashboard__cards">
+  <section class="dashboard__card">
+    <h2 class="dashboard__card-title">Enrolled Courses</h2>
+    <app-skeleton-loader *ngIf="enrolledCoursesCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!enrolledCoursesCard.isLoading">
+      <p *ngIf="!enrolledCoursesCard.hasError" class="dashboard__card-value">{{ enrolledCoursesCard.value }}</p>
+      <div *ngIf="enrolledCoursesCard.hasError" class="dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryEnrolledCourses()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="dashboard__card">
+    <h2 class="dashboard__card-title">Upcoming Assessments</h2>
+    <app-skeleton-loader *ngIf="upcomingAssessmentsCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!upcomingAssessmentsCard.isLoading">
+      <p *ngIf="!upcomingAssessmentsCard.hasError" class="dashboard__card-value">{{ upcomingAssessmentsCard.value }}</p>
+      <div *ngIf="upcomingAssessmentsCard.hasError" class="dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryUpcomingAssessments()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="dashboard__card">
+    <h2 class="dashboard__card-title">Active Registrations</h2>
+    <app-skeleton-loader *ngIf="activeRegistrationsCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!activeRegistrationsCard.isLoading">
+      <p *ngIf="!activeRegistrationsCard.hasError" class="dashboard__card-value">{{ activeRegistrationsCard.value }}</p>
+      <div *ngIf="activeRegistrationsCard.hasError" class="dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryActiveRegistrations()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+
+  <section class="dashboard__card">
+    <h2 class="dashboard__card-title">Issued Certificates</h2>
+    <app-skeleton-loader *ngIf="issuedCertificatesCard.isLoading" type="card"></app-skeleton-loader>
+    <ng-container *ngIf="!issuedCertificatesCard.isLoading">
+      <p *ngIf="!issuedCertificatesCard.hasError" class="dashboard__card-value">{{ issuedCertificatesCard.value }}</p>
+      <div *ngIf="issuedCertificatesCard.hasError" class="dashboard__card-error">
+        <p>Couldn't load this.</p>
+        <button type="button" (click)="retryIssuedCertificates()">Retry</button>
+      </div>
+    </ng-container>
+  </section>
+</div>
+
+<section class="dashboard__recent">
+  <h2 class="dashboard__recent-title">Recently Enrolled Courses</h2>
+  <app-skeleton-loader *ngIf="enrolledCoursesCard.isLoading" type="card"></app-skeleton-loader>
+  <app-empty-state
+    *ngIf="!enrolledCoursesCard.isLoading && !enrolledCoursesCard.hasError && recentEnrollments.length === 0"
+    message="You are not enrolled in any courses yet."
+  ></app-empty-state>
+  <ul *ngIf="!enrolledCoursesCard.isLoading && recentEnrollments.length > 0" class="dashboard__recent-list">
+    <li *ngFor="let enrollment of recentEnrollments">
+      <span>{{ enrollment.courseTitle }}</span>
+      <span>{{ enrollment.enrolledAt | date: 'mediumDate' }}</span>
+    </li>
+  </ul>
+</section>

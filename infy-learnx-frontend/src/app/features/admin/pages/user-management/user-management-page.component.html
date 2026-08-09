@@ -1,0 +1,56 @@
+<app-page-header pageTitle="User Management"></app-page-header>
+
+<div class="user-management__toolbar">
+  <label class="user-management__filter">
+    Role
+    <select [value]="role" (change)="onRoleChange($any($event.target).value)">
+      <option value="">All</option>
+      <option *ngFor="let option of roleOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <label class="user-management__filter">
+    Status
+    <select [value]="status" (change)="onStatusChange($any($event.target).value)">
+      <option value="">All</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <a class="user-management__add-button" [routerLink]="['/' + AppRoutes.admin.studentCreate]">Add Student</a>
+  <a class="user-management__add-button" [routerLink]="['/' + AppRoutes.admin.instructorCreate]">Add Instructor</a>
+</div>
+
+<div *ngIf="errorMessage" class="user-management__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-data-table
+  *ngIf="!errorMessage"
+  [columns]="columns"
+  [rows]="visibleUsers"
+  [isLoading]="isLoading"
+  emptyMessage="No users found."
+  [currentSort]="currentSort"
+  [totalElements]="totalElements"
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  (sortChange)="onSortChange($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+>
+  <ng-template let-row>
+    <ng-container *ngIf="row.role === UserRole.STUDENT || row.role === UserRole.INSTRUCTOR">
+      <button type="button" (click)="onEdit(row)">Edit</button>
+      <button
+        type="button"
+        [disabled]="row.isDeactivating || row.status === UserStatus.INACTIVE"
+        (click)="onDeactivate(row)"
+      >
+        {{ row.isDeactivating ? 'Deactivating…' : row.status === UserStatus.INACTIVE ? 'Deactivated' : 'Deactivate' }}
+      </button>
+    </ng-container>
+  </ng-template>
+</app-data-table>

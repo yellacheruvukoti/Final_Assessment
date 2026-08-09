@@ -1,0 +1,93 @@
+.module-management {
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    margin-bottom: var(--spacing-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+
+    p {
+      margin: 0;
+      flex: 1;
+    }
+  }
+
+  &__note {
+    margin: 0 0 var(--spacing-4);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    max-width: 24rem;
+    margin: var(--spacing-6) 0;
+  }
+
+  &__form-title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+
+    input {
+      padding: var(--spacing-2) var(--spacing-3);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-normal);
+    }
+  }
+
+  &__field-error {
+    color: var(--color-error);
+    font-weight: var(--font-weight-normal);
+  }
+
+  &__form-actions {
+    display: flex;
+    gap: var(--spacing-3);
+
+    button {
+      padding: var(--spacing-2) var(--spacing-4);
+      border: 1px solid var(--color-border-strong);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-background);
+      cursor: pointer;
+
+      &[type='submit'] {
+        border-color: var(--color-primary);
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  &__materials-link {
+    display: inline-block;
+    color: var(--color-primary);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

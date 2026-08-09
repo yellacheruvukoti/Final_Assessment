@@ -1,0 +1,45 @@
+<app-page-header
+  pageTitle="Edit Course"
+  [breadcrumbs]="[{ label: 'Course Management', route: '/instructor/courses' }, { label: 'Edit Course', route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && loadError" class="course-edit__error">
+  <p>{{ loadError }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<form *ngIf="!isLoading && !loadError" [formGroup]="form" (ngSubmit)="onSubmit()" class="course-edit__form">
+  <div *ngIf="formErrors.length > 0" class="course-edit__error" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="course-edit__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="course-edit__field-error">
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="course-edit__field">
+    Description
+    <textarea formControlName="description" rows="4"></textarea>
+    <span
+      *ngIf="form.get('description')?.errors?.['serverError'] && form.get('description')?.touched"
+      class="course-edit__field-error"
+    >
+      {{ form.get('description')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="course-edit__field">
+    Status
+    <select formControlName="status">
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Save Changes' }}</button>
+</form>

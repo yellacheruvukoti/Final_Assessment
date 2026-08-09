@@ -1,0 +1,42 @@
+<app-page-header
+  pageTitle="Create Course"
+  [breadcrumbs]="[{ label: 'Course Management', route: '/instructor/courses' }, { label: 'Create Course', route: '' }]"
+></app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="course-create__form">
+  <div *ngIf="formErrors.length > 0" class="course-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="course-create__field">
+    Course Code
+    <input type="text" formControlName="courseCode" />
+    <span
+      *ngIf="form.get('courseCode')?.invalid && form.get('courseCode')?.touched"
+      class="course-create__field-error"
+    >
+      {{ form.get('courseCode')?.errors?.['serverError'] || 'Course code is required.' }}
+    </span>
+  </label>
+
+  <label class="course-create__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="course-create__field-error">
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="course-create__field">
+    Description
+    <textarea formControlName="description" rows="4"></textarea>
+    <span
+      *ngIf="form.get('description')?.invalid && form.get('description')?.touched"
+      class="course-create__field-error"
+    >
+      {{ form.get('description')?.errors?.['serverError'] || 'Description must be 2000 characters or fewer.' }}
+    </span>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Creating…' : 'Create Course' }}</button>
+</form>

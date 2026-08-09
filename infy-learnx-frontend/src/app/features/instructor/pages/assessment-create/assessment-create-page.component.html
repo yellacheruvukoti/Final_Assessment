@@ -1,0 +1,117 @@
+<app-page-header
+  pageTitle="Create Assessment"
+  [breadcrumbs]="[{ label: 'Assessment Management', route: '/instructor/assessments' }, { label: 'Create Assessment', route: '' }]"
+></app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="assessment-create__form">
+  <div *ngIf="formErrors.length > 0" class="assessment-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="assessment-create__field">
+    Assessment Code
+    <input type="text" formControlName="assessmentCode" />
+    <span
+      *ngIf="form.get('assessmentCode')?.errors?.['serverError'] && form.get('assessmentCode')?.touched"
+      class="assessment-create__field-error"
+    >
+      {{ form.get('assessmentCode')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span
+      *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+      class="assessment-create__field-error"
+    >
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    Description
+    <textarea formControlName="description" rows="3"></textarea>
+    <span
+      *ngIf="form.get('description')?.errors?.['serverError'] && form.get('description')?.touched"
+      class="assessment-create__field-error"
+    >
+      {{ form.get('description')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    Status
+    <select formControlName="status">
+      <option value="" disabled>Select status</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <label class="assessment-create__field">
+    Start Time
+    <input type="datetime-local" formControlName="startTime" />
+    <span
+      *ngIf="form.get('startTime')?.errors?.['serverError'] && form.get('startTime')?.touched"
+      class="assessment-create__field-error"
+    >
+      {{ form.get('startTime')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    End Time
+    <input type="datetime-local" formControlName="endTime" />
+    <span
+      *ngIf="
+        form.get('endTime')?.touched &&
+        (form.get('endTime')?.errors?.['serverError'] || form.get('endTime')?.errors?.['endBeforeStart'])
+      "
+      class="assessment-create__field-error"
+    >
+      {{ form.get('endTime')?.errors?.['serverError'] || 'End Time must be after Start Time.' }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    Duration (minutes)
+    <input type="number" formControlName="durationMinutes" />
+    <span
+      *ngIf="form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched"
+      class="assessment-create__field-error"
+    >
+      {{ form.get('durationMinutes')?.errors?.['serverError'] || 'Duration must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <label class="assessment-create__field">
+    Scope Type
+    <select formControlName="scopeType">
+      <option value="" disabled>Select scope type</option>
+      <option *ngFor="let option of scopeTypeOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <ng-container *ngIf="form.get('scopeType')?.value">
+    <label *ngIf="form.get('scopeType')?.value === ScopeType.COURSE" class="assessment-create__field">
+      Scope Reference (course)
+      <app-skeleton-loader *ngIf="isLoadingCourses" type="card"></app-skeleton-loader>
+      <select *ngIf="!isLoadingCourses" formControlName="scopeId">
+        <option value="" disabled>Select a course</option>
+        <option *ngFor="let course of courseOptions" [value]="course.courseId">{{ course.title }}</option>
+      </select>
+      <span *ngIf="coursesError" class="assessment-create__field-error">{{ coursesError }}</span>
+    </label>
+
+    <label *ngIf="form.get('scopeType')?.value === ScopeType.BATCH" class="assessment-create__field">
+      Scope Reference (batch id)
+      <input type="text" formControlName="scopeId" />
+      <span class="assessment-create__hint">
+        No endpoint lists your batches — enter a known batch id directly.
+      </span>
+    </label>
+  </ng-container>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Creating…' : 'Create Assessment' }}</button>
+</form>

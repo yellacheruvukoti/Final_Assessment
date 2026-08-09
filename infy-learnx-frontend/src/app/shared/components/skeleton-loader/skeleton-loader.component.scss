@@ -1,0 +1,57 @@
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton-loader {
+  &__bar {
+    display: block;
+    height: 1rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-border-strong);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__bar--short {
+    width: 15%;
+  }
+
+  &__bar--medium {
+    width: 25%;
+  }
+
+  &__bar--long {
+    width: 40%;
+  }
+
+  &__card {
+    height: 96px;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-border-strong);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  &__bar--input {
+    height: 2.5rem;
+    width: 100%;
+  }
+}

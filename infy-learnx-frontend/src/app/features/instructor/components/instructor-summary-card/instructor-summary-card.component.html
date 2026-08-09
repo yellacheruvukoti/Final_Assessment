@@ -1,0 +1,16 @@
+<section class="summary-card">
+  <h2 class="summary-card__title">{{ cardTitle }}</h2>
+
+  <app-skeleton-loader *ngIf="state.isLoading" type="card"></app-skeleton-loader>
+
+  <ng-container *ngIf="!state.isLoading">
+    <p *ngIf="state.isUnavailable" class="summary-card__unavailable">{{ unavailableMessage }}</p>
+
+    <div *ngIf="!state.isUnavailable && state.hasError" class="summary-card__error">
+      <p>Couldn't load this.</p>
+      <button type="button" (click)="retry.emit()">Retry</button>
+    </div>
+
+    <p *ngIf="!state.isUnavailable && !state.hasError" class="summary-card__value">{{ state.value }}</p>
+  </ng-container>
+</section>

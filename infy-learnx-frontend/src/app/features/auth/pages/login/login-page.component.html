@@ -1,0 +1,54 @@
+<main class="login-page">
+  <div class="login-page__panel">
+    <h1 class="login-page__title">Infy_LearnX</h1>
+
+    <form class="login-page__form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="login-page__field">
+        <label for="login-email" class="login-page__label">
+          Email
+          <span aria-hidden="true">*</span>
+        </label>
+        <input
+          id="login-email"
+          type="email"
+          formControlName="email"
+          class="login-page__input"
+          [class.login-page__input--invalid]="emailErrorMessage()"
+          aria-required="true"
+          [attr.aria-invalid]="!!emailErrorMessage()"
+          [attr.aria-describedby]="emailErrorMessage() ? 'login-email-error' : null"
+        />
+        <p *ngIf="emailErrorMessage()" id="login-email-error" class="login-page__error" role="alert">
+          {{ emailErrorMessage() }}
+        </p>
+      </div>
+
+      <div class="login-page__field">
+        <label for="login-password" class="login-page__label">
+          Password
+          <span aria-hidden="true">*</span>
+        </label>
+        <input
+          id="login-password"
+          type="password"
+          formControlName="password"
+          class="login-page__input"
+          [class.login-page__input--invalid]="passwordErrorMessage()"
+          aria-required="true"
+          [attr.aria-invalid]="!!passwordErrorMessage()"
+          [attr.aria-describedby]="passwordErrorMessage() ? 'login-password-error' : null"
+        />
+        <p *ngIf="passwordErrorMessage()" id="login-password-error" class="login-page__error" role="alert">
+          {{ passwordErrorMessage() }}
+        </p>
+      </div>
+
+      <p *ngIf="formError" class="login-page__form-error" role="alert">{{ formError }}</p>
+
+      <button type="submit" class="login-page__submit" [disabled]="isSubmitting">
+        <span *ngIf="isSubmitting" class="login-page__spinner" aria-hidden="true"></span>
+        {{ isSubmitting ? 'Logging in…' : 'Login' }}
+      </button>
+    </form>
+  </div>
+</main>

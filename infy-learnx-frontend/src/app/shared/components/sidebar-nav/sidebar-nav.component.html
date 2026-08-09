@@ -1,0 +1,16 @@
+<div class="sidebar-nav__backdrop" *ngIf="isOpen" (click)="onBackdropClick()"></div>
+
+<nav class="sidebar-nav" [class.sidebar-nav--open]="isOpen" aria-label="Primary">
+  <ul class="sidebar-nav__list">
+    <li class="sidebar-nav__item" *ngFor="let item of navItems">
+      <a
+        class="sidebar-nav__link"
+        [routerLink]="'/' + item.route"
+        routerLinkActive="sidebar-nav__link--active"
+        (click)="onNavItemClick()"
+      >
+        <span class="sidebar-nav__label">{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+</nav>

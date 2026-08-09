@@ -1,0 +1,36 @@
+<app-page-header
+  pageTitle="Add Student"
+  [breadcrumbs]="[{ label: 'User Management', route: '/admin/users' }, { label: 'Add Student', route: '' }]"
+></app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="student-create__form">
+  <div *ngIf="formErrors.length > 0" class="student-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="student-create__field">
+    Full Name
+    <input type="text" formControlName="fullName" />
+    <span *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched" class="student-create__field-error">
+      {{ form.get('fullName')?.errors?.['serverError'] || 'Full name is required.' }}
+    </span>
+  </label>
+
+  <label class="student-create__field">
+    Email
+    <input type="email" formControlName="email" />
+    <span *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="student-create__field-error">
+      {{ form.get('email')?.errors?.['serverError'] || 'A valid email is required.' }}
+    </span>
+  </label>
+
+  <label class="student-create__field">
+    Batch (optional)
+    <select formControlName="batchId" [disabled]="isLoadingBatches">
+      <option value="">No batch</option>
+      <option *ngFor="let batch of batches" [value]="batch.batchId">{{ batch.batchName }}</option>
+    </select>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Adding…' : 'Add Student' }}</button>
+</form>

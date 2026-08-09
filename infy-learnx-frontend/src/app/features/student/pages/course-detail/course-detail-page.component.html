@@ -1,0 +1,121 @@
+<ng-container *ngIf="course">
+  <app-page-header
+    [pageTitle]="course.title"
+    [breadcrumbs]="[{ label: 'Courses', route: '/student/courses' }, { label: course.title, route: '' }]"
+  ></app-page-header>
+</ng-container>
+
+<app-skeleton-loader *ngIf="isLoadingCourse" type="card"></app-skeleton-loader>
+
+<div *ngIf="courseError" class="course-detail__error">
+  <p>{{ courseError }}</p>
+  <button type="button" (click)="retryCourse()">Retry</button>
+</div>
+
+<ng-container *ngIf="course && !isLoadingCourse">
+  <nav class="course-detail__tabs" aria-label="Course sections">
+    <button
+      type="button"
+      class="course-detail__tab"
+      [class.course-detail__tab--active]="activeTab === 'overview'"
+      (click)="selectTab('overview')"
+    >
+      Overview
+    </button>
+    <button
+      type="button"
+      class="course-detail__tab"
+      [class.course-detail__tab--active]="activeTab === 'materials'"
+      (click)="selectTab('materials')"
+    >
+      Modules and Materials
+    </button>
+    <button
+      type="button"
+      class="course-detail__tab"
+      [class.course-detail__tab--active]="activeTab === 'quizzes'"
+      (click)="selectTab('quizzes')"
+    >
+      Quizzes
+    </button>
+  </nav>
+
+  <section *ngIf="activeTab === 'overview'" class="course-detail__panel">
+    <dl class="course-detail__overview">
+      <dt>Course Code</dt>
+      <dd>{{ course.courseCode }}</dd>
+      <dt>Status</dt>
+      <dd>{{ course.status }}</dd>
+      <dt>Description</dt>
+      <dd>{{ course.description || 'No description available.' }}</dd>
+      <dt>Enrollment Status</dt>
+      <dd>{{ isEnrolled === null ? 'Not available' : isEnrolled ? 'Enrolled' : 'Not enrolled' }}</dd>
+    </dl>
+  </section>
+
+  <section *ngIf="activeTab === 'materials'" class="course-detail__panel">
+    <app-skeleton-loader *ngIf="isLoadingMaterials" type="table"></app-skeleton-loader>
+
+    <div *ngIf="materialsError" class="course-detail__error">
+      <p>{{ materialsError }}</p>
+    </div>
+
+    <app-empty-state
+      *ngIf="!isLoadingMaterials && !materialsError && materialGroups.length === 0"
+      message="No materials available for this course."
+    ></app-empty-state>
+
+    <div *ngFor="let group of materialGroups" class="course-detail__module-group">
+      <button
+        type="button"
+        class="course-detail__module-toggle"
+        (click)="toggleModule(group.moduleId)"
+        [attr.aria-expanded]="isModuleExpanded(group.moduleId)"
+      >
+        Module {{ group.moduleId }} ({{ group.materials.length }} items)
+      </button>
+      <ul *ngIf="isModuleExpanded(group.moduleId)" class="course-detail__material-list">
+        <li *ngFor="let material of group.materials">
+          <span>{{ material.title }}</span>
+          <span class="course-detail__badge">{{ material.materialType }}</span>
+          <a [href]="material.resourcePath" target="_blank" rel="noopener">Access</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section *ngIf="activeTab === 'quizzes'" class="course-detail__panel">
+    <app-skeleton-loader *ngIf="isLoadingQuizzes" type="table"></app-skeleton-loader>
+
+    <div *ngIf="quizzesError" class="course-detail__error">
+      <p>{{ quizzesError }}</p>
+      <button type="button" (click)="retryQuizzes()">Retry</button>
+    </div>
+
+    <app-empty-state
+      *ngIf="!isLoadingQuizzes && !quizzesError && quizzes.length === 0"
+      message="No quizzes available for this course."
+    ></app-empty-state>
+
+    <table *ngIf="!isLoadingQuizzes && quizzes.length > 0" class="course-detail__quiz-table">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Status</th>
+          <th scope="col">Scheduled At</th>
+          <th scope="col">Duration</th>
+          <th scope="col">Total Marks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let quiz of quizzes">
+          <td>{{ quiz.title }}</td>
+          <td><span class="course-detail__badge">{{ quiz.status }}</span></td>
+          <td>{{ quiz.scheduledAt || '—' }}</td>
+          <td>{{ quiz.durationMinutes }} min</td>
+          <td>{{ quiz.totalMarks }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</ng-container>

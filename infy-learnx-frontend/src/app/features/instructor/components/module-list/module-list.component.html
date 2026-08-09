@@ -1,0 +1,9 @@
+<app-empty-state *ngIf="modules.length === 0" message="No modules added yet."></app-empty-state>
+
+<ul *ngIf="modules.length > 0" class="module-list">
+  <li *ngFor="let module of modules" class="module-list__item">
+    <span class="module-list__order">{{ module.moduleOrder }}</span>
+    <span class="module-list__title">{{ module.title }}</span>
+    <span class="module-list__status">{{ module.status }}</span>
+  </li>
+</ul>

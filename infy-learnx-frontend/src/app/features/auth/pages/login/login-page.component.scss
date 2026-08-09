@@ -1,0 +1,110 @@
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-4);
+  background-color: var(--color-surface);
+
+  &__panel {
+    width: 100%;
+    max-width: 380px;
+    padding: var(--spacing-8);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-background);
+    box-shadow: var(--shadow-md);
+  }
+
+  &__title {
+    margin: 0 0 var(--spacing-6);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    text-align: center;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  &__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  &__input {
+    padding: var(--spacing-2) var(--spacing-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+
+    &:focus {
+      outline: 2px solid var(--color-focus-ring);
+      outline-offset: 1px;
+    }
+
+    &--invalid {
+      border-color: var(--color-error);
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--color-error);
+  }
+
+  &__form-error {
+    margin: 0;
+    padding: var(--spacing-3);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+  }
+
+  &__submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    border: none;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    font-weight: var(--font-weight-semibold);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-primary-hover);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: var(--color-text-on-primary);
+    border-radius: var(--radius-full);
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

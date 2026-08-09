@@ -1,0 +1,60 @@
+<app-page-header pageTitle="My Registrations"></app-page-header>
+
+<div class="my-registrations__filter">
+  <label for="registrations-status-filter">Status</label>
+  <select
+    id="registrations-status-filter"
+    [value]="statusFilter"
+    (change)="onStatusFilterChange($any($event.target).value)"
+  >
+    <option value="">All</option>
+    <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+  </select>
+</div>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="my-registrations__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <app-empty-state *ngIf="visibleRows.length === 0" message="No registrations found."></app-empty-state>
+
+  <table *ngIf="visibleRows.length > 0" class="my-registrations__table">
+    <thead>
+      <tr>
+        <th scope="col">Assessment Title</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">Status</th>
+        <th scope="col">Registered At</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let row of visibleRows"
+        app-registration-row
+        [registration]="row.registration"
+        [assessmentTitle]="row.assessmentTitle"
+        [assessmentStartTime]="row.assessmentStartTime"
+        [canCancel]="row.canCancel"
+        [canReRegister]="row.canReRegister"
+        [isActioning]="row.isActioning"
+        (cancel)="onCancel(row)"
+        (reRegister)="onReRegister(row)"
+      ></tr>
+    </tbody>
+  </table>
+
+  <app-pagination
+    *ngIf="visibleRows.length > 0"
+    [totalElements]="totalElements"
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</ng-container>

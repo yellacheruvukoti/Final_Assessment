@@ -1,0 +1,45 @@
+<app-page-header [pageTitle]="'Materials – ' + (courseTitle || '…')"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="accessDeniedMessage" class="course-materials__denied">
+  <p>{{ accessDeniedMessage }}</p>
+</div>
+
+<div *ngIf="errorMessage" class="course-materials__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !accessDeniedMessage && !errorMessage">
+  <app-empty-state
+    *ngIf="materialGroups.length === 0"
+    message="No materials available for this course."
+  ></app-empty-state>
+
+  <table *ngIf="materialGroups.length > 0" class="course-materials__table">
+    <thead>
+      <tr>
+        <th scope="col">Title</th>
+        <th scope="col">Type</th>
+        <th scope="col">Access Level</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let group of materialGroups">
+      <tr class="course-materials__group-header">
+        <td colspan="5">Module {{ group.moduleId }}</td>
+      </tr>
+      <tr *ngFor="let material of group.materials">
+        <td>{{ material.title }}</td>
+        <td><span class="course-materials__badge">{{ material.materialType }}</span></td>
+        <td>{{ material.accessLevel }}</td>
+        <td><span class="course-materials__badge">{{ material.status }}</span></td>
+        <td>
+          <a [href]="material.resourcePath" target="_blank" rel="noopener">Access</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

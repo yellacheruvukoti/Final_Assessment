@@ -1,0 +1,32 @@
+<div class="summary-tabs" role="tablist">
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="activeTab === 'overview'"
+    [class.summary-tabs__tab--active]="activeTab === 'overview'"
+    class="summary-tabs__tab"
+    (click)="tabChange.emit('overview')"
+  >
+    Overview
+  </button>
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="activeTab === 'byAssessment'"
+    [class.summary-tabs__tab--active]="activeTab === 'byAssessment'"
+    class="summary-tabs__tab"
+    (click)="tabChange.emit('byAssessment')"
+  >
+    By Assessment
+  </button>
+  <button
+    type="button"
+    role="tab"
+    [attr.aria-selected]="activeTab === 'byStatus'"
+    [class.summary-tabs__tab--active]="activeTab === 'byStatus'"
+    class="summary-tabs__tab"
+    (click)="tabChange.emit('byStatus')"
+  >
+    By Status
+  </button>
+</div>

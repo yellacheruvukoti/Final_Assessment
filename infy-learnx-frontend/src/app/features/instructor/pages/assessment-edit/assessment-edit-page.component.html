@@ -1,0 +1,89 @@
+<app-page-header
+  pageTitle="Edit Assessment"
+  [breadcrumbs]="[{ label: 'Assessment Management', route: '/instructor/assessments' }, { label: 'Edit Assessment', route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && loadError" class="assessment-edit__error">
+  <p>{{ loadError }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<form
+  *ngIf="!isLoading && !loadError"
+  [formGroup]="form"
+  (ngSubmit)="onSubmit()"
+  class="assessment-edit__form"
+>
+  <div *ngIf="formErrors.length > 0" class="assessment-edit__error" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="assessment-edit__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span
+      *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+      class="assessment-edit__field-error"
+    >
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="assessment-edit__field">
+    Description
+    <textarea formControlName="description" rows="3"></textarea>
+    <span
+      *ngIf="form.get('description')?.errors?.['serverError'] && form.get('description')?.touched"
+      class="assessment-edit__field-error"
+    >
+      {{ form.get('description')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="assessment-edit__field">
+    Status
+    <select formControlName="status">
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <label class="assessment-edit__field">
+    Start Time
+    <input type="datetime-local" formControlName="startTime" />
+    <span
+      *ngIf="form.get('startTime')?.errors?.['serverError'] && form.get('startTime')?.touched"
+      class="assessment-edit__field-error"
+    >
+      {{ form.get('startTime')?.errors?.['serverError'] }}
+    </span>
+  </label>
+
+  <label class="assessment-edit__field">
+    End Time
+    <input type="datetime-local" formControlName="endTime" />
+    <span
+      *ngIf="
+        form.get('endTime')?.touched &&
+        (form.get('endTime')?.errors?.['serverError'] || form.get('endTime')?.errors?.['endBeforeStart'])
+      "
+      class="assessment-edit__field-error"
+    >
+      {{ form.get('endTime')?.errors?.['serverError'] || 'End Time must be after Start Time.' }}
+    </span>
+  </label>
+
+  <label class="assessment-edit__field">
+    Duration (minutes)
+    <input type="number" formControlName="durationMinutes" />
+    <span
+      *ngIf="form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched"
+      class="assessment-edit__field-error"
+    >
+      {{ form.get('durationMinutes')?.errors?.['serverError'] || 'Duration must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Save Changes' }}</button>
+</form>

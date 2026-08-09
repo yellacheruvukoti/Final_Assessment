@@ -1,0 +1,44 @@
+<div class="data-table">
+  <app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+  <ng-container *ngIf="!isLoading">
+    <app-empty-state *ngIf="rows.length === 0" [message]="emptyMessage"></app-empty-state>
+
+    <table class="data-table__table" *ngIf="rows.length > 0">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns" scope="col">
+            <button
+              *ngIf="column.sortable; else plainHeader"
+              type="button"
+              class="data-table__sort-button"
+              (click)="onHeaderClick(column)"
+            >
+              {{ column.header }}
+              <span class="data-table__sort-indicator" aria-hidden="true">{{ sortIndicator(column) }}</span>
+            </button>
+            <ng-template #plainHeader>{{ column.header }}</ng-template>
+          </th>
+          <th *ngIf="actionsTemplate" scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td *ngFor="let column of columns">{{ cellValue(row, column.key) }}</td>
+          <td *ngIf="actionsTemplate">
+            <ng-container *ngTemplateOutlet="actionsTemplate; context: { $implicit: row }"></ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <app-pagination
+    [totalElements]="totalElements"
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</div>

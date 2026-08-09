@@ -1,0 +1,79 @@
+<app-page-header
+  pageTitle="Create Quiz"
+  [breadcrumbs]="[{ label: 'Quiz Management', route: '' }, { label: 'Create Quiz', route: '' }]"
+></app-page-header>
+
+<p *ngIf="!courseId" class="quiz-create__note">
+  No course was specified. Open this page via "New Quiz" from a course's Quiz Management page.
+</p>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="quiz-create__form">
+  <div *ngIf="formErrors.length > 0" class="quiz-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="quiz-create__field">
+    Title
+    <input type="text" formControlName="title" />
+    <span *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="quiz-create__field-error">
+      {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 150 characters.' }}
+    </span>
+  </label>
+
+  <label class="quiz-create__field">
+    Duration (minutes)
+    <input type="number" formControlName="durationMinutes" />
+    <span
+      *ngIf="form.get('durationMinutes')?.invalid && form.get('durationMinutes')?.touched"
+      class="quiz-create__field-error"
+    >
+      {{ form.get('durationMinutes')?.errors?.['serverError'] || 'Duration must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <label class="quiz-create__field">
+    Total Marks
+    <input type="number" formControlName="totalMarks" />
+    <span
+      *ngIf="form.get('totalMarks')?.invalid && form.get('totalMarks')?.touched"
+      class="quiz-create__field-error"
+    >
+      {{ form.get('totalMarks')?.errors?.['serverError'] || 'Total marks must be a positive whole number.' }}
+    </span>
+  </label>
+
+  <label class="quiz-create__field">
+    Scheduled At (optional)
+    <input type="datetime-local" formControlName="scheduledAt" />
+    <span
+      *ngIf="form.get('scheduledAt')?.invalid && form.get('scheduledAt')?.touched"
+      class="quiz-create__field-error"
+    >
+      {{ form.get('scheduledAt')?.errors?.['serverError'] || 'Scheduled time must be in the future.' }}
+    </span>
+  </label>
+
+  <section class="quiz-create__questions">
+    <h2 class="quiz-create__questions-title">Questions</h2>
+
+    <app-quiz-question-block
+      *ngFor="let question of questionGroups; let i = index"
+      [questionGroup]="question"
+      [index]="i"
+      (removeQuestion)="onRemoveQuestion(i)"
+    ></app-quiz-question-block>
+
+    <span
+      *ngIf="questionsArray.invalid && questionsArray.touched"
+      class="quiz-create__field-error"
+    >
+      At least one question is required.
+    </span>
+
+    <button type="button" (click)="onAddQuestion()">Add Question</button>
+  </section>
+
+  <button type="submit" [disabled]="isSubmitting || !courseId">
+    {{ isSubmitting ? 'Creating…' : 'Create Quiz' }}
+  </button>
+</form>

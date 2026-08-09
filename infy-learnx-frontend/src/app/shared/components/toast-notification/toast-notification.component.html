@@ -1,0 +1,20 @@
+<ng-container *ngIf="toast$ | async as toast">
+  <div
+    *ngIf="toast.visible"
+    class="toast"
+    [ngClass]="'toast--' + toast.type"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="toast__indicator" aria-hidden="true"></span>
+    <span class="toast__message">{{ toast.message }}</span>
+    <button
+      type="button"
+      class="toast__close"
+      (click)="dismiss()"
+      aria-label="Dismiss notification"
+    >
+      &times;
+    </button>
+  </div>
+</ng-container>

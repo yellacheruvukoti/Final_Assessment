@@ -1,0 +1,34 @@
+<app-page-header pageTitle="Course Catalog"></app-page-header>
+
+<app-course-catalog-filters
+  [status]="status"
+  [searchValue]="search"
+  (statusChange)="onStatusChange($event)"
+  (searchSubmit)="onSearchSubmit($event)"
+  (clearFilters)="onClearFilters()"
+></app-course-catalog-filters>
+
+<div *ngIf="errorMessage" class="course-catalog__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-data-table
+  *ngIf="!errorMessage"
+  [columns]="columns"
+  [rows]="visibleCourses"
+  [isLoading]="isLoading"
+  emptyMessage="No courses found."
+  [currentSort]="currentSort"
+  [totalElements]="totalElements"
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  (sortChange)="onSortChange($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+>
+  <ng-template let-row>
+    <a [routerLink]="courseDetailRoute(row.courseId)">View</a>
+  </ng-template>
+</app-data-table>

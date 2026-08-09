@@ -1,0 +1,45 @@
+<app-page-header pageTitle="Upcoming Assessments"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="upcoming-assessments__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <app-empty-state *ngIf="visibleRows.length === 0" message="No upcoming assessments."></app-empty-state>
+
+  <table *ngIf="visibleRows.length > 0" class="upcoming-assessments__table">
+    <thead>
+      <tr>
+        <th scope="col">Assessment Code</th>
+        <th scope="col">Title</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">End Time</th>
+        <th scope="col">Duration</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let row of visibleRows"
+        app-assessment-row
+        [assessment]="row.assessment"
+        [isRegistered]="row.isRegistered"
+        [isRegistering]="row.isRegistering"
+        (register)="onRegister(row)"
+      ></tr>
+    </tbody>
+  </table>
+
+  <app-pagination
+    *ngIf="visibleRows.length > 0"
+    [totalElements]="totalElements"
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</ng-container>

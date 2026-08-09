@@ -1,0 +1,17 @@
+<td>{{ assessment.assessmentCode }}</td>
+<td>{{ assessment.title }}</td>
+<td>{{ assessment.startTime }}</td>
+<td>{{ assessment.endTime }}</td>
+<td>{{ assessment.durationMinutes }} min</td>
+<td>
+  <button
+    *ngIf="!isRegistered"
+    type="button"
+    class="assessment-row__button"
+    [disabled]="isRegistering"
+    (click)="register.emit()"
+  >
+    {{ isRegistering ? 'Registering…' : 'Register' }}
+  </button>
+  <span *ngIf="isRegistered" class="assessment-row__registered">Registered</span>
+</td>

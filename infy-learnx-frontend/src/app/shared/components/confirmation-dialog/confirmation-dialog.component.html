@@ -1,0 +1,30 @@
+<div class="confirmation-dialog__backdrop">
+  <div
+    #panel
+    class="confirmation-dialog__panel"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirmation-dialog-title"
+    aria-describedby="confirmation-dialog-body"
+  >
+    <h2 id="confirmation-dialog-title" class="confirmation-dialog__title">{{ title }}</h2>
+    <p id="confirmation-dialog-body" class="confirmation-dialog__body">{{ bodyMessage }}</p>
+    <div class="confirmation-dialog__actions">
+      <button
+        type="button"
+        class="confirmation-dialog__button confirmation-dialog__button--secondary"
+        (click)="onCancel()"
+      >
+        {{ cancelLabel }}
+      </button>
+      <button
+        #confirmButton
+        type="button"
+        class="confirmation-dialog__button confirmation-dialog__button--primary"
+        (click)="onConfirm()"
+      >
+        {{ confirmLabel }}
+      </button>
+    </div>
+  </div>
+</div>

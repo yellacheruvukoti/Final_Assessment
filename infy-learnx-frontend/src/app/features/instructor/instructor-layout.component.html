@@ -1,0 +1,31 @@
+<div class="layout">
+  <app-sidebar-nav
+    [navItems]="navItems"
+    [isOpen]="isSidebarOpen"
+    (closeRequested)="onSidebarCloseRequested()"
+  ></app-sidebar-nav>
+
+  <div class="layout__main">
+    <header class="layout__header">
+      <button
+        type="button"
+        class="layout__hamburger"
+        (click)="toggleSidebar()"
+        aria-label="Toggle navigation menu"
+      >
+        ☰
+      </button>
+
+      <span class="layout__app-name">Infy_LearnX</span>
+
+      <div class="layout__user">
+        <span *ngIf="role$ | async as role" class="layout__user-role">{{ role }}</span>
+        <button type="button" class="layout__logout" (click)="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="layout__content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

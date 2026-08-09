@@ -1,0 +1,19 @@
+<div class="performance-filters">
+  <label class="performance-filters__field">
+    Course
+    <select [value]="selectedCourseId" (change)="courseChange.emit($any($event.target).value)">
+      <option value="">All courses</option>
+      <option *ngFor="let course of courseOptions" [value]="course.courseId">{{ course.title }}</option>
+    </select>
+  </label>
+
+  <label class="performance-filters__field">
+    Module
+    <select disabled>
+      <option value="">Not available</option>
+    </select>
+    <span class="performance-filters__note">
+      No backend endpoint returns module-level or per-student performance data.
+    </span>
+  </label>
+</div>

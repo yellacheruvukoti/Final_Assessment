@@ -1,0 +1,15 @@
+<div class="skeleton-loader" [ngSwitch]="type" aria-hidden="true">
+  <div *ngSwitchCase="'table'" class="skeleton-loader__table">
+    <div class="skeleton-loader__row" *ngFor="let row of tableRows">
+      <span class="skeleton-loader__bar skeleton-loader__bar--short"></span>
+      <span class="skeleton-loader__bar skeleton-loader__bar--long"></span>
+      <span class="skeleton-loader__bar skeleton-loader__bar--medium"></span>
+    </div>
+  </div>
+
+  <div *ngSwitchCase="'card'" class="skeleton-loader__card"></div>
+
+  <div *ngSwitchCase="'form'" class="skeleton-loader__form">
+    <span class="skeleton-loader__bar skeleton-loader__bar--input" *ngFor="let block of formBlocks"></span>
+  </div>
+</div>

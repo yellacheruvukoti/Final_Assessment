@@ -1,0 +1,39 @@
+<app-page-header pageTitle="Course Management"></app-page-header>
+
+<div class="course-management__toolbar">
+  <label class="course-management__filter">
+    Status
+    <select [value]="status" (change)="onStatusChange($any($event.target).value)">
+      <option value="">All</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <a [routerLink]="courseCreateRoute" class="course-management__new-button">New Course</a>
+</div>
+
+<div *ngIf="errorMessage" class="course-management__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-data-table
+  *ngIf="!errorMessage"
+  [columns]="columns"
+  [rows]="visibleCourses"
+  [isLoading]="isLoading"
+  emptyMessage="No courses found."
+  [currentSort]="currentSort"
+  [totalElements]="totalElements"
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  (sortChange)="onSortChange($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+>
+  <ng-template let-row>
+    <a [routerLink]="moduleManagementRoute(row.courseId)">View</a>
+    <a [routerLink]="courseEditRoute(row.courseId)">Edit</a>
+  </ng-template>
+</app-data-table>

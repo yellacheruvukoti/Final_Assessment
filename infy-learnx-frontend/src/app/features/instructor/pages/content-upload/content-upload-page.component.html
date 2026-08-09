@@ -1,0 +1,89 @@
+<app-page-header
+  [pageTitle]="'Materials – ' + (courseTitle || '…')"
+  [breadcrumbs]="[{ label: 'Course Management', route: '/instructor/courses' }, { label: courseTitle || 'Materials', route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoadingCourse" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoadingCourse && courseError" class="content-upload__error">
+  <p>{{ courseError }}</p>
+  <button type="button" (click)="retryCourse()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoadingCourse && !courseError">
+  <p *ngIf="modules.length === 0" class="content-upload__note">
+    No modules found for this course in this session. Add a module from Module Management first.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="content-upload__form">
+    <div *ngIf="formErrors.length > 0" class="content-upload__error" role="alert">
+      <p *ngFor="let message of formErrors">{{ message }}</p>
+    </div>
+
+    <label class="content-upload__field">
+      Title
+      <input type="text" formControlName="title" />
+      <span
+        *ngIf="form.get('title')?.invalid && form.get('title')?.touched"
+        class="content-upload__field-error"
+      >
+        {{ form.get('title')?.errors?.['serverError'] || 'Title must be between 3 and 200 characters.' }}
+      </span>
+    </label>
+
+    <label class="content-upload__field">
+      Module
+      <select formControlName="moduleId">
+        <option value="" disabled>Select a module</option>
+        <option *ngFor="let module of modules" [value]="module.moduleId">{{ module.title }}</option>
+      </select>
+      <span
+        *ngIf="form.get('moduleId')?.invalid && form.get('moduleId')?.touched"
+        class="content-upload__field-error"
+      >
+        {{ form.get('moduleId')?.errors?.['serverError'] || 'Module is required.' }}
+      </span>
+    </label>
+
+    <label class="content-upload__field">
+      Material Type
+      <select formControlName="materialType">
+        <option value="" disabled>Select a type</option>
+        <option *ngFor="let option of materialTypeOptions" [value]="option">{{ option }}</option>
+      </select>
+      <span
+        *ngIf="form.get('materialType')?.invalid && form.get('materialType')?.touched"
+        class="content-upload__field-error"
+      >
+        {{ form.get('materialType')?.errors?.['serverError'] || 'Material type is required.' }}
+      </span>
+    </label>
+
+    <label class="content-upload__field">
+      Resource Path
+      <input type="text" formControlName="resourcePath" placeholder="https://... or /content/..." />
+      <span
+        *ngIf="form.get('resourcePath')?.invalid && form.get('resourcePath')?.touched"
+        class="content-upload__field-error"
+      >
+        {{ form.get('resourcePath')?.errors?.['serverError'] || 'Resource path is required.' }}
+      </span>
+    </label>
+
+    <label class="content-upload__field">
+      Access Level
+      <select formControlName="accessLevel">
+        <option value="" disabled>Select access level</option>
+        <option *ngFor="let option of accessLevelOptions" [value]="option">{{ option }}</option>
+      </select>
+      <span
+        *ngIf="form.get('accessLevel')?.invalid && form.get('accessLevel')?.touched"
+        class="content-upload__field-error"
+      >
+        {{ form.get('accessLevel')?.errors?.['serverError'] || 'Access level is required.' }}
+      </span>
+    </label>
+
+    <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Uploading…' : 'Add Material' }}</button>
+  </form>
+</ng-container>

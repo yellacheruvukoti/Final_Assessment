@@ -1,0 +1,47 @@
+<app-page-header pageTitle="Quiz Management"></app-page-header>
+
+<div class="quiz-management__toolbar">
+  <label class="quiz-management__filter">
+    Status
+    <select [value]="status" (change)="onStatusFilterChange($any($event.target).value)">
+      <option value="">All</option>
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <a [routerLink]="quizCreateRoute" [queryParams]="{ courseId: courseId }" class="quiz-management__new-button"
+    >New Quiz</a
+  >
+</div>
+
+<div *ngIf="errorMessage" class="quiz-management__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-data-table
+  *ngIf="!errorMessage"
+  [columns]="columns"
+  [rows]="visibleQuizzes"
+  [isLoading]="isLoading"
+  emptyMessage="No quizzes found."
+  [currentSort]="currentSort"
+  [totalElements]="totalElements"
+  [totalPages]="totalPages"
+  [currentPage]="currentPage"
+  [pageSize]="pageSize"
+  (sortChange)="onSortChange($event)"
+  (pageChange)="onPageChange($event)"
+  (pageSizeChange)="onPageSizeChange($event)"
+>
+  <ng-template let-row>
+    <a [routerLink]="quizEditRoute(row.quizId)">Edit</a>
+    <select
+      [value]="row.status"
+      [disabled]="isUpdating(row.quizId)"
+      (change)="onRowStatusChange(row, $any($event.target).value)"
+    >
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </ng-template>
+</app-data-table>

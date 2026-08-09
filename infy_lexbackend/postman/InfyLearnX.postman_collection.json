@@ -1,0 +1,925 @@
+{
+  "info": {
+    "name": "Infy_LearnX Platform",
+    "description": "Full endpoint coverage for the Infy_LearnX microservices platform, run through api-gateway (http://localhost:8080), except one request that deliberately targets user-service directly (http://localhost:8081) because /api/batches is an internal, non-gateway-routed contract by design (see docs/traceability-and-compliance-review.md). All CREATE requests use dynamic values so the collection is safely re-runnable. Note: the platform has no DELETE endpoints anywhere in its design (api-contract.md defines only GET/POST/PUT/PATCH) — lifecycle changes use status transitions (cancel/reregister/revoke) instead of hard deletes, per data-model.md's persistence guidelines.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userServiceDirectUrl", "value": "http://localhost:8081" },
+    { "key": "userId_student1", "value": "aaaa0001-0001-0001-0001-aaaaaaaaaaaa" },
+    { "key": "userId_instructor1", "value": "aaaa0002-0002-0002-0002-aaaaaaaaaaaa" },
+    { "key": "userId_admin1", "value": "aaaa0003-0003-0003-0003-aaaaaaaaaaaa" },
+    { "key": "userId_student2_inactive", "value": "aaaa0004-0004-0004-0004-aaaaaaaaaaaa" },
+    { "key": "studentId_1", "value": "5dbd0001-0001-0001-0001-5dbd00000001" },
+    { "key": "studentId_2_inactive", "value": "5dbd0002-0002-0002-0002-5dbd00000002" },
+    { "key": "instructorId_1", "value": "1e5d0001-0001-0001-0001-1e5d00000001" },
+    { "key": "administratorId_1", "value": "adce0001-0001-0001-0001-adce00000001" },
+    { "key": "batchId_1", "value": "cccc0001-0001-0001-0001-cccccccccccc" },
+    { "key": "assessmentId_upcoming", "value": "bbbb0001-0001-0001-0001-bbbbbbbbbbbb" },
+    { "key": "assessmentId_closed", "value": "bbbb0003-0003-0003-0003-bbbbbbbbbbbb" },
+    { "key": "courseId_1", "value": "ca500001-0001-0001-0001-ca5000000001" },
+    { "key": "newAssessmentId", "value": "" },
+    { "key": "newAssessmentId_started", "value": "" },
+    { "key": "newCourseId", "value": "" },
+    { "key": "newModuleId", "value": "" },
+    { "key": "newQuizId", "value": "" },
+    { "key": "newRegistrationId", "value": "" },
+    { "key": "newCertificateId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 Platform",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('status UP', () => pm.expect(pm.response.json().data.status).to.eql('UP'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/health","host":["{{baseUrl}}"],"path":["api","health"]}}
+        },
+        {
+          "name": "GET /api/version",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('platform name present', () => pm.expect(pm.response.json().data.platform).to.eql('Infy_LearnX'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/version","host":["{{baseUrl}}"],"path":["api","version"]}}
+        }
+      ]
+    },
+    {
+      "name": "02 User Service",
+      "item": [
+        {
+          "name": "GET /api/users/{userId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('role is STUDENT', () => pm.expect(pm.response.json().data.role).to.eql('STUDENT'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/users/{{userId_student1}}","host":["{{baseUrl}}"],"path":["api","users","{{userId_student1}}"]}}
+        },
+        {
+          "name": "GET /api/users/{userId}/role",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/users/{{userId_student1}}/role","host":["{{baseUrl}}"],"path":["api","users","{{userId_student1}}","role"]}}
+        },
+        {
+          "name": "GET /api/users/{userId}/status",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/users/{{userId_student1}}/status","host":["{{baseUrl}}"],"path":["api","users","{{userId_student1}}","status"]}}
+        },
+        {
+          "name": "GET /api/users/{userId} - not found",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code USER_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('USER_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000","host":["{{baseUrl}}"],"path":["api","users","00000000-0000-0000-0000-000000000000"]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('studentCode present', () => pm.expect(pm.response.json().data.studentCode).to.eql('STU-0001'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_1}}","host":["{{baseUrl}}"],"path":["api","students","{{studentId_1}}"]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}/batch",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('batchCode present', () => pm.expect(pm.response.json().data.batchCode).to.eql('BATCH-2024-A'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_1}}/batch","host":["{{baseUrl}}"],"path":["api","students","{{studentId_1}}","batch"]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}/status",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('active true', () => pm.expect(pm.response.json().data.active).to.eql(true));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_1}}/status","host":["{{baseUrl}}"],"path":["api","students","{{studentId_1}}","status"]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}/status - inactive student",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('active false', () => pm.expect(pm.response.json().data.active).to.eql(false));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_2_inactive}}/status","host":["{{baseUrl}}"],"path":["api","students","{{studentId_2_inactive}}","status"]}}
+        },
+        {
+          "name": "GET /api/students?batchId= (internal, via gateway catch-all)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('returns array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students?batchId={{batchId_1}}","host":["{{baseUrl}}"],"path":["api","students"],"query":[{"key":"batchId","value":"{{batchId_1}}"}]}}
+        },
+        {
+          "name": "GET /api/students/by-user/{userId} (internal, via gateway catch-all)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/by-user/{{userId_student1}}","host":["{{baseUrl}}"],"path":["api","students","by-user","{{userId_student1}}"]}}
+        },
+        {
+          "name": "GET /api/instructors/{instructorId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('instructorCode present', () => pm.expect(pm.response.json().data.instructorCode).to.eql('INS-0001'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/instructors/{{instructorId_1}}","host":["{{baseUrl}}"],"path":["api","instructors","{{instructorId_1}}"]}}
+        },
+        {
+          "name": "GET /api/instructors/by-user/{userId} (internal, via gateway catch-all)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/instructors/by-user/{{userId_instructor1}}","host":["{{baseUrl}}"],"path":["api","instructors","by-user","{{userId_instructor1}}"]}}
+        },
+        {
+          "name": "GET /api/administrators/{administratorId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('adminCode present', () => pm.expect(pm.response.json().data.adminCode).to.eql('ADM-0001'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/administrators/{{administratorId_1}}","host":["{{baseUrl}}"],"path":["api","administrators","{{administratorId_1}}"]}}
+        },
+        {
+          "name": "GET /api/batches/{batchId} (internal, direct-to-service - NOT gateway routed by design)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('batchCode present', () => pm.expect(pm.response.json().data.batchCode).to.eql('BATCH-2024-A'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{userServiceDirectUrl}}/api/batches/{{batchId_1}}","host":["{{userServiceDirectUrl}}"],"path":["api","batches","{{batchId_1}}"]}}
+        }
+      ]
+    },
+    {
+      "name": "03 Assessment Service",
+      "item": [
+        {
+          "name": "GET /api/assessments",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('returns array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/assessments","host":["{{baseUrl}}"],"path":["api","assessments"]}}
+        },
+        {
+          "name": "GET /api/assessments/upcoming",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('all results PUBLISHED', function () {",
+            "    var data = pm.response.json().data;",
+            "    data.forEach(function (a) { pm.expect(a.status).to.eql('PUBLISHED'); });",
+            "  });",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/assessments/upcoming","host":["{{baseUrl}}"],"path":["api","assessments","upcoming"]}}
+        },
+        {
+          "name": "GET /api/assessments/{assessmentId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('assessmentCode ASM-0001', () => pm.expect(pm.response.json().data.assessmentCode).to.eql('ASM-0001'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/assessments/{{assessmentId_upcoming}}","host":["{{baseUrl}}"],"path":["api","assessments","{{assessmentId_upcoming}}"]}}
+        },
+        {
+          "name": "GET /api/assessments/{assessmentId} - not found",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code ASSESSMENT_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('ASSESSMENT_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/assessments/00000000-0000-0000-0000-000000000000","host":["{{baseUrl}}"],"path":["api","assessments","00000000-0000-0000-0000-000000000000"]}}
+        },
+        {
+          "name": "GET /api/assessments/{assessmentId} - malformed id",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 400', () => pm.response.to.have.status(400));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/assessments/not-a-valid-uuid","host":["{{baseUrl}}"],"path":["api","assessments","not-a-valid-uuid"]}}
+        },
+        {
+          "name": "POST /api/assessments",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newAssessmentId', data.assessmentId);",
+            "  pm.test('status PUBLISHED', () => pm.expect(data.status).to.eql('PUBLISHED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"assessmentCode\": \"ASM-POSTMAN-{{$timestamp}}\",\n  \"title\": \"Postman Verification Assessment\",\n  \"description\": \"Created by the automated Postman verification pass\",\n  \"status\": \"PUBLISHED\",\n  \"startTime\": \"2030-01-01T09:00:00\",\n  \"endTime\": \"2030-01-01T11:00:00\",\n  \"durationMinutes\": 60,\n  \"scopeType\": \"BATCH\",\n  \"scopeId\": \"{{batchId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/assessments","host":["{{baseUrl}}"],"path":["api","assessments"]}
+          }
+        },
+        {
+          "name": "POST /api/assessments - validation error",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 400', () => pm.response.to.have.status(400));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{}"},
+            "url":{"raw":"{{baseUrl}}/api/assessments","host":["{{baseUrl}}"],"path":["api","assessments"]}
+          }
+        },
+        {
+          "name": "PUT /api/assessments/{assessmentId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('title updated', () => pm.expect(pm.response.json().data.title).to.eql('Postman Verification Assessment (Updated)'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"PUT",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"title\": \"Postman Verification Assessment (Updated)\",\n  \"description\": \"Updated by the automated Postman verification pass\",\n  \"status\": \"PUBLISHED\",\n  \"startTime\": \"2030-01-01T09:00:00\",\n  \"endTime\": \"2030-01-01T11:00:00\",\n  \"durationMinutes\": 90\n}"},
+            "url":{"raw":"{{baseUrl}}/api/assessments/{{newAssessmentId}}","host":["{{baseUrl}}"],"path":["api","assessments","{{newAssessmentId}}"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Registration Service",
+      "item": [
+        {
+          "name": "POST /api/registrations",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newRegistrationId', data.registrationId);",
+            "  pm.test('status REGISTERED', () => pm.expect(data.status).to.eql('REGISTERED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{newAssessmentId}}\",\n  \"sourceChannel\": \"WEB\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "POST /api/registrations - validation error",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 400', () => pm.response.to.have.status(400));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "POST /api/registrations - duplicate",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 409', () => pm.response.to.have.status(409));",
+            "  pm.test('error code DUPLICATE_REGISTRATION', () => pm.expect(pm.response.json().error.code).to.eql('DUPLICATE_REGISTRATION'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{newAssessmentId}}\",\n  \"sourceChannel\": \"WEB\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "POST /api/registrations - inactive student",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code STUDENT_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('STUDENT_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_2_inactive}}\",\n  \"assessmentId\": \"{{assessmentId_upcoming}}\",\n  \"sourceChannel\": \"WEB\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "POST /api/registrations - assessment not published (CLOSED)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 422', () => pm.response.to.have.status(422));",
+            "  pm.test('error code ASSESSMENT_NOT_UPCOMING', () => pm.expect(pm.response.json().error.code).to.eql('ASSESSMENT_NOT_UPCOMING'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{assessmentId_closed}}\",\n  \"sourceChannel\": \"WEB\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "POST /api/assessments - create already-started (setup)",
+          "event": [
+            {"listen":"prerequest","script":{"type":"text/javascript","exec":[
+              "(function () {",
+              "  function pad(n) { return n < 10 ? '0' + n : '' + n; }",
+              "  var past = new Date(Date.now() - 5 * 60 * 1000);",
+              "  var iso = past.getFullYear() + '-' + pad(past.getMonth() + 1) + '-' + pad(past.getDate()) +",
+              "    'T' + pad(past.getHours()) + ':' + pad(past.getMinutes()) + ':' + pad(past.getSeconds());",
+              "  pm.collectionVariables.set('pastStartTime', iso);",
+              "})();"
+            ]}},
+            {"listen":"test","script":{"type":"text/javascript","exec":[
+              "(function () {",
+              "  pm.test('status 201', () => pm.response.to.have.status(201));",
+              "  pm.collectionVariables.set('newAssessmentId_started', pm.response.json().data.assessmentId);",
+              "})();"
+            ]}}
+          ],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"assessmentCode\": \"ASM-POSTMAN-STARTED-{{$timestamp}}\",\n  \"title\": \"Postman Already-Started Assessment\",\n  \"description\": \"Dynamically created so this negative test never depends on seeded/clock-relative timestamps\",\n  \"status\": \"PUBLISHED\",\n  \"startTime\": \"{{pastStartTime}}\",\n  \"endTime\": \"2030-01-01T00:00:00\",\n  \"durationMinutes\": 60,\n  \"scopeType\": \"BATCH\",\n  \"scopeId\": \"{{batchId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/assessments","host":["{{baseUrl}}"],"path":["api","assessments"]}
+          }
+        },
+        {
+          "name": "POST /api/registrations - assessment already started (PUBLISHED, past start)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 422', () => pm.response.to.have.status(422));",
+            "  pm.test('error code ASSESSMENT_ALREADY_STARTED', () => pm.expect(pm.response.json().error.code).to.eql('ASSESSMENT_ALREADY_STARTED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{newAssessmentId_started}}\",\n  \"sourceChannel\": \"WEB\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/registrations","host":["{{baseUrl}}"],"path":["api","registrations"]}
+          }
+        },
+        {
+          "name": "GET /api/registrations/{registrationId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/{{newRegistrationId}}","host":["{{baseUrl}}"],"path":["api","registrations","{{newRegistrationId}}"]}}
+        },
+        {
+          "name": "GET /api/registrations/{registrationId} - not found",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code REGISTRATION_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('REGISTRATION_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/00000000-0000-0000-0000-000000000000","host":["{{baseUrl}}"],"path":["api","registrations","00000000-0000-0000-0000-000000000000"]}}
+        },
+        {
+          "name": "GET /api/registrations?studentIds= (internal, via gateway catch-all)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('returns array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/registrations?studentIds={{studentId_1}}","host":["{{baseUrl}}"],"path":["api","registrations"],"query":[{"key":"studentIds","value":"{{studentId_1}}"}]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}/registrations",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('returns array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_1}}/registrations","host":["{{baseUrl}}"],"path":["api","students","{{studentId_1}}","registrations"]}}
+        },
+        {
+          "name": "PATCH /api/registrations/{registrationId}/cancel",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('status CANCELLED', () => pm.expect(pm.response.json().data.status).to.eql('CANCELLED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"PATCH","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/{{newRegistrationId}}/cancel","host":["{{baseUrl}}"],"path":["api","registrations","{{newRegistrationId}}","cancel"]}}
+        },
+        {
+          "name": "PATCH /api/registrations/{registrationId}/cancel - already cancelled",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 409', () => pm.response.to.have.status(409));",
+            "  pm.test('error code REGISTRATION_CANCELLED', () => pm.expect(pm.response.json().error.code).to.eql('REGISTRATION_CANCELLED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"PATCH","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/{{newRegistrationId}}/cancel","host":["{{baseUrl}}"],"path":["api","registrations","{{newRegistrationId}}","cancel"]}}
+        },
+        {
+          "name": "PATCH /api/registrations/{registrationId}/reregister",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('status REGISTERED', () => pm.expect(pm.response.json().data.status).to.eql('REGISTERED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"PATCH","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/{{newRegistrationId}}/reregister","host":["{{baseUrl}}"],"path":["api","registrations","{{newRegistrationId}}","reregister"]}}
+        },
+        {
+          "name": "PATCH /api/registrations/{registrationId}/reregister - already active",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 422', () => pm.response.to.have.status(422));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {"method":"PATCH","header":[],"url":{"raw":"{{baseUrl}}/api/registrations/{{newRegistrationId}}/reregister","host":["{{baseUrl}}"],"path":["api","registrations","{{newRegistrationId}}","reregister"]}}
+        }
+      ]
+    },
+    {
+      "name": "05 Summary Service",
+      "item": [
+        {
+          "name": "GET /api/summaries/batches/{batchId} - administrator",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('totals present', function () {",
+            "    var data = pm.response.json().data;",
+            "    pm.expect(data.totalRegistered).to.be.a('number');",
+            "    pm.expect(data.totalCancelled).to.be.a('number');",
+            "  });",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/summaries/batches/{{batchId_1}}","host":["{{baseUrl}}"],"path":["api","summaries","batches","{{batchId_1}}"]}}
+        },
+        {
+          "name": "GET /api/summaries/batches/{batchId}/assessments - administrator",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('assessments array present', () => pm.expect(pm.response.json().data.assessments).to.be.an('array'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/summaries/batches/{{batchId_1}}/assessments","host":["{{baseUrl}}"],"path":["api","summaries","batches","{{batchId_1}}","assessments"]}}
+        },
+        {
+          "name": "GET /api/summaries/batches/{batchId}/status - administrator",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/summaries/batches/{{batchId_1}}/status","host":["{{baseUrl}}"],"path":["api","summaries","batches","{{batchId_1}}","status"]}}
+        },
+        {
+          "name": "GET /api/summaries/batches/{batchId} - owner instructor",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"INSTRUCTOR"},{"key":"X-User-Id","value":"{{userId_instructor1}}"}],"url":{"raw":"{{baseUrl}}/api/summaries/batches/{{batchId_1}}","host":["{{baseUrl}}"],"path":["api","summaries","batches","{{batchId_1}}"]}}
+        },
+        {
+          "name": "GET /api/summaries/batches/{batchId} - unauthorized student",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 403', () => pm.response.to.have.status(403));",
+            "  pm.test('error code SUMMARY_ACCESS_DENIED', () => pm.expect(pm.response.json().error.code).to.eql('SUMMARY_ACCESS_DENIED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"STUDENT"},{"key":"X-User-Id","value":"{{userId_student1}}"}],"url":{"raw":"{{baseUrl}}/api/summaries/batches/{{batchId_1}}","host":["{{baseUrl}}"],"path":["api","summaries","batches","{{batchId_1}}"]}}
+        }
+      ]
+    },
+    {
+      "name": "06 Learning Service",
+      "item": [
+        {
+          "name": "GET /api/courses",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('all PUBLISHED', function () {",
+            "    var data = pm.response.json().data;",
+            "    data.forEach(function (c) { pm.expect(c.status).to.eql('PUBLISHED'); });",
+            "  });",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/courses","host":["{{baseUrl}}"],"path":["api","courses"]}}
+        },
+        {
+          "name": "GET /api/courses/{courseId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('courseCode CRS-0001', () => pm.expect(pm.response.json().data.courseCode).to.eql('CRS-0001'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/courses/{{courseId_1}}","host":["{{baseUrl}}"],"path":["api","courses","{{courseId_1}}"]}}
+        },
+        {
+          "name": "GET /api/courses/{courseId} - not found",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code COURSE_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('COURSE_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/courses/00000000-0000-0000-0000-000000000000","host":["{{baseUrl}}"],"path":["api","courses","00000000-0000-0000-0000-000000000000"]}}
+        },
+        {
+          "name": "POST /api/courses",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newCourseId', data.courseId);",
+            "  pm.test('status DRAFT', () => pm.expect(data.status).to.eql('DRAFT'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"courseCode\": \"CRS-POSTMAN-{{$timestamp}}\",\n  \"title\": \"Postman Verification Course\",\n  \"description\": \"Created by the automated Postman verification pass\",\n  \"instructorId\": \"{{instructorId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses","host":["{{baseUrl}}"],"path":["api","courses"]}
+          }
+        },
+        {
+          "name": "POST /api/courses - validation error",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 400', () => pm.response.to.have.status(400));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{}"},
+            "url":{"raw":"{{baseUrl}}/api/courses","host":["{{baseUrl}}"],"path":["api","courses"]}
+          }
+        },
+        {
+          "name": "PUT /api/courses/{courseId} - publish",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  var data = pm.response.json().data;",
+            "  pm.test('status PUBLISHED', () => pm.expect(data.status).to.eql('PUBLISHED'));",
+            "  pm.test('publishedAt set', () => pm.expect(data.publishedAt).to.not.be.null);",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"PUT",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"title\": \"Postman Verification Course (Published)\",\n  \"description\": \"Now published\",\n  \"status\": \"PUBLISHED\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}"]}
+          }
+        },
+        {
+          "name": "POST /api/courses/{courseId}/modules",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newModuleId', data.moduleId);",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"title\": \"Postman Module 1\",\n  \"moduleOrder\": 1\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/modules","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","modules"]}
+          }
+        },
+        {
+          "name": "POST /api/courses/{courseId}/modules - unauthorized instructor",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 403', () => pm.response.to.have.status(403));",
+            "  pm.test('error code COURSE_ACCESS_DENIED', () => pm.expect(pm.response.json().error.code).to.eql('COURSE_ACCESS_DENIED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"INSTRUCTOR"},{"key":"X-User-Id","value":"{{userId_student1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"title\": \"Should Be Rejected\",\n  \"moduleOrder\": 2\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/modules","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","modules"]}
+          }
+        },
+        {
+          "name": "POST /api/courses/{courseId}/materials",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 201', () => pm.response.to.have.status(201)); })();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"moduleId\": \"{{newModuleId}}\",\n  \"title\": \"Postman Material 1\",\n  \"materialType\": \"PDF\",\n  \"resourcePath\": \"/content/postman-test.pdf\",\n  \"accessLevel\": \"ENROLLED_ONLY\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/materials","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","materials"]}
+          }
+        },
+        {
+          "name": "GET /api/courses/{courseId}/materials - administrator",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/courses/{{courseId_1}}/materials","host":["{{baseUrl}}"],"path":["api","courses","{{courseId_1}}","materials"]}}
+        },
+        {
+          "name": "GET /api/courses/{courseId}/materials - not enrolled student",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 403', () => pm.response.to.have.status(403));",
+            "  pm.test('error code COURSE_NOT_ENROLLED', () => pm.expect(pm.response.json().error.code).to.eql('COURSE_NOT_ENROLLED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"STUDENT"},{"key":"X-User-Id","value":"{{userId_student1}}"}],"url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/materials","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","materials"]}}
+        },
+        {
+          "name": "POST /api/courses/{courseId}/enrollments",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  pm.test('status ACTIVE', () => pm.expect(pm.response.json().data.enrollmentStatus).to.eql('ACTIVE'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/enrollments","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","enrollments"]}
+          }
+        },
+        {
+          "name": "GET /api/courses/{courseId}/materials - now-enrolled student",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"STUDENT"},{"key":"X-User-Id","value":"{{userId_student1}}"}],"url":{"raw":"{{baseUrl}}/api/courses/{{newCourseId}}/materials","host":["{{baseUrl}}"],"path":["api","courses","{{newCourseId}}","materials"]}}
+        },
+        {
+          "name": "GET /api/courses/{courseId}/quizzes",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/courses/{{courseId_1}}/quizzes","host":["{{baseUrl}}"],"path":["api","courses","{{courseId_1}}","quizzes"]}}
+        },
+        {
+          "name": "GET /api/courses/{courseId}/progress/{studentId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/courses/{{courseId_1}}/progress/{{studentId_1}}","host":["{{baseUrl}}"],"path":["api","courses","{{courseId_1}}","progress","{{studentId_1}}"]}}
+        },
+        {
+          "name": "POST /api/quizzes",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newQuizId', data.quizId);",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"courseId\": \"{{newCourseId}}\",\n  \"title\": \"Postman Quiz 1\",\n  \"durationMinutes\": 30,\n  \"totalMarks\": 10,\n  \"ownerInstructorId\": \"{{instructorId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/quizzes","host":["{{baseUrl}}"],"path":["api","quizzes"]}
+          }
+        },
+        {
+          "name": "PUT /api/quizzes/{quizId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('status PUBLISHED', () => pm.expect(pm.response.json().data.status).to.eql('PUBLISHED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"PUT",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"title\": \"Postman Quiz 1 (Updated)\",\n  \"status\": \"PUBLISHED\",\n  \"durationMinutes\": 45,\n  \"totalMarks\": 15\n}"},
+            "url":{"raw":"{{baseUrl}}/api/quizzes/{{newQuizId}}","host":["{{baseUrl}}"],"path":["api","quizzes","{{newQuizId}}"]}
+          }
+        },
+        {
+          "name": "GET /api/quizzes/{quizId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/quizzes/{{newQuizId}}","host":["{{baseUrl}}"],"path":["api","quizzes","{{newQuizId}}"]}}
+        },
+        {
+          "name": "POST /api/quizzes/{quizId}/questions",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 201', () => pm.response.to.have.status(201)); })();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"},{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],
+            "body":{"mode":"raw","raw":"{\n  \"questionText\": \"What does JVM stand for?\",\n  \"questionType\": \"MCQ\",\n  \"difficultyLevel\": \"EASY\",\n  \"marks\": 2,\n  \"optionSet\": \"A:Java Virtual Machine,B:Java Verified Method,C:Just Virtual Memory,D:None\",\n  \"correctAnswerKey\": \"A\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/quizzes/{{newQuizId}}/questions","host":["{{baseUrl}}"],"path":["api","quizzes","{{newQuizId}}","questions"]}
+          }
+        },
+        {
+          "name": "GET /api/quizzes/{quizId}/questions",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('at least one question', () => pm.expect(pm.response.json().data.length).to.be.above(0));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/quizzes/{{newQuizId}}/questions","host":["{{baseUrl}}"],"path":["api","quizzes","{{newQuizId}}","questions"]}}
+        },
+        {
+          "name": "GET /api/instructors/{instructorId}/performance",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('totalCourses is a number', () => pm.expect(pm.response.json().data.totalCourses).to.be.a('number'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[{"key":"X-Role","value":"ADMINISTRATOR"},{"key":"X-User-Id","value":"{{userId_admin1}}"}],"url":{"raw":"{{baseUrl}}/api/instructors/{{instructorId_1}}/performance","host":["{{baseUrl}}"],"path":["api","instructors","{{instructorId_1}}","performance"]}}
+        }
+      ]
+    },
+    {
+      "name": "07 Certification Service",
+      "item": [
+        {
+          "name": "POST /api/certificates",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 201', () => pm.response.to.have.status(201));",
+            "  var data = pm.response.json().data;",
+            "  pm.collectionVariables.set('newCertificateId', data.certificateId);",
+            "  pm.test('status ISSUED', () => pm.expect(data.status).to.eql('ISSUED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{newAssessmentId}}\",\n  \"score\": 88.0\n}"},
+            "url":{"raw":"{{baseUrl}}/api/certificates","host":["{{baseUrl}}"],"path":["api","certificates"]}
+          }
+        },
+        {
+          "name": "POST /api/certificates - already issued",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 409', () => pm.response.to.have.status(409));",
+            "  pm.test('error code CERTIFICATE_ALREADY_ISSUED', () => pm.expect(pm.response.json().error.code).to.eql('CERTIFICATE_ALREADY_ISSUED'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{newAssessmentId}}\",\n  \"score\": 90.0\n}"},
+            "url":{"raw":"{{baseUrl}}/api/certificates","host":["{{baseUrl}}"],"path":["api","certificates"]}
+          }
+        },
+        {
+          "name": "POST /api/certificates - score below threshold",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 422', () => pm.response.to.have.status(422));",
+            "  pm.test('error code SCORE_BELOW_THRESHOLD', () => pm.expect(pm.response.json().error.code).to.eql('SCORE_BELOW_THRESHOLD'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\",\n  \"assessmentId\": \"{{assessmentId_closed}}\",\n  \"score\": 35.0\n}"},
+            "url":{"raw":"{{baseUrl}}/api/certificates","host":["{{baseUrl}}"],"path":["api","certificates"]}
+          }
+        },
+        {
+          "name": "POST /api/certificates - validation error",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 400', () => pm.response.to.have.status(400));",
+            "  pm.test('error code VALIDATION_ERROR', () => pm.expect(pm.response.json().error.code).to.eql('VALIDATION_ERROR'));",
+            "})();"
+          ]}}],
+          "request": {
+            "method":"POST",
+            "header":[{"key":"Content-Type","value":"application/json"}],
+            "body":{"mode":"raw","raw":"{\n  \"studentId\": \"{{studentId_1}}\"\n}"},
+            "url":{"raw":"{{baseUrl}}/api/certificates","host":["{{baseUrl}}"],"path":["api","certificates"]}
+          }
+        },
+        {
+          "name": "GET /api/certificates/{certificateId}",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () { pm.test('status 200', () => pm.response.to.have.status(200)); })();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/certificates/{{newCertificateId}}","host":["{{baseUrl}}"],"path":["api","certificates","{{newCertificateId}}"]}}
+        },
+        {
+          "name": "GET /api/certificates/{certificateId} - not found",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 404', () => pm.response.to.have.status(404));",
+            "  pm.test('error code CERTIFICATE_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('CERTIFICATE_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/certificates/00000000-0000-0000-0000-000000000000","host":["{{baseUrl}}"],"path":["api","certificates","00000000-0000-0000-0000-000000000000"]}}
+        },
+        {
+          "name": "GET /api/certificates/{certificateId}/download",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('downloadToken present', () => pm.expect(pm.response.json().data.downloadToken).to.match(/^dlt-/));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/certificates/{{newCertificateId}}/download","host":["{{baseUrl}}"],"path":["api","certificates","{{newCertificateId}}","download"]}}
+        },
+        {
+          "name": "GET /api/students/{studentId}/certificates",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('at least one certificate', () => pm.expect(pm.response.json().data.length).to.be.above(0));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/students/{{studentId_1}}/certificates","host":["{{baseUrl}}"],"path":["api","students","{{studentId_1}}","certificates"]}}
+        },
+        {
+          "name": "PATCH /api/certificates/{certificateId}/revoke",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 200', () => pm.response.to.have.status(200));",
+            "  pm.test('status REVOKED', () => pm.expect(pm.response.json().data.status).to.eql('REVOKED'));",
+            "})();"
+          ]}}],
+          "request": {"method":"PATCH","header":[],"url":{"raw":"{{baseUrl}}/api/certificates/{{newCertificateId}}/revoke","host":["{{baseUrl}}"],"path":["api","certificates","{{newCertificateId}}","revoke"]}}
+        },
+        {
+          "name": "GET /api/certificates/{certificateId}/download - after revoke",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "(function () {",
+            "  pm.test('status 403', () => pm.response.to.have.status(403));",
+            "  pm.test('error code CERTIFICATE_NOT_FOUND', () => pm.expect(pm.response.json().error.code).to.eql('CERTIFICATE_NOT_FOUND'));",
+            "})();"
+          ]}}],
+          "request": {"method":"GET","header":[],"url":{"raw":"{{baseUrl}}/api/certificates/{{newCertificateId}}/download","host":["{{baseUrl}}"],"path":["api","certificates","{{newCertificateId}}","download"]}}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+<app-page-header pageTitle="My Certificates"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="my-certificates__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <app-empty-state *ngIf="visibleRows.length === 0" message="No certificates yet."></app-empty-state>
+
+  <table *ngIf="visibleRows.length > 0" class="my-certificates__table">
+    <thead>
+      <tr>
+        <th scope="col">Assessment</th>
+        <th scope="col">Issued At</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let row of visibleRows"
+        app-certificate-row
+        [certificate]="row.certificate"
+        [assessmentTitle]="row.assessmentTitle"
+        [isDownloading]="row.isDownloading"
+        (download)="onDownload(row)"
+      ></tr>
+    </tbody>
+  </table>
+
+  <app-pagination
+    *ngIf="visibleRows.length > 0"
+    [totalElements]="totalElements"
+    [totalPages]="totalPages"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</ng-container>

@@ -1,0 +1,25 @@
+<td>{{ assessmentTitle || registration.assessmentId }}</td>
+<td>{{ assessmentStartTime || '—' }}</td>
+<td><span class="registration-row__badge">{{ registration.status }}</span></td>
+<td>{{ registration.registeredAt }}</td>
+<td>
+  <button
+    *ngIf="canCancel"
+    type="button"
+    class="registration-row__button"
+    [disabled]="isActioning"
+    (click)="cancel.emit()"
+  >
+    {{ isActioning ? 'Cancelling…' : 'Cancel' }}
+  </button>
+  <button
+    *ngIf="canReRegister"
+    type="button"
+    class="registration-row__button"
+    [disabled]="isActioning"
+    (click)="reRegister.emit()"
+  >
+    {{ isActioning ? 'Re-registering…' : 'Re-register' }}
+  </button>
+  <span *ngIf="!canCancel && !canReRegister" class="registration-row__none">—</span>
+</td>

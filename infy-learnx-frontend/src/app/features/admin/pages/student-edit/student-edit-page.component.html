@@ -1,0 +1,50 @@
+<app-page-header
+  pageTitle="Edit Student"
+  [breadcrumbs]="[{ label: 'User Management', route: '/admin/users' }, { label: 'Edit Student', route: '' }]"
+></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && loadError" class="student-edit__error">
+  <p>{{ loadError }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<form *ngIf="!isLoading && !loadError" [formGroup]="form" (ngSubmit)="onSubmit()" class="student-edit__form">
+  <div *ngIf="formErrors.length > 0" class="student-edit__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="student-edit__field">
+    Full Name
+    <input type="text" formControlName="fullName" />
+    <span *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched" class="student-edit__field-error">
+      {{ form.get('fullName')?.errors?.['serverError'] || 'Full name is required.' }}
+    </span>
+  </label>
+
+  <label class="student-edit__field">
+    Email
+    <input type="email" formControlName="email" />
+    <span *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="student-edit__field-error">
+      {{ form.get('email')?.errors?.['serverError'] || 'A valid email is required.' }}
+    </span>
+  </label>
+
+  <label class="student-edit__field">
+    Batch (optional)
+    <select formControlName="batchId">
+      <option value="">No batch</option>
+      <option *ngFor="let batch of batches" [value]="batch.batchId">{{ batch.batchName }}</option>
+    </select>
+  </label>
+
+  <label class="student-edit__field">
+    Status
+    <select formControlName="status">
+      <option *ngFor="let option of statusOptions" [value]="option">{{ option }}</option>
+    </select>
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Save Changes' }}</button>
+</form>

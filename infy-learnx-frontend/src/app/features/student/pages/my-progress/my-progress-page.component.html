@@ -1,0 +1,22 @@
+<app-page-header pageTitle="My Progress"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="card"></app-skeleton-loader>
+
+<div *ngIf="!isLoading && hasError" class="my-progress__error">
+  <p>Couldn't load your progress.</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<app-empty-state
+  *ngIf="!isLoading && !hasError && groups.length === 0"
+  message="You are not enrolled in any courses yet."
+></app-empty-state>
+
+<div *ngIf="!isLoading && !hasError && groups.length > 0" class="my-progress__list">
+  <app-course-progress-row
+    *ngFor="let group of groups"
+    [group]="group"
+    [isExpanded]="isExpanded(group.courseId)"
+    (toggleExpand)="toggleExpand(group.courseId)"
+  ></app-course-progress-row>
+</div>

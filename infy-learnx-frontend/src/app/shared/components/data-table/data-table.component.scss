@@ -1,0 +1,44 @@
+.data-table {
+  &__table {
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: var(--spacing-3) var(--spacing-4);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-sm);
+  }
+
+  th {
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-semibold);
+    background-color: var(--color-surface);
+  }
+
+  td {
+    color: var(--color-text-primary);
+  }
+
+  &__sort-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: 0;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-weight: inherit;
+    color: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text-primary);
+    }
+  }
+
+  &__sort-indicator {
+    font-size: var(--font-size-xs);
+  }
+}
