@@ -1,0 +1,91 @@
+<section class="assessment-quiz-manager">
+  <div class="assessment-quiz-manager__header">
+    <h2>Quizzes</h2>
+    <button type="button" (click)="toggleNewQuizForm()">{{ showNewQuizForm ? 'Cancel' : 'Add Quiz' }}</button>
+  </div>
+
+  <form *ngIf="showNewQuizForm" [formGroup]="newQuizForm" class="assessment-quiz-manager__new-quiz" (ngSubmit)="submitNewQuiz()">
+    <label class="assessment-quiz-manager__field">
+      Quiz Title
+      <input type="text" formControlName="title" />
+    </label>
+    <label class="assessment-quiz-manager__field">
+      Duration (minutes)
+      <input type="number" formControlName="durationMinutes" />
+    </label>
+    <label class="assessment-quiz-manager__field">
+      Total Marks
+      <input type="number" formControlName="totalMarks" />
+    </label>
+
+    <div formArrayName="questions">
+      <app-quiz-question-block
+        *ngFor="let group of newQuizQuestionGroups; let i = index"
+        [questionGroup]="group"
+        [index]="i"
+        (removeQuestion)="onRemoveNewQuizQuestion(i)"
+      ></app-quiz-question-block>
+    </div>
+    <button type="button" (click)="onAddNewQuizQuestion()">Add Question</button>
+    <span *ngIf="newQuizQuestionsArray.invalid && newQuizQuestionsArray.touched" class="assessment-quiz-manager__field-error">
+      At least one question is required.
+    </span>
+
+    <div class="assessment-quiz-manager__actions">
+      <button type="submit" [disabled]="isSubmittingNewQuiz">{{ isSubmittingNewQuiz ? 'Saving…' : 'Save Quiz' }}</button>
+    </div>
+  </form>
+
+  <app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+  <div *ngIf="loadError" class="assessment-quiz-manager__error">{{ loadError }}</div>
+  <app-empty-state
+    *ngIf="!isLoading && !loadError && quizzes.length === 0"
+    message="No quizzes added to this assessment yet."
+  ></app-empty-state>
+
+  <div *ngFor="let quiz of quizzes" class="assessment-quiz-manager__quiz">
+    <button type="button" class="assessment-quiz-manager__quiz-toggle" (click)="toggleQuiz(quiz)">
+      {{ quiz.title }} — {{ quiz.status }} · {{ quiz.durationMinutes }} min · {{ quiz.totalMarks }} marks
+    </button>
+
+    <div *ngIf="expandedQuizId === quiz.quizId" class="assessment-quiz-manager__questions">
+      <app-skeleton-loader *ngIf="isLoadingQuestions" type="table"></app-skeleton-loader>
+
+      <ng-container *ngFor="let question of questionsByQuiz.get(quiz.quizId)">
+        <div *ngIf="editingQuestionId !== question.questionId" class="assessment-quiz-manager__question-row">
+          <div>
+            <p class="assessment-quiz-manager__question-text">{{ question.questionText }}</p>
+            <p class="assessment-quiz-manager__question-meta">{{ question.optionSet }} (correct: {{ question.correctAnswerKey }})</p>
+          </div>
+          <div class="assessment-quiz-manager__question-actions">
+            <button type="button" (click)="startEditQuestion(question)">Edit</button>
+            <button type="button" (click)="removeQuestion(quiz.quizId, question)">Remove</button>
+          </div>
+        </div>
+
+        <form
+          *ngIf="editingQuestionId === question.questionId && editQuestionForm as form"
+          [formGroup]="form"
+          (ngSubmit)="submitEditQuestion(quiz.quizId)"
+        >
+          <app-quiz-question-block [questionGroup]="form" [index]="0" [showRemoveButton]="false"></app-quiz-question-block>
+          <div class="assessment-quiz-manager__actions">
+            <button type="submit">Save Question</button>
+            <button type="button" (click)="cancelEditQuestion()">Cancel</button>
+          </div>
+        </form>
+      </ng-container>
+
+      <form
+        *ngIf="addQuestionForm(quiz.quizId) as addForm"
+        [formGroup]="addForm"
+        (ngSubmit)="submitAddQuestion(quiz.quizId)"
+        class="assessment-quiz-manager__add-question"
+      >
+        <h3>Add Question</h3>
+        <app-quiz-question-block [questionGroup]="addForm" [index]="0" [showRemoveButton]="false"></app-quiz-question-block>
+        <button type="submit">Add Question</button>
+      </form>
+    </div>
+  </div>
+</section>

@@ -17,6 +17,8 @@ export const AppRoutes = {
     courseMaterials: (courseId: string): string => `student/courses/${courseId}/materials`,
     progress: 'student/progress',
     courseQuizzes: (courseId: string): string => `student/courses/${courseId}/quizzes`,
+    assessmentQuizzes: (assessmentId: string): string => `student/assessments/${assessmentId}/quizzes`,
+    quizAttempt: (quizId: string): string => `student/quizzes/${quizId}/attempt`,
     assessments: 'student/assessments',
     registrations: 'student/registrations',
     certificates: 'student/certificates',
@@ -48,6 +50,7 @@ export const AppRoutes = {
     studentEdit: (userId: string): string => `admin/users/students/${userId}/edit`,
     instructorCreate: 'admin/users/instructors/new',
     instructorEdit: (userId: string): string => `admin/users/instructors/${userId}/edit`,
+    batchCreate: 'admin/batches/new',
     certificates: 'admin/certificates',
   },
 } as const;

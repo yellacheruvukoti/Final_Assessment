@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class UserServiceClient {
 
     private static final String STUDENT_STATUS_URL = "http://user-service/api/students/{studentId}/status";
+    private static final String STUDENT_BATCH_URL = "http://user-service/api/students/{studentId}/batch";
 
     private final RestTemplate restTemplate;
 
@@ -46,6 +47,33 @@ public class UserServiceClient {
             throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "DEPENDENCY_UNAVAILABLE",
                     "user-service is temporarily unavailable. Please try again shortly.");
         }
+    }
+
+    /**
+     * Resolves the student's Batch for BATCH-scoped assessment access checks
+     * (requirement 23). Reuses the existing
+     * GET /api/students/{studentId}/batch endpoint.
+     */
+    @CircuitBreaker(name = "userService", fallbackMethod = "getStudentBatchIdFallback")
+    public UUID getStudentBatchId(UUID studentId) {
+        try {
+            ResponseEntity<ApiResponse<StudentBatchInfo>> response = restTemplate.exchange(
+                    STUDENT_BATCH_URL, HttpMethod.GET, null,
+                    new ParameterizedTypeReference<ApiResponse<StudentBatchInfo>>() {
+                    }, studentId);
+            ApiResponse<StudentBatchInfo> body = response.getBody();
+            return body == null || body.getData() == null ? null : body.getData().getBatchId();
+        } catch (HttpClientErrorException.NotFound ex) {
+            return null;
+        } catch (RestClientException ex) {
+            throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "DEPENDENCY_UNAVAILABLE",
+                    "user-service is temporarily unavailable. Please try again shortly.");
+        }
+    }
+
+    private UUID getStudentBatchIdFallback(UUID studentId, Throwable throwable) {
+        throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "DEPENDENCY_UNAVAILABLE",
+                "user-service is temporarily unavailable. Please try again shortly.");
     }
 
     /**

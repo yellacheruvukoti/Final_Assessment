@@ -1,4 +1,4 @@
-<app-page-header [pageTitle]="'Materials – ' + (courseTitle || '…')"></app-page-header>
+<app-page-header [pageTitle]="'Learning – ' + (courseTitle || '…')"></app-page-header>
 
 <app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
 
@@ -13,33 +13,60 @@
 
 <ng-container *ngIf="!isLoading && !accessDeniedMessage && !errorMessage">
   <app-empty-state
-    *ngIf="materialGroups.length === 0"
-    message="No materials available for this course."
+    *ngIf="flatLessons.length === 0"
+    message="No lessons available for this course."
   ></app-empty-state>
 
-  <table *ngIf="materialGroups.length > 0" class="course-materials__table">
-    <thead>
-      <tr>
-        <th scope="col">Title</th>
-        <th scope="col">Type</th>
-        <th scope="col">Access Level</th>
-        <th scope="col">Status</th>
-        <th scope="col">Action</th>
-      </tr>
-    </thead>
-    <tbody *ngFor="let group of materialGroups">
-      <tr class="course-materials__group-header">
-        <td colspan="5">Module {{ group.moduleId }}</td>
-      </tr>
-      <tr *ngFor="let material of group.materials">
-        <td>{{ material.title }}</td>
-        <td><span class="course-materials__badge">{{ material.materialType }}</span></td>
-        <td>{{ material.accessLevel }}</td>
-        <td><span class="course-materials__badge">{{ material.status }}</span></td>
-        <td>
-          <a [href]="material.resourcePath" target="_blank" rel="noopener">Access</a>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <div *ngIf="flatLessons.length > 0" class="course-materials__progress">
+    Course progress: {{ courseProgressPercentage }}%
+  </div>
+
+  <div *ngIf="flatLessons.length > 0" class="course-materials__layout">
+    <nav class="course-materials__nav" aria-label="Course modules and lessons">
+      <div *ngFor="let group of moduleGroups" class="course-materials__nav-module">
+        <button
+          type="button"
+          class="course-materials__nav-module-toggle"
+          (click)="toggleModule(group.module.moduleId)"
+          [attr.aria-expanded]="isModuleExpanded(group.module.moduleId)"
+        >
+          {{ group.module.title }}
+        </button>
+        <ul *ngIf="isModuleExpanded(group.module.moduleId)" class="course-materials__nav-lesson-list">
+          <li *ngFor="let material of group.materials">
+            <button
+              type="button"
+              class="course-materials__nav-lesson"
+              [class.course-materials__nav-lesson--active]="material.materialId === selectedMaterialId"
+              (click)="selectLesson(material)"
+            >
+              {{ material.title }}
+            </button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="course-materials__content" *ngIf="selectedMaterial as material">
+      <p class="course-materials__module-label">{{ selectedModuleTitle }}</p>
+      <h2 class="course-materials__lesson-title">{{ material.title }}</h2>
+      <p class="course-materials__lesson-meta">
+        <span class="course-materials__badge">{{ material.materialType }}</span>
+        <span class="course-materials__badge">{{ material.accessLevel }}</span>
+      </p>
+      <a class="course-materials__lesson-resource" [href]="material.resourcePath" target="_blank" rel="noopener">
+        Open lesson content
+      </a>
+
+      <div class="course-materials__lesson-actions">
+        <button type="button" [disabled]="isMarkingComplete" (click)="markComplete()">
+          {{ isMarkingComplete ? 'Saving…' : 'Mark as Complete' }}
+        </button>
+        <div class="course-materials__nav-buttons">
+          <button type="button" [disabled]="!hasPrevious" (click)="previousLesson()">Previous Lesson</button>
+          <button type="button" [disabled]="!hasNext" (click)="nextLesson()">Next Lesson</button>
+        </div>
+      </div>
+    </main>
+  </div>
 </ng-container>

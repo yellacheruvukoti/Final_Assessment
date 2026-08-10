@@ -1,6 +1,6 @@
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { QuestionType } from '../../../core/models/quiz-question.model';
+import { QuestionType, QuizQuestionResponse } from '../../../core/models/quiz-question.model';
 import { CreateQuizQuestionRequest } from '../../../core/models/quiz-request.model';
 import { correctKeyMatchesOptionValidator } from '../../../shared/validators/correct-key-matches.validator';
 import { minOptionsValidator } from '../../../shared/validators/min-options.validator';
@@ -57,4 +57,28 @@ export function toQuizQuestionRequest(question: Record<string, unknown>): Create
 
 function letterFor(index: number): string {
   return String.fromCharCode(65 + index);
+}
+
+// Reverse of toQuizQuestionRequest: parses a real QuizQuestionResponse's
+// "A:label,B:label" optionSet / letter correctAnswerKey back into the form's
+// internal representation (option labels + the label text of the correct
+// option) so an existing question can be loaded into buildQuizQuestionGroup
+// for editing.
+export function patchQuizQuestionGroup(group: FormGroup, question: QuizQuestionResponse): void {
+  const optionLabels = question.optionSet.split(',').map((pair) => pair.split(':').slice(1).join(':'));
+  const options = group.get('options') as FormArray;
+  while (options.length > 0) {
+    options.removeAt(0);
+  }
+  optionLabels.forEach((label) => options.push(new FormControl(label, Validators.required)));
+
+  const correctIndex = question.optionSet.split(',').findIndex((pair) => pair.startsWith(`${question.correctAnswerKey}:`));
+  const correctLabel = correctIndex >= 0 ? optionLabels[correctIndex] : '';
+
+  group.patchValue({
+    questionText: question.questionText,
+    questionType: question.questionType,
+    marks: question.marks,
+    correctAnswerKey: correctLabel,
+  });
 }

@@ -20,8 +20,9 @@ import lombok.Setter;
 @Builder
 public class QuizCreateRequest {
 
-    @NotNull
     private UUID courseId;
+
+    private UUID assessmentId;
 
     @NotBlank
     @Size(min = 3, max = 150)

@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
 import { AdminLayoutComponent } from './admin-layout.component';
 import { AdminRoutingModule } from './admin-routing.module';
+import { BatchCreatePageComponent } from './pages/batch-create/batch-create-page.component';
 import { AdminDashboardPageComponent } from './pages/dashboard/admin-dashboard-page.component';
 import { CertificateManagementPageComponent } from './pages/certificate-management/certificate-management-page.component';
 import { InstructorCreatePageComponent } from './pages/instructor-create/instructor-create-page.component';
@@ -21,6 +22,7 @@ import { UserManagementPageComponent } from './pages/user-management/user-manage
     StudentEditPageComponent,
     InstructorCreatePageComponent,
     InstructorEditPageComponent,
+    BatchCreatePageComponent,
   ],
   imports: [SharedModule, AdminRoutingModule],
 })

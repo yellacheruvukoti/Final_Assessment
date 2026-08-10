@@ -7,7 +7,8 @@ import { QuizStatus } from './quiz.model';
 // `POST /api/quizzes/{quizId}/questions` endpoint using
 // CreateQuizQuestionRequest below, once the quiz's id is known.
 export interface CreateQuizRequest {
-  courseId: string;
+  courseId?: string | null;
+  assessmentId?: string | null;
   title: string;
   scheduledAt: string | null;
   durationMinutes: number;

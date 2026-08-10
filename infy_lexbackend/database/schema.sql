@@ -91,10 +91,15 @@ INSERT IGNORE INTO users VALUES
   ('aaaa0003-0003-0003-0003-aaaaaaaaaaaa','USR-0003','Carol Admin','carol@infy.com','ADMINISTRATOR','ACTIVE',NOW(),NOW()),
   ('aaaa0004-0004-0004-0004-aaaaaaaaaaaa','USR-0004','Dave Inactive','dave@infy.com','STUDENT','INACTIVE',NOW(),NOW());
 
+-- Default batches (requirement: Java, BigData, AI as real DB records, not
+-- frontend-hardcoded dropdown values). Admin can add more later via
+-- POST /api/batches — they appear in every batch dropdown automatically.
 INSERT IGNORE INTO batches VALUES
-  ('cccc0001-0001-0001-0001-cccccccccccc','BATCH-2024-A','Java Full Stack 2024 Batch A',
+  ('cccc0001-0001-0001-0001-cccccccccccc','BATCH-JAVA','Java',
    'aaaa0002-0002-0002-0002-aaaaaaaaaaaa','2024-01-15','2024-06-30','ACTIVE',NOW(),NOW()),
-  ('cccc0002-0002-0002-0002-cccccccccccc','BATCH-2024-B','Java Full Stack 2024 Batch B',
+  ('cccc0002-0002-0002-0002-cccccccccccc','BATCH-BIGDATA','BigData',
+   'aaaa0002-0002-0002-0002-aaaaaaaaaaaa','2024-07-01',NULL,'ACTIVE',NOW(),NOW()),
+  ('cccc0003-0003-0003-0003-cccccccccccc','BATCH-AI','AI',
    'aaaa0002-0002-0002-0002-aaaaaaaaaaaa','2024-07-01',NULL,'ACTIVE',NOW(),NOW());
 
 INSERT IGNORE INTO students VALUES

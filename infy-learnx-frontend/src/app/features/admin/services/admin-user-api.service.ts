@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { ApiRoutes } from '../../../core/constants/api-routes.constants';
 import { UserRole } from '../../../core/constants/role.constants';
 import { ApiResponse } from '../../../core/models/api-response.model';
-import { BatchResponse } from '../../../core/models/batch.model';
+import { BatchResponse, CreateBatchRequest } from '../../../core/models/batch.model';
 import { InstructorResponse } from '../../../core/models/instructor.model';
 import { StudentResponse } from '../../../core/models/student.model';
 import {
@@ -124,6 +124,13 @@ export class AdminUserApiService {
     const url = `${environment.apiBaseUrl}/${ApiRoutes.batches.list}`;
     return this.http
       .get<ApiResponse<BatchResponse[]>>(url)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  createBatch(request: CreateBatchRequest): Observable<BatchResponse> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.batches.list}`;
+    return this.http
+      .post<ApiResponse<BatchResponse>>(url, request)
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
 }

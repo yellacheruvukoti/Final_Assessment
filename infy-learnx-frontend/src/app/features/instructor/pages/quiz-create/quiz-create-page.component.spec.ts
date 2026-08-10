@@ -24,6 +24,7 @@ describe('QuizCreatePageComponent', () => {
   const createdQuiz = {
     quizId: 'q1',
     courseId: 'c1',
+    assessmentId: null,
     title: 'New Quiz',
     status: QuizStatus.DRAFT,
     scheduledAt: null,

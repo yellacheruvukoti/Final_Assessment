@@ -9,6 +9,7 @@ import { CourseResponse, CourseStatus } from '../../../core/models/course.model'
 import { CourseEnrollmentResponse } from '../../../core/models/enrollment.model';
 import { InstructorResponse } from '../../../core/models/instructor.model';
 import { LearningMaterialResponse } from '../../../core/models/material.model';
+import { CourseModuleResponse } from '../../../core/models/module.model';
 import { LearnerProgressResponse } from '../../../core/models/progress.model';
 import { QuizResponse } from '../../../core/models/quiz.model';
 import { UserResponse } from '../../../core/models/user.model';
@@ -52,6 +53,27 @@ export class CourseApiService {
     const url = `${environment.apiBaseUrl}/${ApiRoutes.courses.materials(courseId)}`;
     return this.http
       .get<ApiResponse<LearningMaterialResponse[]>>(url)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  getCourseModules(courseId: string): Observable<CourseModuleResponse[]> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.courses.modules(courseId)}`;
+    return this.http
+      .get<ApiResponse<CourseModuleResponse[]>>(url)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  enrollInCourse(courseId: string, studentId: string): Observable<CourseEnrollmentResponse> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.courses.enrollments(courseId)}`;
+    return this.http
+      .post<ApiResponse<CourseEnrollmentResponse>>(url, { studentId })
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  markLessonComplete(courseId: string, materialId: string): Observable<LearnerProgressResponse[]> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.courses.materialComplete(courseId, materialId)}`;
+    return this.http
+      .post<ApiResponse<LearnerProgressResponse[]>>(url, {})
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
 

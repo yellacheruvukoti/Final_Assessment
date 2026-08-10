@@ -61,12 +61,20 @@ export const ApiRoutes = {
       `courses/${courseId}/progress/${studentId}`,
     enrollments: (courseId: string): string => `courses/${courseId}/enrollments`,
     enrollmentsForStudent: (studentId: string): string => `courses/enrollments/student/${studentId}`,
+    materialComplete: (courseId: string, materialId: string): string =>
+      `courses/${courseId}/materials/${materialId}/complete`,
   },
 
   quizzes: {
     create: 'quizzes',
+    list: 'quizzes',
     byId: (quizId: string): string => `quizzes/${quizId}`,
     questions: (quizId: string): string => `quizzes/${quizId}/questions`,
+    question: (quizId: string, questionId: string): string => `quizzes/${quizId}/questions/${questionId}`,
+    attempts: (quizId: string): string => `quizzes/${quizId}/attempts`,
+    myAttempt: (quizId: string): string => `quizzes/${quizId}/attempts/me`,
+    assessmentProgress: (assessmentId: string, studentId: string): string =>
+      `quizzes/assessment-progress/${assessmentId}/${studentId}`,
   },
 
   assessments: {

@@ -19,15 +19,6 @@ const INITIAL_CARD: SummaryCardState = { isLoading: true, hasError: false, value
 // GET /api/courses/{courseId}/quizzes across those same owned course ids.
 // All three therefore share one retry path (loadPerformance()); this is a
 // real dependency, not a shortcut.
-//
-// KNOWN BACKEND GAP: "Active Registrations" has no honest data source.
-// Registrations are only listable by studentIds (registration-service's
-// GET /api/registrations, and even that is an internal, not
-// gateway-intended contract) or by batchId (summary-service, requires a
-// batchId the instructor has no self-service way to discover). Nothing
-// lets an instructor query "registrations for assessments scoped to my
-// courses." Rendered as an honest "Not available" card rather than a fake
-// count.
 @Component({
   selector: 'app-instructor-dashboard-page',
   templateUrl: './instructor-dashboard-page.component.html',
@@ -39,7 +30,6 @@ export class InstructorDashboardPageComponent implements OnInit {
   coursesCard: SummaryCardState = { ...INITIAL_CARD };
   quizzesCard: SummaryCardState = { ...INITIAL_CARD };
   learnersCard: SummaryCardState = { ...INITIAL_CARD };
-  readonly registrationsCard: SummaryCardState = { isLoading: false, hasError: false, value: null, isUnavailable: true };
 
   recentCourses: CourseResponse[] = [];
   isLoadingRecent = true;

@@ -1,0 +1,52 @@
+<app-page-header
+  pageTitle="Add Batch"
+  [breadcrumbs]="[{ label: 'User Management', route: '/admin/users' }, { label: 'Add Batch', route: '' }]"
+></app-page-header>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="batch-create__form">
+  <div *ngIf="formErrors.length > 0" class="batch-create__banner" role="alert">
+    <p *ngFor="let message of formErrors">{{ message }}</p>
+  </div>
+
+  <label class="batch-create__field">
+    Batch Code
+    <input type="text" formControlName="batchCode" />
+    <span *ngIf="form.get('batchCode')?.invalid && form.get('batchCode')?.touched" class="batch-create__field-error">
+      {{ form.get('batchCode')?.errors?.['serverError'] || 'Batch code is required.' }}
+    </span>
+  </label>
+
+  <label class="batch-create__field">
+    Batch Name
+    <input type="text" formControlName="batchName" placeholder="e.g. Cloud" />
+    <span *ngIf="form.get('batchName')?.invalid && form.get('batchName')?.touched" class="batch-create__field-error">
+      {{ form.get('batchName')?.errors?.['serverError'] || 'Batch name is required.' }}
+    </span>
+  </label>
+
+  <label class="batch-create__field">
+    Owning Instructor
+    <select formControlName="ownerId">
+      <option value="" disabled>{{ isLoadingInstructors ? 'Loading…' : 'Select an instructor' }}</option>
+      <option *ngFor="let instructor of instructors" [value]="instructor.userId">{{ instructor.fullName }}</option>
+    </select>
+    <span *ngIf="form.get('ownerId')?.invalid && form.get('ownerId')?.touched" class="batch-create__field-error">
+      An owning instructor is required.
+    </span>
+  </label>
+
+  <label class="batch-create__field">
+    Start Date
+    <input type="date" formControlName="startDate" />
+    <span *ngIf="form.get('startDate')?.invalid && form.get('startDate')?.touched" class="batch-create__field-error">
+      Start date is required.
+    </span>
+  </label>
+
+  <label class="batch-create__field">
+    End Date (optional)
+    <input type="date" formControlName="endDate" />
+  </label>
+
+  <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Adding…' : 'Add Batch' }}</button>
+</form>

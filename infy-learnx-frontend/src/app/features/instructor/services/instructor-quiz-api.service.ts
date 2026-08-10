@@ -25,6 +25,13 @@ export class InstructorQuizApiService {
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
 
+  getQuizzesByAssessment(assessmentId: string): Observable<QuizResponse[]> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.quizzes.list}`;
+    return this.http
+      .get<ApiResponse<QuizResponse[]>>(url, { params: { assessmentId } })
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
   getQuizById(quizId: string): Observable<QuizResponse> {
     const url = `${environment.apiBaseUrl}/${ApiRoutes.quizzes.byId(quizId)}`;
     return this.http
@@ -64,6 +71,24 @@ export class InstructorQuizApiService {
     const url = `${environment.apiBaseUrl}/${ApiRoutes.quizzes.questions(quizId)}`;
     return this.http
       .post<ApiResponse<QuizQuestionResponse>>(url, request)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  updateQuizQuestion(
+    quizId: string,
+    questionId: string,
+    request: CreateQuizQuestionRequest,
+  ): Observable<QuizQuestionResponse> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.quizzes.question(quizId, questionId)}`;
+    return this.http
+      .put<ApiResponse<QuizQuestionResponse>>(url, request)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  deleteQuizQuestion(quizId: string, questionId: string): Observable<void> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.quizzes.question(quizId, questionId)}`;
+    return this.http
+      .delete<ApiResponse<void>>(url)
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
 }

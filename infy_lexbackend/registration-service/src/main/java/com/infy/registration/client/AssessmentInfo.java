@@ -22,4 +22,6 @@ public class AssessmentInfo {
     private UUID assessmentId;
     private String status;
     private LocalDateTime startTime;
+    private String scopeType;
+    private UUID scopeId;
 }

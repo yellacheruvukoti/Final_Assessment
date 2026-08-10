@@ -42,6 +42,10 @@ public class CourseService {
 
     public CourseResponse createCourse(CourseCreateRequest request, String role, UUID requesterUserId) {
         authorizationService.requireCourseOwnership(role, requesterUserId, request.getInstructorId());
+        if (courseRepository.findByCourseCode(request.getCourseCode()).isPresent()) {
+            throw new BusinessException(HttpStatus.CONFLICT, "VALIDATION_ERROR",
+                    "Course code " + request.getCourseCode() + " already exists.");
+        }
         Course course = CourseMapper.toEntity(request);
         course.setStatus(CourseStatus.DRAFT);
         return CourseMapper.toResponse(courseRepository.save(course));

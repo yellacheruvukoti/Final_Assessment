@@ -9,7 +9,8 @@ export enum QuizStatus {
 // data-model.md Section 3.11
 export interface QuizResponse {
   quizId: string;
-  courseId: string;
+  courseId: string | null;
+  assessmentId: string | null;
   title: string;
   status: QuizStatus;
   scheduledAt: string | null;

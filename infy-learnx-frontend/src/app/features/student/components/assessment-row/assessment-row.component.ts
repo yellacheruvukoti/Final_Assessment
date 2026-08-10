@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
+import { AppRoutes } from '../../../../core/constants/app-routes.constants';
 import { AssessmentResponse } from '../../../../core/models/assessment.model';
 
 // Attribute selector so this renders as real <tr> cells inside a semantic
@@ -17,4 +18,8 @@ export class AssessmentRowComponent {
   @Input() isRegistering = false;
 
   @Output() readonly register = new EventEmitter<void>();
+
+  quizzesRoute(assessmentId: string): string {
+    return '/' + AppRoutes.student.assessmentQuizzes(assessmentId);
+  }
 }

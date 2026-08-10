@@ -105,11 +105,13 @@
     </label>
 
     <label *ngIf="form.get('scopeType')?.value === ScopeType.BATCH" class="assessment-create__field">
-      Scope Reference (batch id)
-      <input type="text" formControlName="scopeId" />
-      <span class="assessment-create__hint">
-        No endpoint lists your batches — enter a known batch id directly.
-      </span>
+      Batch
+      <app-skeleton-loader *ngIf="isLoadingBatches" type="card"></app-skeleton-loader>
+      <select *ngIf="!isLoadingBatches" formControlName="scopeId">
+        <option value="" disabled>Select a batch</option>
+        <option *ngFor="let batch of batchOptions" [value]="batch.batchId">{{ batch.batchName }}</option>
+      </select>
+      <span *ngIf="batchesError" class="assessment-create__field-error">{{ batchesError }}</span>
     </label>
   </ng-container>
 

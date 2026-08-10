@@ -37,11 +37,36 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+infy:
+  assessment:
+    integration:
+      course-service-timeout-ms: 3000
+      batch-service-timeout-ms: 3000
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      courseService:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+      batchService:
+        failure-rate-threshold: 50
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,circuitbreakers
   endpoint:
     health:
       show-details: always
+  health:
+    circuitbreakers:
+      enabled: true

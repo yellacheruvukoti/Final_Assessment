@@ -29,6 +29,6 @@
   (pageSizeChange)="onPageSizeChange($event)"
 >
   <ng-template let-row>
-    <a [routerLink]="courseDetailRoute(row.courseId)">View</a>
+    <a [routerLink]="'/' + courseDetailRoute(row.courseId)">View</a>
   </ng-template>
 </app-data-table>

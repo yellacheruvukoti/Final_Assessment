@@ -7,13 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.infy.user.dto.ApiResponse;
+import com.infy.user.dto.BatchCreateRequest;
 import com.infy.user.dto.BatchResponse;
+import com.infy.user.service.AdminAuthorizationService;
 import com.infy.user.service.BatchService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -27,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class BatchController {
 
     private final BatchService batchService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<BatchResponse>>> listBatches() {
@@ -38,5 +45,13 @@ public class BatchController {
     public ResponseEntity<ApiResponse<BatchResponse>> getBatch(@PathVariable UUID batchId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success("Batch retrieved successfully.", batchService.getBatch(batchId)));
+    }
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<BatchResponse>> createBatch(@Valid @RequestBody BatchCreateRequest request,
+            @RequestHeader(value = "X-Role", required = false) String role) {
+        adminAuthorizationService.requireAdministrator(role);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Batch created successfully.", batchService.createBatch(request)));
     }
 }

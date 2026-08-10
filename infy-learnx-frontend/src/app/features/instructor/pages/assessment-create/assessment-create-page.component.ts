@@ -7,6 +7,7 @@ import { AppRoutes } from '../../../../core/constants/app-routes.constants';
 import { ComponentWithUnsavedChanges } from '../../../../core/guards/unsaved-changes.guard';
 import { ApiError } from '../../../../core/models/api-response.model';
 import { AssessmentStatus, ScopeType } from '../../../../core/models/assessment.model';
+import { BatchResponse } from '../../../../core/models/batch.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { applyServerErrors } from '../../../../shared/utils/apply-server-errors.util';
@@ -38,6 +39,10 @@ export class AssessmentCreatePageComponent implements OnInit, ComponentWithUnsav
   courseOptions: CourseFilterOption[] = [];
   isLoadingCourses = false;
   coursesError: string | null = null;
+
+  batchOptions: BatchResponse[] = [];
+  isLoadingBatches = false;
+  batchesError: string | null = null;
 
   readonly statusOptions = Object.values(AssessmentStatus);
   readonly scopeTypeOptions = Object.values(ScopeType);
@@ -75,6 +80,9 @@ export class AssessmentCreatePageComponent implements OnInit, ComponentWithUnsav
       if (scopeType === ScopeType.COURSE && this.courseOptions.length === 0 && !this.isLoadingCourses) {
         this.loadCourseOptions();
       }
+      if (scopeType === ScopeType.BATCH && this.batchOptions.length === 0 && !this.isLoadingBatches) {
+        this.loadBatchOptions();
+      }
     });
   }
 
@@ -90,11 +98,11 @@ export class AssessmentCreatePageComponent implements OnInit, ComponentWithUnsav
     }
     this.isSubmitting = true;
     this.instructorAssessmentApiService.createAssessment(this.form.value).subscribe({
-      next: () => {
+      next: (assessment) => {
         this.isSubmitting = false;
         this.form.markAsPristine();
-        this.notificationService.showSuccess('Assessment created.');
-        this.router.navigate([`/${AppRoutes.instructor.assessments}`]);
+        this.notificationService.showSuccess('Assessment created. You can now add quizzes to it below.');
+        this.router.navigate([`/${AppRoutes.instructor.assessmentEdit(assessment.assessmentId)}`]);
       },
       error: (error: ApiError) => {
         this.isSubmitting = false;
@@ -103,6 +111,21 @@ export class AssessmentCreatePageComponent implements OnInit, ComponentWithUnsav
         } else {
           this.notificationService.showError(error?.message ?? 'Unable to create assessment. Please try again.');
         }
+      },
+    });
+  }
+
+  private loadBatchOptions(): void {
+    this.isLoadingBatches = true;
+    this.batchesError = null;
+    this.instructorAssessmentApiService.getBatches().subscribe({
+      next: (batches) => {
+        this.batchOptions = batches;
+        this.isLoadingBatches = false;
+      },
+      error: () => {
+        this.batchesError = 'Unable to load batches. Please try again.';
+        this.isLoadingBatches = false;
       },
     });
   }

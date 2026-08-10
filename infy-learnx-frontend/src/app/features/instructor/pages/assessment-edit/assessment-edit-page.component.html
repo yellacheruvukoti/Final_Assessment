@@ -87,3 +87,5 @@
 
   <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Save Changes' }}</button>
 </form>
+
+<app-assessment-quiz-manager *ngIf="!isLoading && !loadError" [assessmentId]="assessmentId"></app-assessment-quiz-manager>

@@ -30,8 +30,15 @@ public class QuizService {
     private final CourseService courseService;
     private final CourseAuthorizationService authorizationService;
 
+    private static final String ROLE_INSTRUCTOR = "INSTRUCTOR";
+    private static final String ROLE_ADMINISTRATOR = "ADMINISTRATOR";
+
     public List<QuizResponse> listByCourse(UUID courseId) {
         return quizRepository.findByCourseId(courseId).stream().map(QuizMapper::toResponse).toList();
+    }
+
+    public List<QuizResponse> listByAssessment(UUID assessmentId) {
+        return quizRepository.findByAssessmentId(assessmentId).stream().map(QuizMapper::toResponse).toList();
     }
 
     public QuizResponse getQuiz(UUID quizId) {
@@ -39,11 +46,19 @@ public class QuizService {
     }
 
     public QuizResponse createQuiz(QuizCreateRequest request, String role, UUID requesterUserId) {
-        var course = courseService.findCourseOrThrow(request.getCourseId());
-        authorizationService.requireCourseOwnership(role, requesterUserId, course.getInstructorId());
-        if (!course.getInstructorId().equals(request.getOwnerInstructorId())) {
-            throw new BusinessException(HttpStatus.FORBIDDEN, "COURSE_ACCESS_DENIED",
-                    "Quiz owner must match the course's owning instructor.");
+        if (request.getCourseId() == null && request.getAssessmentId() == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "QUIZ_SCOPE_REQUIRED",
+                    "A quiz must be linked to a course or an assessment.");
+        }
+        if (request.getCourseId() != null) {
+            var course = courseService.findCourseOrThrow(request.getCourseId());
+            authorizationService.requireCourseOwnership(role, requesterUserId, course.getInstructorId());
+            if (!course.getInstructorId().equals(request.getOwnerInstructorId())) {
+                throw new BusinessException(HttpStatus.FORBIDDEN, "COURSE_ACCESS_DENIED",
+                        "Quiz owner must match the course's owning instructor.");
+            }
+        } else {
+            requireInstructorOrAdmin(role);
         }
         Quiz quiz = QuizMapper.toEntity(request);
         quiz.setStatus(QuizStatus.DRAFT);
@@ -52,10 +67,22 @@ public class QuizService {
 
     public QuizResponse updateQuiz(UUID quizId, QuizUpdateRequest request, String role, UUID requesterUserId) {
         Quiz quiz = findQuizOrThrow(quizId);
-        var course = courseService.findCourseOrThrow(quiz.getCourseId());
-        authorizationService.requireCourseOwnership(role, requesterUserId, course.getInstructorId());
+        if (quiz.getCourseId() != null) {
+            var course = courseService.findCourseOrThrow(quiz.getCourseId());
+            authorizationService.requireCourseOwnership(role, requesterUserId, course.getInstructorId());
+        } else {
+            requireInstructorOrAdmin(role);
+        }
         QuizMapper.applyUpdate(quiz, request);
         return QuizMapper.toResponse(quizRepository.save(quiz));
+    }
+
+    void requireInstructorOrAdmin(String role) {
+        if (role != null && (role.equalsIgnoreCase(ROLE_INSTRUCTOR) || role.equalsIgnoreCase(ROLE_ADMINISTRATOR))) {
+            return;
+        }
+        throw new BusinessException(HttpStatus.FORBIDDEN, "COURSE_ACCESS_DENIED",
+                "You are not authorized to manage this quiz.");
     }
 
     Quiz findQuizOrThrow(UUID quizId) {

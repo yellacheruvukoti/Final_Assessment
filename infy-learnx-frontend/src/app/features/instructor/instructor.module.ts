@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../../shared/shared.module';
+import { AssessmentQuizManagerComponent } from './components/assessment-quiz-manager/assessment-quiz-manager.component';
 import { InstructorSummaryCardComponent } from './components/instructor-summary-card/instructor-summary-card.component';
 import { ModuleListComponent } from './components/module-list/module-list.component';
 import { PerformanceFiltersComponent } from './components/performance-filters/performance-filters.component';
@@ -45,6 +46,7 @@ import { RegistrationSummaryPageComponent } from './pages/registration-summary/r
     QuizEditPageComponent,
     AssessmentCreatePageComponent,
     AssessmentEditPageComponent,
+    AssessmentQuizManagerComponent,
   ],
   imports: [SharedModule, InstructorRoutingModule],
 })

@@ -6,6 +6,7 @@ import { CertificateRowComponent } from './components/certificate-row/certificat
 import { CourseCatalogFiltersComponent } from './components/course-catalog-filters/course-catalog-filters.component';
 import { CourseProgressRowComponent } from './components/course-progress-row/course-progress-row.component';
 import { RegistrationRowComponent } from './components/registration-row/registration-row.component';
+import { AssessmentQuizzesPageComponent } from './pages/assessment-quizzes/assessment-quizzes-page.component';
 import { CourseCatalogPageComponent } from './pages/course-catalog/course-catalog-page.component';
 import { CourseDetailPageComponent } from './pages/course-detail/course-detail-page.component';
 import { CourseMaterialsPageComponent } from './pages/course-materials/course-materials-page.component';
@@ -13,6 +14,7 @@ import { StudentDashboardPageComponent } from './pages/dashboard/student-dashboa
 import { MyCertificatesPageComponent } from './pages/my-certificates/my-certificates-page.component';
 import { MyProgressPageComponent } from './pages/my-progress/my-progress-page.component';
 import { MyRegistrationsPageComponent } from './pages/my-registrations/my-registrations-page.component';
+import { QuizAttemptPageComponent } from './pages/quiz-attempt/quiz-attempt-page.component';
 import { QuizParticipationPageComponent } from './pages/quiz-participation/quiz-participation-page.component';
 import { UpcomingAssessmentsPageComponent } from './pages/upcoming-assessments/upcoming-assessments-page.component';
 import { StudentLayoutComponent } from './student-layout.component';
@@ -35,6 +37,8 @@ import { StudentRoutingModule } from './student-routing.module';
     RegistrationRowComponent,
     MyCertificatesPageComponent,
     CertificateRowComponent,
+    AssessmentQuizzesPageComponent,
+    QuizAttemptPageComponent,
   ],
   imports: [SharedModule, StudentRoutingModule],
 })

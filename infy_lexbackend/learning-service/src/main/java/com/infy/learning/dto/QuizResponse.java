@@ -19,6 +19,7 @@ import lombok.Setter;
 public class QuizResponse {
     private UUID quizId;
     private UUID courseId;
+    private UUID assessmentId;
     private String title;
     private QuizStatus status;
     private LocalDateTime scheduledAt;

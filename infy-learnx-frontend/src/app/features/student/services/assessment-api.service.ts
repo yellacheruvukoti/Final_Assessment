@@ -40,4 +40,15 @@ export class AssessmentApiService {
       .get<ApiResponse<AssessmentResponse>>(url)
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
+
+  // Reused by Course Details to find the COURSE-scoped assessment(s)
+  // belonging to a given course (client-side filter by scopeType/scopeId —
+  // no course-filtered assessment endpoint exists, same GET /api/assessments
+  // already used elsewhere).
+  getAssessments(): Observable<AssessmentResponse[]> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.assessments.list}`;
+    return this.http
+      .get<ApiResponse<AssessmentResponse[]>>(url)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
 }

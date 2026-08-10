@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.infy.user.dto.BatchCreateRequest;
 import com.infy.user.dto.BatchResponse;
 import com.infy.user.exception.BusinessException;
 import com.infy.user.mapper.BatchMapper;
@@ -18,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 public class BatchService {
 
     private final BatchRepository batchRepository;
+
+    public BatchResponse createBatch(BatchCreateRequest request) {
+        return BatchMapper.toResponse(batchRepository.save(BatchMapper.toEntity(request)));
+    }
 
     /**
      * Internal contract (not gateway-routed) consumed by summary-service to

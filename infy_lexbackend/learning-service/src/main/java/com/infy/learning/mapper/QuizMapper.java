@@ -14,6 +14,7 @@ public final class QuizMapper {
         return QuizResponse.builder()
                 .quizId(quiz.getQuizId())
                 .courseId(quiz.getCourseId())
+                .assessmentId(quiz.getAssessmentId())
                 .title(quiz.getTitle())
                 .status(quiz.getStatus())
                 .scheduledAt(quiz.getScheduledAt())
@@ -28,6 +29,7 @@ public final class QuizMapper {
     public static Quiz toEntity(QuizCreateRequest request) {
         return Quiz.builder()
                 .courseId(request.getCourseId())
+                .assessmentId(request.getAssessmentId())
                 .title(request.getTitle())
                 .scheduledAt(request.getScheduledAt())
                 .durationMinutes(request.getDurationMinutes())

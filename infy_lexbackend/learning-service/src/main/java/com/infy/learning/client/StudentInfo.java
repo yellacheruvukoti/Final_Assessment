@@ -16,4 +16,5 @@ import lombok.Setter;
 public class StudentInfo {
     private UUID studentId;
     private UUID userId;
+    private UUID batchId;
 }

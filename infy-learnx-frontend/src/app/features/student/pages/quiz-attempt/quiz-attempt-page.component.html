@@ -1,0 +1,45 @@
+<app-page-header pageTitle="Take Quiz"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="quiz-attempt__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<div *ngIf="!isLoading && !errorMessage && result" class="quiz-attempt__result">
+  <h2>Quiz already submitted</h2>
+  <p>Score: {{ result.correctCount }} / {{ result.totalQuestions }} ({{ result.scorePercentage }}%)</p>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage && !result">
+  <app-empty-state
+    *ngIf="questionViews.length === 0"
+    message="This quiz has no questions yet."
+  ></app-empty-state>
+
+  <div *ngFor="let view of questionViews; let i = index" class="quiz-attempt__question">
+    <p class="quiz-attempt__question-text">{{ i + 1 }}. {{ view.question.questionText }}</p>
+    <div class="quiz-attempt__options">
+      <label *ngFor="let option of view.options" class="quiz-attempt__option">
+        <input
+          type="radio"
+          [name]="'question-' + view.question.questionId"
+          [checked]="view.selectedKey === option.key"
+          (change)="selectOption(view, option.key)"
+        />
+        {{ option.label }}
+      </label>
+    </div>
+  </div>
+
+  <button
+    *ngIf="questionViews.length > 0"
+    type="button"
+    class="quiz-attempt__submit"
+    [disabled]="!allAnswered || isSubmitting"
+    (click)="submit()"
+  >
+    {{ isSubmitting ? 'Submitting…' : 'Submit Quiz' }}
+  </button>
+</ng-container>

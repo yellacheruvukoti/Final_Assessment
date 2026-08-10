@@ -5,15 +5,9 @@ export interface CourseFilterOption {
   title: string;
 }
 
-// KNOWN BACKEND GAP: GET /api/instructors/{id}/performance returns a
-// course-level aggregate only (courseId, title, enrolledCount,
-// averageCompletionPercentage per course) — there is no module-level or
-// per-student breakdown anywhere in the backend (no endpoint lists a
-// course's students, and progress is only fetchable one specific
-// studentId at a time via GET /api/courses/{courseId}/progress/{studentId},
-// with no bulk/course-wide variant). The Module filter is therefore
-// rendered disabled with an explanatory note rather than wired to fake
-// options; only the Course filter (real data) is functional.
+// GET /api/instructors/{id}/performance returns a course-level aggregate
+// only (courseId, title, enrolledCount, averageCompletionPercentage per
+// course), so this filter offers course-level filtering only.
 @Component({
   selector: 'app-performance-filters',
   templateUrl: './performance-filters.component.html',

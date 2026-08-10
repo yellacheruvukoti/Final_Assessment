@@ -21,7 +21,7 @@ import { InstructorAssessmentApiService } from '../../services/instructor-assess
   styleUrls: ['./assessment-edit-page.component.scss'],
 })
 export class AssessmentEditPageComponent implements OnInit, ComponentWithUnsavedChanges {
-  private readonly assessmentId = this.route.snapshot.paramMap.get('assessmentId') ?? '';
+  readonly assessmentId = this.route.snapshot.paramMap.get('assessmentId') ?? '';
 
   isLoading = true;
   loadError: string | null = null;

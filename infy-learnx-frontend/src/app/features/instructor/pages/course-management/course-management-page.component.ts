@@ -91,6 +91,14 @@ export class CourseManagementPageComponent implements OnInit {
     return `/${AppRoutes.instructor.courseEdit(courseId)}`;
   }
 
+  viewCourse(courseId: string): void {
+    this.router.navigate([this.moduleManagementRoute(courseId)]);
+  }
+
+  editCourse(courseId: string): void {
+    this.router.navigate([this.courseEditRoute(courseId)]);
+  }
+
   onStatusChange(status: CourseStatus | ''): void {
     this.updateQueryParams({ status, page: 0 });
   }

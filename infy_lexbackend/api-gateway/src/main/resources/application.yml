@@ -82,6 +82,10 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/api/administrators/**
+        - id: user-service-batches
+          uri: lb://user-service
+          predicates:
+            - Path=/api/batches/**
         - id: learning-service-courses
           uri: lb://learning-service
           predicates:

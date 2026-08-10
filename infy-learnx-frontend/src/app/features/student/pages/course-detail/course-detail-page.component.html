@@ -13,6 +13,35 @@
 </div>
 
 <ng-container *ngIf="course && !isLoadingCourse">
+  <section class="course-detail__summary">
+    <p class="course-detail__description">{{ course.description || 'No description available.' }}</p>
+    <div class="course-detail__badges">
+      <span class="course-detail__badge">{{ course.status }}</span>
+      <span class="course-detail__badge" [class.course-detail__badge--success]="isEnrolled">
+        {{ isEnrolled === null ? 'Registration status unavailable' : isEnrolled ? 'Registered' : 'Not registered' }}
+      </span>
+    </div>
+    <div class="course-detail__actions">
+      <button
+        *ngIf="isEnrolled === false"
+        type="button"
+        class="course-detail__primary-button"
+        [disabled]="isEnrolling"
+        (click)="register()"
+      >
+        {{ isEnrolling ? 'Registering…' : 'Register' }}
+      </button>
+      <button
+        *ngIf="isEnrolled"
+        type="button"
+        class="course-detail__primary-button"
+        (click)="startLearning()"
+      >
+        Start Learning
+      </button>
+    </div>
+  </section>
+
   <nav class="course-detail__tabs" aria-label="Course sections">
     <button
       type="button"
@@ -28,7 +57,7 @@
       [class.course-detail__tab--active]="activeTab === 'materials'"
       (click)="selectTab('materials')"
     >
-      Modules and Materials
+      Course Content
     </button>
     <button
       type="button"
@@ -38,6 +67,15 @@
     >
       Quizzes
     </button>
+    <button
+      *ngIf="isEnrolled"
+      type="button"
+      class="course-detail__tab"
+      [class.course-detail__tab--active]="activeTab === 'assessment'"
+      (click)="selectTab('assessment')"
+    >
+      Course Assessment
+    </button>
   </nav>
 
   <section *ngIf="activeTab === 'overview'" class="course-detail__panel">
@@ -46,10 +84,8 @@
       <dd>{{ course.courseCode }}</dd>
       <dt>Status</dt>
       <dd>{{ course.status }}</dd>
-      <dt>Description</dt>
-      <dd>{{ course.description || 'No description available.' }}</dd>
-      <dt>Enrollment Status</dt>
-      <dd>{{ isEnrolled === null ? 'Not available' : isEnrolled ? 'Enrolled' : 'Not enrolled' }}</dd>
+      <dt>Registration Status</dt>
+      <dd>{{ isEnrolled === null ? 'Not available' : isEnrolled ? 'Registered' : 'Not registered' }}</dd>
     </dl>
   </section>
 
@@ -58,28 +94,33 @@
 
     <div *ngIf="materialsError" class="course-detail__error">
       <p>{{ materialsError }}</p>
+      <button type="button" (click)="retryMaterials()">Retry</button>
     </div>
 
     <app-empty-state
-      *ngIf="!isLoadingMaterials && !materialsError && materialGroups.length === 0"
-      message="No materials available for this course."
+      *ngIf="!isLoadingMaterials && !materialsError && moduleGroups.length === 0"
+      message="No modules available for this course."
     ></app-empty-state>
 
-    <div *ngFor="let group of materialGroups" class="course-detail__module-group">
+    <p *ngIf="!isLoadingMaterials && !materialsError && moduleGroups.length > 0" class="course-detail__module-count">
+      {{ totalModules }} module{{ totalModules === 1 ? '' : 's' }}
+    </p>
+
+    <div *ngFor="let group of moduleGroups" class="course-detail__module-group">
       <button
         type="button"
         class="course-detail__module-toggle"
-        (click)="toggleModule(group.moduleId)"
-        [attr.aria-expanded]="isModuleExpanded(group.moduleId)"
+        (click)="toggleModule(group.module.moduleId)"
+        [attr.aria-expanded]="isModuleExpanded(group.module.moduleId)"
       >
-        Module {{ group.moduleId }} ({{ group.materials.length }} items)
+        {{ group.module.title }} ({{ group.materials.length }} lesson{{ group.materials.length === 1 ? '' : 's' }})
       </button>
-      <ul *ngIf="isModuleExpanded(group.moduleId)" class="course-detail__material-list">
+      <ul *ngIf="isModuleExpanded(group.module.moduleId)" class="course-detail__material-list">
         <li *ngFor="let material of group.materials">
           <span>{{ material.title }}</span>
           <span class="course-detail__badge">{{ material.materialType }}</span>
-          <a [href]="material.resourcePath" target="_blank" rel="noopener">Access</a>
         </li>
+        <li *ngIf="group.materials.length === 0">No lessons in this module yet.</li>
       </ul>
     </div>
   </section>
@@ -114,6 +155,49 @@
           <td>{{ quiz.scheduledAt || '—' }}</td>
           <td>{{ quiz.durationMinutes }} min</td>
           <td>{{ quiz.totalMarks }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section *ngIf="activeTab === 'assessment' && isEnrolled" class="course-detail__panel">
+    <app-skeleton-loader *ngIf="isLoadingAssessment" type="table"></app-skeleton-loader>
+
+    <div *ngIf="assessmentError" class="course-detail__error">
+      <p>{{ assessmentError }}</p>
+      <button type="button" (click)="retryAssessment()">Retry</button>
+    </div>
+
+    <app-empty-state
+      *ngIf="!isLoadingAssessment && !assessmentError && courseAssessments.length === 0"
+      message="No assessment has been added to this course yet."
+    ></app-empty-state>
+
+    <table *ngIf="!isLoadingAssessment && courseAssessments.length > 0" class="course-detail__quiz-table">
+      <thead>
+        <tr>
+          <th scope="col">Assessment</th>
+          <th scope="col">Status</th>
+          <th scope="col">Start Time</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of courseAssessments">
+          <td>{{ row.assessment.title }}</td>
+          <td><span class="course-detail__badge">{{ row.assessment.status }}</span></td>
+          <td>{{ row.assessment.startTime }}</td>
+          <td>
+            <button
+              *ngIf="!row.isRegistered"
+              type="button"
+              [disabled]="row.isRegistering"
+              (click)="registerForAssessment(row)"
+            >
+              {{ row.isRegistering ? 'Registering…' : 'Register' }}
+            </button>
+            <a *ngIf="row.isRegistered" [routerLink]="assessmentQuizzesRoute(row.assessment.assessmentId)">Take Quizzes</a>
+          </td>
         </tr>
       </tbody>
     </table>

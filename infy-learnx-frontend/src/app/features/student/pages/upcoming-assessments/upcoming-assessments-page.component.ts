@@ -3,7 +3,7 @@ import { Title } from '@angular/platform-browser';
 import { forkJoin } from 'rxjs';
 
 import { DEFAULT_PAGE_SIZE } from '../../../../core/constants/pagination.constants';
-import { AssessmentResponse } from '../../../../core/models/assessment.model';
+import { AssessmentResponse, ScopeType } from '../../../../core/models/assessment.model';
 import { RegistrationStatus } from '../../../../core/models/registration.model';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -98,6 +98,10 @@ export class UpcomingAssessmentsPageComponent implements OnInit {
           registrations.filter((r) => r.status === RegistrationStatus.REGISTERED).map((r) => r.assessmentId),
         );
         this.allRows = [...upcoming.data]
+          // This tab is the batch-assessment flow only (requirement 21):
+          // course-based assessments are reached from Course Details for
+          // enrolled students instead, so the two flows stay separate.
+          .filter((assessment) => assessment.scopeType === ScopeType.BATCH)
           .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
           .map((assessment) => ({
             assessment,

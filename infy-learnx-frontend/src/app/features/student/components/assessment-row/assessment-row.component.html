@@ -14,4 +14,5 @@
     {{ isRegistering ? 'Registering…' : 'Register' }}
   </button>
   <span *ngIf="isRegistered" class="assessment-row__registered">Registered</span>
+  <a *ngIf="isRegistered" [routerLink]="quizzesRoute(assessment.assessmentId)">Take Quizzes</a>
 </td>

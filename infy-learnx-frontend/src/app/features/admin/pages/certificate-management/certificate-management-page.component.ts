@@ -167,14 +167,17 @@ export class CertificateManagementPageComponent implements OnInit {
   }
 
   private enrichCertificate(certificate: CertificateResponse) {
+    // Never fall back to the raw id in the UI — if the student/assessment
+    // record can't be resolved (e.g. a stale reference), show a
+    // human-readable placeholder instead of a UUID.
     const studentName$ = this.adminUserApiService.getStudentById(certificate.studentId).pipe(
       switchMap((student) => this.adminUserApiService.getUserById(student.userId)),
       map((user) => user.fullName),
-      catchError(() => of(certificate.studentId)),
+      catchError(() => of('Unknown Student')),
     );
     const assessmentTitle$ = this.adminCertificateApiService.getAssessmentById(certificate.assessmentId).pipe(
       map((assessment) => assessment.title),
-      catchError(() => of(certificate.assessmentId)),
+      catchError(() => of('Unknown Assessment')),
     );
 
     return forkJoin({ studentName: studentName$, assessmentTitle: assessmentTitle$ }).pipe(

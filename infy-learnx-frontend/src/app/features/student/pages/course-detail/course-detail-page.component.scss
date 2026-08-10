@@ -1,4 +1,49 @@
 .course-detail {
+  &__summary {
+    margin-bottom: var(--spacing-5);
+  }
+
+  &__description {
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-3);
+  }
+
+  &__badges {
+    display: flex;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-3);
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-3);
+  }
+
+  &__primary-button {
+    padding: var(--spacing-2) var(--spacing-5);
+    border: none;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__module-count {
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--spacing-3);
+  }
+
+  &__badge--success {
+    background-color: var(--color-success-light, var(--color-surface));
+    color: var(--color-success, inherit);
+  }
+
   &__error {
     display: flex;
     align-items: center;

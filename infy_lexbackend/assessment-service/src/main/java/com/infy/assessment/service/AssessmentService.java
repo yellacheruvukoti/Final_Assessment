@@ -7,11 +7,14 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.infy.assessment.client.BatchServiceClient;
+import com.infy.assessment.client.CourseServiceClient;
 import com.infy.assessment.dto.AssessmentCreateRequest;
 import com.infy.assessment.dto.AssessmentResponse;
 import com.infy.assessment.dto.AssessmentUpdateRequest;
 import com.infy.assessment.entity.Assessment;
 import com.infy.assessment.enums.AssessmentStatus;
+import com.infy.assessment.enums.ScopeType;
 import com.infy.assessment.exception.BusinessException;
 import com.infy.assessment.mapper.AssessmentMapper;
 import com.infy.assessment.repository.AssessmentRepository;
@@ -23,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class AssessmentService {
 
     private final AssessmentRepository assessmentRepository;
+    private final CourseServiceClient courseServiceClient;
+    private final BatchServiceClient batchServiceClient;
 
     public List<AssessmentResponse> listAssessments(AssessmentStatus statusFilter) {
         List<Assessment> assessments = statusFilter == null
@@ -51,8 +56,20 @@ public class AssessmentService {
             throw new BusinessException(HttpStatus.CONFLICT, "VALIDATION_ERROR",
                     "Assessment code " + request.getAssessmentCode() + " already exists.");
         }
+        requireValidScope(request.getScopeType(), request.getScopeId());
         Assessment saved = assessmentRepository.save(AssessmentMapper.toEntity(request));
         return AssessmentMapper.toResponse(saved);
+    }
+
+    private void requireValidScope(ScopeType scopeType, UUID scopeId) {
+        if (scopeType == ScopeType.COURSE && !courseServiceClient.courseExists(scopeId)) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "COURSE_NOT_FOUND",
+                    "Course not found for id " + scopeId);
+        }
+        if (scopeType == ScopeType.BATCH && !batchServiceClient.batchExists(scopeId)) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "BATCH_NOT_FOUND",
+                    "Batch not found for id " + scopeId);
+        }
     }
 
     public AssessmentResponse updateAssessment(UUID assessmentId, AssessmentUpdateRequest request) {

@@ -33,7 +33,7 @@
   (pageSizeChange)="onPageSizeChange($event)"
 >
   <ng-template let-row>
-    <a [routerLink]="moduleManagementRoute(row.courseId)">View</a>
-    <a [routerLink]="courseEditRoute(row.courseId)">Edit</a>
+    <button type="button" class="course-management__action-button" (click)="viewCourse(row.courseId)">View</button>
+    <button type="button" class="course-management__action-button" (click)="editCourse(row.courseId)">Edit</button>
   </ng-template>
 </app-data-table>

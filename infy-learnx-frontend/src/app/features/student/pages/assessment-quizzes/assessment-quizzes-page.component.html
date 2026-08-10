@@ -1,0 +1,47 @@
+<app-page-header [pageTitle]="assessment ? assessment.title + ' – Quizzes' : 'Assessment Quizzes'"></app-page-header>
+
+<app-skeleton-loader *ngIf="isLoading" type="table"></app-skeleton-loader>
+
+<div *ngIf="errorMessage" class="assessment-quizzes__error">
+  <p>{{ errorMessage }}</p>
+  <button type="button" (click)="retry()">Retry</button>
+</div>
+
+<ng-container *ngIf="!isLoading && !errorMessage">
+  <div *ngIf="progress" class="assessment-quizzes__summary">
+    <p>{{ progress.completedQuizzes }} of {{ progress.totalQuizzes }} quizzes completed</p>
+    <p>Overall score: {{ progress.overallScorePercentage }}%</p>
+    <p class="assessment-quizzes__eligibility" [class.assessment-quizzes__eligibility--eligible]="progress.certificateEligible">
+      {{ progress.certificateEligible ? 'Certificate eligible' : 'Not yet certificate eligible (requires all quizzes completed and an overall score of 60% or higher)' }}
+    </p>
+  </div>
+
+  <app-empty-state
+    *ngIf="rows.length === 0"
+    message="No quizzes are associated with this assessment yet."
+  ></app-empty-state>
+
+  <table *ngIf="rows.length > 0" class="assessment-quizzes__table">
+    <thead>
+      <tr>
+        <th scope="col">Quiz</th>
+        <th scope="col">Questions</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of rows">
+        <td>{{ row.quiz.title }}</td>
+        <td>{{ row.quiz.totalMarks }} marks</td>
+        <td>
+          <span *ngIf="row.attempt">Completed — {{ row.attempt.scorePercentage }}%</span>
+          <span *ngIf="!row.attempt">Not attempted</span>
+        </td>
+        <td>
+          <a *ngIf="!row.attempt" [routerLink]="quizAttemptRoute(row.quiz.quizId)">Take Quiz</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-container>

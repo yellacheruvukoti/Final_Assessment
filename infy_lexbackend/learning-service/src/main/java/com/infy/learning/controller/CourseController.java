@@ -77,6 +77,12 @@ public class CourseController {
                 courseService.updateCourse(courseId, request, role, userId)));
     }
 
+    @GetMapping("/{courseId}/modules")
+    public ResponseEntity<ApiResponse<List<CourseModuleResponse>>> listModules(@PathVariable UUID courseId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success("Modules retrieved successfully.", courseModuleService.listModules(courseId)));
+    }
+
     @PostMapping("/{courseId}/modules")
     public ResponseEntity<ApiResponse<CourseModuleResponse>> addModule(@PathVariable UUID courseId,
             @Valid @RequestBody CourseModuleCreateRequest request,
@@ -132,5 +138,14 @@ public class CourseController {
             @RequestHeader(value = "X-User-Id", required = false) UUID userId) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Progress retrieved successfully.",
                 learnerProgressService.getProgress(courseId, studentId, role, userId)));
+    }
+
+    @PostMapping("/{courseId}/materials/{materialId}/complete")
+    public ResponseEntity<ApiResponse<List<LearnerProgressResponse>>> markLessonComplete(@PathVariable UUID courseId,
+            @PathVariable UUID materialId,
+            @RequestHeader(value = "X-Role", required = false) String role,
+            @RequestHeader(value = "X-User-Id", required = false) UUID userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("Lesson marked complete successfully.",
+                learnerProgressService.markLessonComplete(courseId, materialId, role, userId)));
     }
 }

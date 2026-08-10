@@ -14,12 +14,6 @@
   ></app-instructor-summary-card>
 
   <app-instructor-summary-card
-    cardTitle="Active Registrations"
-    [state]="registrationsCard"
-    unavailableMessage="Not available — no backend endpoint lists registrations by instructor scope."
-  ></app-instructor-summary-card>
-
-  <app-instructor-summary-card
     cardTitle="Total Learners"
     [state]="learnersCard"
     (retry)="retry()"

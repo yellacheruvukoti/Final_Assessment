@@ -16,19 +16,6 @@
       border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-sm);
       font-size: var(--font-size-base);
-
-      &:disabled {
-        background-color: var(--color-surface);
-        color: var(--color-text-disabled);
-        cursor: not-allowed;
-      }
     }
-  }
-
-  &__note {
-    max-width: 16rem;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-disabled);
   }
 }

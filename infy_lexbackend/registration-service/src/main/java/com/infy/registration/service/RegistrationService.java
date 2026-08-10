@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.infy.registration.client.AssessmentInfo;
 import com.infy.registration.client.AssessmentServiceClient;
+import com.infy.registration.client.LearningServiceClient;
 import com.infy.registration.client.UserServiceClient;
 import com.infy.registration.dto.RegistrationCreateRequest;
 import com.infy.registration.dto.RegistrationResponse;
@@ -33,6 +34,7 @@ public class RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final UserServiceClient userServiceClient;
     private final AssessmentServiceClient assessmentServiceClient;
+    private final LearningServiceClient learningServiceClient;
 
     public RegistrationResponse register(RegistrationCreateRequest request) {
         UUID studentId = request.getStudentId();
@@ -42,7 +44,8 @@ public class RegistrationService {
             throw new BusinessException(HttpStatus.NOT_FOUND, "STUDENT_NOT_FOUND",
                     "Student not found or not active: " + studentId);
         }
-        requireUpcomingAssessment(assessmentId);
+        AssessmentInfo assessment = requireUpcomingAssessment(assessmentId);
+        requireScopeAccess(studentId, assessment);
 
         Registration registration = registrationRepository.findByStudentIdAndAssessmentId(studentId, assessmentId)
                 .orElse(null);
@@ -113,7 +116,7 @@ public class RegistrationService {
                 .toList();
     }
 
-    private void requireUpcomingAssessment(UUID assessmentId) {
+    private AssessmentInfo requireUpcomingAssessment(UUID assessmentId) {
         AssessmentInfo assessment = assessmentServiceClient.getAssessment(assessmentId)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "ASSESSMENT_NOT_FOUND",
                         "Assessment not found for id " + assessmentId));
@@ -125,6 +128,30 @@ public class RegistrationService {
         if (!assessment.getStartTime().isAfter(LocalDateTime.now())) {
             throw new BusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "ASSESSMENT_ALREADY_STARTED",
                     "Assessment start time has passed or started.");
+        }
+        return assessment;
+    }
+
+    /**
+     * Requirement 22/23: a student may register for a COURSE-scoped
+     * assessment only if actively enrolled in that course, and for a
+     * BATCH-scoped assessment only if they belong to that batch.
+     */
+    private void requireScopeAccess(UUID studentId, AssessmentInfo assessment) {
+        if (assessment.getScopeType() == null || assessment.getScopeId() == null) {
+            return;
+        }
+        if ("COURSE".equals(assessment.getScopeType())) {
+            if (!learningServiceClient.isActivelyEnrolled(studentId, assessment.getScopeId())) {
+                throw new BusinessException(HttpStatus.FORBIDDEN, "COURSE_NOT_ENROLLED",
+                        "Student is not enrolled in the course this assessment belongs to.");
+            }
+        } else if ("BATCH".equals(assessment.getScopeType())) {
+            UUID studentBatchId = userServiceClient.getStudentBatchId(studentId);
+            if (studentBatchId == null || !studentBatchId.equals(assessment.getScopeId())) {
+                throw new BusinessException(HttpStatus.FORBIDDEN, "BATCH_ACCESS_DENIED",
+                        "Student does not belong to the batch this assessment belongs to.");
+            }
         }
     }
 

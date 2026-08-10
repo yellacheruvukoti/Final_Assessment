@@ -10,6 +10,7 @@ import {
   UpdateAssessmentRequest,
 } from '../../../core/models/assessment-request.model';
 import { AssessmentResponse, AssessmentStatus } from '../../../core/models/assessment.model';
+import { BatchResponse } from '../../../core/models/batch.model';
 import { rethrowApiError, unwrapEnvelope } from '../../../shared/utils/api-response.util';
 import { toHttpParams } from '../../../shared/utils/http-params.util';
 
@@ -47,6 +48,15 @@ export class InstructorAssessmentApiService {
     const url = `${environment.apiBaseUrl}/${ApiRoutes.assessments.byId(assessmentId)}`;
     return this.http
       .put<ApiResponse<AssessmentResponse>>(url, request)
+      .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
+  }
+
+  // Dynamic Batch dropdown source for scopeType=BATCH — reuses the same
+  // GET /api/batches endpoint the Admin batch pickers already use.
+  getBatches(): Observable<BatchResponse[]> {
+    const url = `${environment.apiBaseUrl}/${ApiRoutes.batches.list}`;
+    return this.http
+      .get<ApiResponse<BatchResponse[]>>(url)
       .pipe(map(unwrapEnvelope), catchError(rethrowApiError));
   }
 }

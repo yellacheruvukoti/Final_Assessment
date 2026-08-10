@@ -43,8 +43,12 @@ public class Quiz {
     private UUID quizId;
 
     @JdbcTypeCode(SqlTypes.CHAR)
-    @Column(name = "course_id", nullable = false, length = 36)
+    @Column(name = "course_id", length = 36)
     private UUID courseId;
+
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(name = "assessment_id", length = 36)
+    private UUID assessmentId;
 
     @Column(name = "title", nullable = false, length = 150)
     private String title;

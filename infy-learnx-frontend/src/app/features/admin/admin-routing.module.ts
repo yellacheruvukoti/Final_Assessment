@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { UnsavedChangesGuard } from '../../core/guards/unsaved-changes.guard';
 import { AdminLayoutComponent } from './admin-layout.component';
+import { BatchCreatePageComponent } from './pages/batch-create/batch-create-page.component';
 import { AdminDashboardPageComponent } from './pages/dashboard/admin-dashboard-page.component';
 import { CertificateManagementPageComponent } from './pages/certificate-management/certificate-management-page.component';
 import { InstructorCreatePageComponent } from './pages/instructor-create/instructor-create-page.component';
@@ -44,6 +45,12 @@ const routes: Routes = [
         path: 'users/instructors/:userId/edit',
         component: InstructorEditPageComponent,
         data: { title: 'Edit Instructor' },
+        canDeactivate: [UnsavedChangesGuard],
+      },
+      {
+        path: 'batches/new',
+        component: BatchCreatePageComponent,
+        data: { title: 'Add Batch' },
         canDeactivate: [UnsavedChangesGuard],
       },
       {

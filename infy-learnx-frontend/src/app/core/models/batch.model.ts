@@ -1,3 +1,11 @@
+export interface CreateBatchRequest {
+  batchCode: string;
+  batchName: string;
+  ownerId: string;
+  startDate: string;
+  endDate: string | null;
+}
+
 export interface BatchResponse {
   batchId: string;
   batchCode: string;
