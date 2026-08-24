@@ -1,0 +1,55 @@
+.ps-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ps-primary) 0%, var(--ps-primary-dark) 100%);
+  padding: 24px;
+}
+
+.ps-auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 36px 32px 28px 32px !important;
+}
+
+.ps-auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.ps-auth-brand mat-icon {
+  color: var(--ps-accent);
+  font-size: 30px;
+  height: 30px;
+  width: 30px;
+}
+
+.ps-auth-brand-title {
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ps-primary);
+}
+
+.ps-auth-subtitle {
+  color: var(--ps-text-muted);
+  font-size: 13px;
+  margin-bottom: 22px;
+}
+
+.ps-auth-field { width: 100%; margin-bottom: 4px; }
+
+.ps-auth-submit {
+  width: 100%;
+  height: 44px;
+  margin-top: 10px;
+}
+
+.ps-auth-switch {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13.5px;
+  color: var(--ps-text-muted);
+}

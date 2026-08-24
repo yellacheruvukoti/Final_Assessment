@@ -1,0 +1,97 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Check Eligibility</h1>
+  <p class="ps-section-subtitle">Answer a few questions to find out which passport category applies to you.</p>
+
+  <div class="ps-card">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="ps-form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Date of birth</mat-label>
+          <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth" [max]="today">
+          <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+          <mat-datepicker #dobPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Existing passport</mat-label>
+          <mat-select formControlName="existingPassportStatus">
+            <mat-option *ngFor="let s of passportStatuses" [value]="s.value">{{ s.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div style="margin-top:6px;">
+        <mat-checkbox formControlName="addressChangedSinceLastPassport">My address has changed since my last passport</mat-checkbox>
+      </div>
+      <div>
+        <mat-checkbox formControlName="pagesExhausted">My passport's pages are exhausted</mat-checkbox>
+      </div>
+      <div>
+        <mat-checkbox formControlName="wantsTatkal">I need Tatkal (urgent) processing</mat-checkbox>
+      </div>
+
+      <div class="ps-form-grid" *ngIf="form.controls.wantsTatkal.value" style="margin-top:10px;">
+        <mat-form-field appearance="outline">
+          <mat-label>Reason for urgency</mat-label>
+          <mat-select formControlName="tatkalReason">
+            <mat-option *ngFor="let r of tatkalReasons" [value]="r.value">{{ r.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Travel/deadline within how many days?</mat-label>
+          <input matInput type="number" formControlName="travelWithinDays" min="0">
+        </mat-form-field>
+      </div>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="loading || !form.controls.dateOfBirth.value" style="margin-top:16px;">
+        {{ loading ? 'Checking...' : 'Check Eligibility' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="ps-card" *ngIf="result">
+    <div class="ps-section-title" style="font-size:16px;">Your Result</div>
+    <div class="ps-chip-row" style="margin: 8px 0 16px 0;">
+      <mat-chip-set>
+        <mat-chip *ngIf="result.minor" color="accent">Minor applicant</mat-chip>
+        <mat-chip [color]="result.tatkalEligible ? 'primary' : undefined" [highlighted]="result.tatkalEligible">
+          {{ result.tatkalEligible ? 'Tatkal eligible' : 'Tatkal not eligible' }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <div class="ps-result-grid">
+      <div class="ps-result-item">
+        <div class="ps-result-label">Recommended application type</div>
+        <div class="ps-result-value">{{ result.recommendedApplicationType | titlecase }}</div>
+      </div>
+      <div class="ps-result-item">
+        <div class="ps-result-label">Eligible types</div>
+        <div class="ps-result-value">{{ result.eligibleApplicationTypes.join(', ') }}</div>
+      </div>
+      <div class="ps-result-item">
+        <div class="ps-result-label">Validity</div>
+        <div class="ps-result-value">{{ result.validityYears }} years</div>
+      </div>
+      <div class="ps-result-item">
+        <div class="ps-result-label">Allowed booklet types</div>
+        <div class="ps-result-value">{{ result.allowedBookletTypes.join(', ') }}</div>
+      </div>
+      <div class="ps-result-item">
+        <div class="ps-result-label">Likely police verification</div>
+        <div class="ps-result-value">{{ result.recommendedPvType }}</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <div class="ps-result-label">Tatkal note</div>
+      <p>{{ result.tatkalNote }}</p>
+      <div class="ps-result-label">ECR / ECNR guidance</div>
+      <p>{{ result.ecrEcnrGuidance }}</p>
+      <div class="ps-result-label">Notes</div>
+      <p>{{ result.notes }}</p>
+    </div>
+
+    <a mat-flat-button color="accent" routerLink="/applicant/apply">Proceed to Apply <mat-icon iconPositionEnd>arrow_forward</mat-icon></a>
+  </div>
+</div>

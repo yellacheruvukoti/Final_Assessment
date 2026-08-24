@@ -1,0 +1,54 @@
+<div class="ps-page ps-chat-page">
+  <h1 class="ps-section-title">Ask PassportSahayak AI</h1>
+  <p class="ps-section-subtitle">Ask about passport rules, documents, fees or your application status. Answers are grounded in official Passport Seva policy.</p>
+
+  <div class="ps-card ps-chat-card">
+    <div class="ps-chat-messages">
+      <ps-empty-state *ngIf="!messages.length" icon="smart_toy" title="Ask me anything about passports"
+        subtitle="Try a suggestion below, or type your own question."></ps-empty-state>
+
+      <div class="ps-chip-row" *ngIf="!messages.length">
+        <button mat-stroked-button *ngFor="let s of suggestions" (click)="useSuggestion(s)" class="ps-suggestion-chip">
+          {{ s }}
+        </button>
+      </div>
+
+      <div *ngFor="let m of messages" class="ps-msg-row" [class.ps-msg-row-user]="m.role === 'user'">
+        <div class="ps-msg-bubble" [class.ps-msg-user]="m.role === 'user'" [class.ps-msg-assistant]="m.role === 'assistant'">
+          <div class="ps-msg-text">{{ m.text }}<span class="ps-cursor" *ngIf="m.pending">&#9612;</span></div>
+
+          <mat-chip-set class="ps-citations" *ngIf="m.citations?.length">
+            <mat-chip *ngFor="let c of m.citations" [matTooltip]="'Similarity: ' + (c.similarity | number:'1.2-2')">
+              {{ c.docCode }} &middot; chunk {{ c.chunkIndex }}
+            </mat-chip>
+          </mat-chip-set>
+
+          <div class="ps-escalated-note" *ngIf="m.escalated">
+            <mat-icon>report</mat-icon> This query has been flagged for escalation per policy.
+          </div>
+        </div>
+      </div>
+
+      <div #scrollAnchor></div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="send()" class="ps-chat-input-row">
+      <mat-form-field appearance="outline" class="ps-arn-field">
+        <mat-label>ARN (optional)</mat-label>
+        <mat-select formControlName="arn">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let a of applications" [value]="a.arn">{{ a.arn }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="ps-query-field">
+        <mat-label>Type your question...</mat-label>
+        <input matInput formControlName="query" (keydown.enter)="send()" [disabled]="sending">
+      </mat-form-field>
+
+      <button mat-mini-fab color="primary" type="submit" [disabled]="sending || !form.controls.query.value">
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </div>
+</div>

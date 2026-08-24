@@ -1,0 +1,53 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Official Dashboard</h1>
+  <p class="ps-section-subtitle">Operational overview across applications, verification, grievances, appeals and fraud.</p>
+
+  <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="ps-stat-grid">
+      <a class="ps-stat-card ps-card" routerLink="/official/applications">
+        <div class="ps-stat-icon"><mat-icon>assignment</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ submittedApplications }}</div>
+          <div class="ps-stat-label">Submitted applications</div>
+        </div>
+      </a>
+      <a class="ps-stat-card ps-card" routerLink="/official/pv">
+        <div class="ps-stat-icon ps-stat-icon-warn"><mat-icon>local_police</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ pvOverdue }}</div>
+          <div class="ps-stat-label">Overdue PV cases</div>
+        </div>
+      </a>
+      <a class="ps-stat-card ps-card" routerLink="/official/grievances">
+        <div class="ps-stat-icon"><mat-icon>report_problem</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ openGrievances }}</div>
+          <div class="ps-stat-label">Open grievances</div>
+        </div>
+      </a>
+      <a class="ps-stat-card ps-card" routerLink="/official/appeals">
+        <div class="ps-stat-icon"><mat-icon>gavel</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ pendingAppeals }}</div>
+          <div class="ps-stat-label">Pending appeals</div>
+        </div>
+      </a>
+      <a class="ps-stat-card ps-card" routerLink="/official/fraud">
+        <div class="ps-stat-icon ps-stat-icon-warn"><mat-icon>shield</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ reportedFraud }}</div>
+          <div class="ps-stat-label">New fraud reports</div>
+        </div>
+      </a>
+      <a class="ps-stat-card ps-card" routerLink="/official/capacity">
+        <div class="ps-stat-icon"><mat-icon>insights</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">&rarr;</div>
+          <div class="ps-stat-label">Capacity monitor</div>
+        </div>
+      </a>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,76 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Welcome, {{ auth.currentUser?.fullName }}</h1>
+  <p class="ps-section-subtitle">Here's an overview of your passport applications and appointments.</p>
+
+  <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="ps-stat-grid">
+      <mat-card class="ps-stat-card">
+        <div class="ps-stat-icon"><mat-icon>folder_shared</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ applications.length }}</div>
+          <div class="ps-stat-label">Applications</div>
+        </div>
+      </mat-card>
+      <mat-card class="ps-stat-card">
+        <div class="ps-stat-icon"><mat-icon>event_available</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ upcomingAppointments.length }}</div>
+          <div class="ps-stat-label">Upcoming appointments</div>
+        </div>
+      </mat-card>
+      <mat-card class="ps-stat-card">
+        <div class="ps-stat-icon"><mat-icon>report_problem</mat-icon></div>
+        <div>
+          <div class="ps-stat-value">{{ openGrievances }}</div>
+          <div class="ps-stat-label">Open grievances</div>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="ps-card">
+      <div class="ps-section-title" style="font-size:16px;">Quick actions</div>
+      <div class="ps-quick-links" style="margin-top:14px;">
+        <a class="ps-card ps-quick-link" routerLink="/applicant/eligibility">
+          <mat-icon>fact_check</mat-icon><span>Check Eligibility</span>
+        </a>
+        <a class="ps-card ps-quick-link" routerLink="/applicant/apply">
+          <mat-icon>note_add</mat-icon><span>Apply for Passport</span>
+        </a>
+        <a class="ps-card ps-quick-link" routerLink="/applicant/appointments">
+          <mat-icon>event_available</mat-icon><span>Book Appointment</span>
+        </a>
+        <a class="ps-card ps-quick-link" routerLink="/applicant/chat">
+          <mat-icon>smart_toy</mat-icon><span>Ask AI Assistant</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="ps-card" *ngIf="applications.length">
+      <div class="ps-section-title" style="font-size:16px;">Recent applications</div>
+      <table mat-table [dataSource]="applications.slice(0, 5)" class="ps-full-width" style="margin-top:8px;">
+        <ng-container matColumnDef="arn">
+          <th mat-header-cell *matHeaderCellDef>ARN</th>
+          <td mat-cell *matCellDef="let a">{{ a.arn }}</td>
+        </ng-container>
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let a">{{ a.applicationType | titlecase }}</td>
+        </ng-container>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let a"><ps-status-chip [status]="a.status"></ps-status-chip></td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['arn','type','status']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['arn','type','status'];"></tr>
+      </table>
+      <div style="margin-top:12px;">
+        <a mat-button color="primary" routerLink="/applicant/applications">View all applications <mat-icon iconPositionEnd>arrow_forward</mat-icon></a>
+      </div>
+    </div>
+
+    <ps-empty-state *ngIf="!applications.length" icon="folder_open" title="No applications yet"
+      subtitle="Start by checking your eligibility, then apply for a passport."></ps-empty-state>
+  </ng-container>
+</div>

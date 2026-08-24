@@ -1,0 +1,80 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Appeals</h1>
+  <p class="ps-section-subtitle">If you disagree with a grievance resolution, escalate through the appeal authority chain.</p>
+
+  <div class="ps-card">
+    <div class="ps-panel-header">
+      <div class="ps-section-title" style="font-size:16px;">File an appeal</div>
+      <button mat-button color="primary" (click)="showChain = !showChain">
+        {{ showChain ? 'Hide' : 'View' }} authority chain
+      </button>
+    </div>
+
+    <div class="ps-chain" *ngIf="showChain">
+      <div class="ps-chain-item" *ngFor="let c of authorityChain">
+        <div class="ps-chain-level">{{ c.level }}</div>
+        <div class="ps-result-value">{{ c.authority }}</div>
+        <div class="ps-hint">Grounds: {{ c.grounds }}</div>
+        <div class="ps-hint">Timeline: {{ c.timeline }}</div>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="ps-form-grid" style="margin-top:12px;">
+        <mat-form-field appearance="outline">
+          <mat-label>Application (ARN)</mat-label>
+          <mat-select formControlName="arn" (selectionChange)="onArnChange($event.value)">
+            <mat-option *ngFor="let a of applications" [value]="a.arn">{{ a.arn }} &mdash; {{ a.applicationType | titlecase }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" style="width:100%;">
+        <mat-label>Grounds for appeal</mat-label>
+        <textarea matInput rows="4" formControlName="groundText"></textarea>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="submitting">
+        {{ submitting ? 'Submitting...' : 'File Appeal' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="ps-card" *ngIf="form.controls.arn.value">
+    <div class="ps-section-title" style="font-size:16px;">Appeals for {{ form.controls.arn.value }}</div>
+    <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner></div>
+
+    <table mat-table [dataSource]="appeals" class="ps-full-width" *ngIf="!loading && appeals.length" style="margin-top:8px;">
+      <ng-container matColumnDef="level">
+        <th mat-header-cell *matHeaderCellDef>Level</th>
+        <td mat-cell *matCellDef="let a">{{ a.level | titlecase }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let a"><ps-status-chip [status]="a.status"></ps-status-chip></td>
+      </ng-container>
+      <ng-container matColumnDef="ground">
+        <th mat-header-cell *matHeaderCellDef>Grounds</th>
+        <td mat-cell *matCellDef="let a">{{ a.groundText }}</td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Filed</th>
+        <td mat-cell *matCellDef="let a">{{ a.createdAt | date:'mediumDate' }}</td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    <div *ngIf="!loading" class="ps-decision-notes">
+      <ng-container *ngFor="let a of appeals">
+        <ng-container *ngIf="a.decisionNotes">
+          <div class="ps-result-label">Decision notes &mdash; {{ a.level | titlecase }}</div>
+          <p>{{ a.decisionNotes }}</p>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <ps-empty-state *ngIf="!loading && !appeals.length" icon="gavel" title="No appeals filed"
+      subtitle="File an appeal above for this application."></ps-empty-state>
+  </div>
+</div>

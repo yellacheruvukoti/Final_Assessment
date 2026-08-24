@@ -1,0 +1,12 @@
+package com.passportsahayak.fraud.entity;
+
+public enum FraudCategory {
+    DOCUMENT_FORGERY,
+    IDENTITY_IMPERSONATION,
+    SUPPRESSION_OF_INFO,
+    AGENT_BROKER_FRAUD,
+    DUPLICATE_PASSPORT,
+    ONLINE_PHISHING,
+    INTERNAL_MISCONDUCT,
+    PV_CORRUPTION
+}

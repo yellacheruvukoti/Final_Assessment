@@ -1,0 +1,57 @@
+server:
+  port: ${SERVER_PORT:9083}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: appointment-service
+
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:passportsahayak_appointment}?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:passportsahayak_app}
+    password: ${DB_PASSWORD:PassSahayak@2026}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:passport-sahayak-dev-secret-key-change-in-production-min-256-bits-long-0123456789}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:8080}
+  internal:
+    api-key: ${INTERNAL_API_KEY:internal-service-key-dev-change-me}
+  appointment:
+    reschedule-max-count: 2
+    reschedule-cutoff-working-days: 3
+    reschedule-second-fee: 100
+    tatkal-daily-capacity-percent: 12
+  clients:
+    application-service: ${APPLICATION_SERVICE_URL:http://localhost:9082}/api
+
+logging:
+  level:
+    com.passportsahayak.appointment: INFO
+    org.springframework.security: WARN

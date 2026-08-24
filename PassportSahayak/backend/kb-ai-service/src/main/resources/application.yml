@@ -1,0 +1,98 @@
+server:
+  port: ${SERVER_PORT:9087}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: kb-ai-service
+
+  security:
+    filter:
+      # SSE streaming (/ai/passport/chat/async) completes via a Servlet ASYNC dispatch on a
+      # separate Tomcat worker thread. If the security filter chain re-runs on that dispatch,
+      # AuthorizationFilter finds no context there (JwtAuthFilter deliberately doesn't
+      # re-authenticate on ASYNC dispatch) and kills the already-authorized, in-flight
+      # response. Re-checking authorization on ASYNC completion is unnecessary anyway - the
+      # request was already authorized at REQUEST time - so it's excluded here.
+      dispatcher-types: REQUEST, ERROR
+
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:passportsahayak_kb}?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:passportsahayak_app}
+    password: ${DB_PASSWORD:PassSahayak@2026}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  ai:
+    # --- Azure OpenAI credentials --------------------------------------------------
+    # These are ROUGH PLACEHOLDER values only. Replace via environment variables
+    # (recommended - never commit real keys) or edit the defaults below directly:
+    #   AZURE_OPENAI_ENDPOINT              e.g. https://your-resource.openai.azure.com
+    #   AZURE_OPENAI_API_KEY               your Azure OpenAI resource key
+    #   AZURE_OPENAI_CHAT_DEPLOYMENT       your gpt-4/gpt-4o deployment name (not the model name)
+    #   AZURE_OPENAI_EMBEDDING_DEPLOYMENT  your text-embedding-3-small / ada deployment name
+    azure:
+      openai:
+        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        api-key: ${AZURE_OPENAI_API_KEY}
+        chat:
+          options:
+            deployment-name: gpt-4o
+            temperature: 0.2
+        embedding:
+          options:
+            deployment-name: ${AZURE_OPENAI_CHAT_DEPLOYMENT}
+            model: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:passport-sahayak-dev-secret-key-change-in-production-min-256-bits-long-0123456789}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:8080}
+  kb:
+    chunk-max-chars: 1200
+    similarity-threshold: 0.7
+  ai:
+    # RAG pipeline per SRS Sec 2.1: Query -> PII Redaction -> Query Transformation ->
+    # Vector Retrieval (threshold >= 0.7) -> Prompt Augmentation with Citations ->
+    # Azure OpenAI (gpt-4+) -> Grounded Response with Citation.
+    # allowEmptyContext is always false: if nothing clears the threshold, the standard
+    # "No matching policy found" response is returned WITHOUT calling the LLM.
+    enabled: true
+    top-k: 5
+  clients:
+    application-service: ${APPLICATION_SERVICE_URL:http://localhost:9082}/api
+    appointment-service: ${APPOINTMENT_SERVICE_URL:http://localhost:9083}/api
+
+logging:
+  level:
+    com.passportsahayak.kb: INFO
+    org.springframework.security: WARN

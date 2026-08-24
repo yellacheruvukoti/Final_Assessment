@@ -1,0 +1,11 @@
+.ps-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ps-matrix-table {
+  margin: 14px 0;
+  overflow-x: auto;
+}

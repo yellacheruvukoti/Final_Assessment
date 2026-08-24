@@ -1,0 +1,79 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Fraud Queue</h1>
+  <p class="ps-section-subtitle">Review, investigate and refer reported fraud cases.</p>
+
+  <div class="ps-card">
+    <div class="ps-filter-row">
+      <mat-form-field appearance="outline" class="ps-filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilterChange()">
+          <mat-option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner></div>
+
+    <table mat-table [dataSource]="reports" class="ps-full-width" *ngIf="!loading && reports.length" style="margin-top:8px;">
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef>Category</th>
+        <td mat-cell *matCellDef="let r">{{ r.category | titlecase }}</td>
+      </ng-container>
+      <ng-container matColumnDef="arn">
+        <th mat-header-cell *matHeaderCellDef>ARN</th>
+        <td mat-cell *matCellDef="let r">{{ r.arn || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="severity">
+        <th mat-header-cell *matHeaderCellDef>Severity</th>
+        <td mat-cell *matCellDef="let r">{{ r.severity }}</td>
+      </ng-container>
+      <ng-container matColumnDef="authority">
+        <th mat-header-cell *matHeaderCellDef>Referral authority</th>
+        <td mat-cell *matCellDef="let r">{{ r.referralAuthority }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let r"><ps-status-chip [status]="r.status"></ps-status-chip></td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Filed</th>
+        <td mat-cell *matCellDef="let r">{{ r.createdAt | date:'mediumDate' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let r">
+          <button mat-button color="primary" (click)="startEdit(r)">Update</button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    <mat-paginator *ngIf="!loading && reports.length" [length]="totalElements" [pageIndex]="pageIndex"
+      [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 50]" (page)="onPage($event)"></mat-paginator>
+
+    <ps-empty-state *ngIf="!loading && !reports.length" icon="shield" title="No fraud reports in this status"
+      subtitle="Try selecting a different status filter."></ps-empty-state>
+  </div>
+
+  <div class="ps-detail-overlay" *ngIf="editing" (click)="editing = null">
+    <div class="ps-card ps-detail-panel" (click)="$event.stopPropagation()">
+      <div class="ps-detail-header">
+        <div class="ps-section-title" style="font-size:16px;">Update fraud report</div>
+        <button mat-icon-button (click)="editing = null"><mat-icon>close</mat-icon></button>
+      </div>
+      <p class="ps-hint">{{ editing.description }}</p>
+      <form [formGroup]="editForm" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" style="width:100%; margin-top:10px;">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save Status' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

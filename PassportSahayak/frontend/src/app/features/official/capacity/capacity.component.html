@@ -1,0 +1,49 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Capacity Monitor</h1>
+  <p class="ps-section-subtitle">Check normal and Tatkal booking capacity for a center on a given date.</p>
+
+  <div class="ps-card">
+    <form [formGroup]="form" (ngSubmit)="check()">
+      <div class="ps-form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Center</mat-label>
+          <mat-select formControlName="centerId">
+            <mat-option *ngFor="let c of centers" [value]="c.id">{{ c.name }} ({{ c.city }})</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Date</mat-label>
+          <input matInput [matDatepicker]="dp" formControlName="date">
+          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp></mat-datepicker>
+        </mat-form-field>
+      </div>
+      <button mat-flat-button color="primary" type="submit" [disabled]="loading || form.invalid">
+        {{ loading ? 'Checking...' : 'Check Capacity' }}
+      </button>
+    </form>
+  </div>
+
+  <div class="ps-card" *ngIf="capacity as c">
+    <div class="ps-section-title" style="font-size:16px;">{{ c.centerName }} &mdash; {{ c.date }}</div>
+
+    <div class="ps-cap-block">
+      <div class="ps-cap-header">
+        <span>Normal</span>
+        <span>{{ c.normalBooked }} / {{ c.normalCapacity }}</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="percent(c.normalBooked, c.normalCapacity)"></mat-progress-bar>
+    </div>
+
+    <div class="ps-cap-block">
+      <div class="ps-cap-header">
+        <span>Tatkal</span>
+        <span>{{ c.tatkalBooked }} / {{ c.tatkalCapacity }}</span>
+      </div>
+      <mat-progress-bar mode="determinate" color="accent" [value]="percent(c.tatkalBooked, c.tatkalCapacity)"></mat-progress-bar>
+    </div>
+  </div>
+
+  <ps-empty-state *ngIf="!capacity && !loading" icon="insights" title="No capacity checked yet"
+    subtitle="Select a center and date above to view booking capacity."></ps-empty-state>
+</div>

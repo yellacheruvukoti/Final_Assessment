@@ -1,0 +1,39 @@
+# ---- Java / Maven (backend/*) ----
+target/
+*.class
+*.log
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+# ---- Node / Angular (frontend/) ----
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# ---- IDEs ----
+.idea/
+*.iml
+*.iws
+.vscode/
+.classpath
+.project
+.settings/
+*.launch
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Env / local secrets ----
+.env
+.env.local
+*.local.yml
+*.local.yaml
+
+# ---- Misc ----
+*.tmp
+*.bak
+*.swp

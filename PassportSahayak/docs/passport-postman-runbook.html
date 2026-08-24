@@ -1,0 +1,2462 @@
+<title>PassportSahayak API Runbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+:root{
+  --bg:#F6F7FA; --surface:#FFFFFF; --surface-2:#EEF1F6; --code-bg:#F3F5F9;
+  --ink:#141821; --ink-2:#4B5563; --ink-3:#7C8695;
+  --line:#DDE2EB; --line-soft:#E9EDF3;
+  --accent:#1F4E8C; --accent-soft:#E6EDF8;
+  --get:#0A6F58; --post:#2B5FA8; --patch:#8A6410; --put:#6B4E9E; --del:#AE3A38;
+  --ok:#0A6F58; --err:#AE3A38; --warn:#8A6410;
+  --shadow:0 1px 2px rgba(20,24,33,.05), 0 1px 10px rgba(20,24,33,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1016; --surface:#151A22; --surface-2:#1B222C; --code-bg:#11161D;
+    --ink:#E4E9F0; --ink-2:#A2ACBA; --ink-3:#727D8C;
+    --line:#242C37; --line-soft:#1E252F;
+    --accent:#82AAE2; --accent-soft:#182231;
+    --get:#4FC5A2; --post:#7EACE9; --patch:#DDB25F; --put:#B69CE2; --del:#EB8A88;
+    --ok:#4FC5A2; --err:#EB8A88; --warn:#DDB25F;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1016; --surface:#151A22; --surface-2:#1B222C; --code-bg:#11161D;
+  --ink:#E4E9F0; --ink-2:#A2ACBA; --ink-3:#727D8C;
+  --line:#242C37; --line-soft:#1E252F;
+  --accent:#82AAE2; --accent-soft:#182231;
+  --get:#4FC5A2; --post:#7EACE9; --patch:#DDB25F; --put:#B69CE2; --del:#EB8A88;
+  --ok:#4FC5A2; --err:#EB8A88; --warn:#DDB25F;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+code,pre,.mono{font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace}
+
+/* ---------- shell ---------- */
+.shell{max-width:1240px; margin:0 auto; padding:0 20px; display:grid; grid-template-columns:230px minmax(0,1fr); gap:44px; align-items:start}
+@media (max-width:960px){ .shell{grid-template-columns:1fr; gap:0} .rail{position:static !important; display:none} }
+
+.rail{position:sticky; top:0; max-height:100vh; overflow-y:auto; padding:36px 0 40px; font-size:13.5px}
+.rail-title{font-family:"IBM Plex Serif",Georgia,serif; font-size:15px; font-weight:600; margin:0 0 14px}
+.rail a{display:block; color:var(--ink-2); text-decoration:none; padding:5px 10px; border-left:2px solid var(--line); margin-left:1px}
+.rail a:hover{color:var(--accent); border-left-color:var(--accent); background:var(--accent-soft)}
+.rail a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.rail .rail-num{color:var(--ink-3); margin-right:7px; font-family:"IBM Plex Mono",monospace; font-size:12px}
+
+main{padding:36px 0 90px; min-width:0}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--line); padding-bottom:26px; margin-bottom:34px}
+.eyebrow{font-size:11.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:0 0 10px}
+h1{font-family:"IBM Plex Serif",Georgia,serif; font-size:clamp(28px,4vw,38px); line-height:1.15; margin:0 0 12px; font-weight:600; text-wrap:balance}
+.lede{color:var(--ink-2); max-width:66ch; margin:0}
+
+h2{font-family:"IBM Plex Serif",Georgia,serif; font-size:23px; font-weight:600; margin:0; text-wrap:balance}
+.sec{margin:52px 0 0; scroll-margin-top:20px}
+.sec-head{display:flex; align-items:baseline; gap:12px; padding-bottom:10px; border-bottom:2px solid var(--ink); margin-bottom:22px}
+.sec-num{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--ink-3); font-weight:500}
+.sec-count{margin-left:auto; font-size:12px; color:var(--ink-3); font-family:"IBM Plex Mono",monospace}
+
+/* ---------- callouts ---------- */
+.note{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:16px 18px; margin:18px 0; box-shadow:var(--shadow)}
+.note p{margin:0 0 8px} .note p:last-child{margin:0}
+.note strong{color:var(--ink)}
+.note.warn{border-left:3px solid var(--warn)}
+.note.tip{border-left:3px solid var(--accent)}
+
+ol.steps{padding-left:20px; margin:14px 0} ol.steps li{margin-bottom:8px}
+
+/* ---------- endpoint card ---------- */
+.ep{background:var(--surface); border:1px solid var(--line); border-radius:8px; margin-bottom:18px; overflow:hidden; box-shadow:var(--shadow)}
+.ep-h{display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:13px 18px; border-bottom:1px solid var(--line-soft); background:var(--surface-2)}
+.m{font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600; letter-spacing:.06em; padding:3px 8px; border-radius:4px; border:1px solid currentColor; flex:none}
+.m-get{color:var(--get)} .m-post{color:var(--post)} .m-patch{color:var(--patch)} .m-put{color:var(--put)} .m-del{color:var(--del)}
+.path{font-size:13.5px; color:var(--ink); font-weight:500; word-break:break-all}
+.tok{margin-left:auto; font-size:11px; font-family:"IBM Plex Mono",monospace; color:var(--ink-3); border:1px dashed var(--line); padding:2px 7px; border-radius:4px; white-space:nowrap}
+.ep-name{font-size:15px; font-weight:600; margin:0; padding:14px 18px 0}
+.ep-why{color:var(--ink-2); font-size:13.5px; margin:4px 18px 0}
+
+.cols{display:grid; grid-template-columns:1fr; gap:0}
+@media (min-width:880px){ .cols{grid-template-columns:1fr 1fr} .cols > .pane + .pane{border-left:1px solid var(--line-soft); border-top:none !important} }
+.pane{padding:14px 18px 18px; min-width:0}
+.pane + .pane{border-top:1px solid var(--line-soft)}
+h4.pane-t{font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); font-weight:600; margin:0 0 10px}
+
+.f{display:grid; grid-template-columns:76px minmax(0,1fr); gap:6px 10px; margin-bottom:10px; align-items:start}
+.f dt{font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); font-weight:600; padding-top:3px}
+.f dd{margin:0; min-width:0}
+.val{font-family:"IBM Plex Mono",monospace; font-size:12.5px; background:var(--code-bg); border:1px solid var(--line-soft); border-radius:4px; padding:4px 7px; display:block; overflow-x:auto; white-space:pre; color:var(--ink)}
+.val.wrap{white-space:normal; word-break:break-all}
+.none{color:var(--ink-3); font-size:13px; font-style:italic}
+
+table.hdr{width:100%; border-collapse:collapse; font-size:12.5px; font-family:"IBM Plex Mono",monospace}
+table.hdr td{border:1px solid var(--line-soft); padding:4px 7px; vertical-align:top; word-break:break-all}
+table.hdr td:first-child{background:var(--code-bg); color:var(--ink-2); width:38%; white-space:nowrap}
+
+pre{background:var(--code-bg); border:1px solid var(--line-soft); border-radius:5px; padding:11px 13px; margin:0; overflow-x:auto; font-size:12.5px; line-height:1.55; color:var(--ink)}
+
+.status{display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:600; padding:2px 9px; border-radius:4px; margin-bottom:9px}
+.s-ok{color:var(--ok); background:var(--accent-soft)}
+.s-err{color:var(--err); background:var(--accent-soft)}
+.s-warn{color:var(--warn); background:var(--accent-soft)}
+
+.alt{margin-top:14px; padding-top:12px; border-top:1px dashed var(--line)}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--surface); box-shadow:var(--shadow)}
+table.data{width:100%; border-collapse:collapse; font-size:13.5px; min-width:520px}
+table.data th{text-align:left; font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); padding:10px 14px; border-bottom:1px solid var(--line); background:var(--surface-2); white-space:nowrap}
+table.data td{padding:9px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+table.data tr:last-child td{border-bottom:none}
+table.data code{font-size:12.5px; background:var(--code-bg); padding:1px 5px; border-radius:3px; border:1px solid var(--line-soft)}
+
+footer{margin-top:60px; padding-top:20px; border-top:1px solid var(--line); color:var(--ink-3); font-size:13px}
+</style>
+
+<div class="shell">
+
+<nav class="rail" aria-label="Sections">
+  <p class="rail-title">Contents</p>
+  <a href="#setup"><span class="rail-num">§</span>Setup</a>
+  <a href="#vars"><span class="rail-num">§</span>Variables</a>
+  <a href="#authz"><span class="rail-num">§</span>Authorization</a>
+  <a href="#auth"><span class="rail-num">0</span>Auth</a>
+  <a href="#apps"><span class="rail-num">1</span>Applications</a>
+  <a href="#appt"><span class="rail-num">2</span>Appointments</a>
+  <a href="#pv"><span class="rail-num">3</span>Police Verification</a>
+  <a href="#grv"><span class="rail-num">4</span>Grievances &amp; Appeals</a>
+  <a href="#fraud"><span class="rail-num">5</span>Fraud</a>
+  <a href="#kb"><span class="rail-num">6</span>Knowledge Base &amp; AI</a>
+  <a href="#trouble"><span class="rail-num">§</span>Troubleshooting</a>
+</nav>
+
+<main>
+
+<header class="mast">
+  <p class="eyebrow">Postman Runbook · API Gateway :9080</p>
+  <h1>PassportSahayak API Runbook</h1>
+  <p class="lede">Every endpoint written out the same way: the exact method, URL, headers and body you type into Postman on the left — the response you should see on the right. Base URL for everything is <code>http://localhost:9080/api</code>.</p>
+</header>
+
+<!-- ===================== SETUP ===================== -->
+<section class="sec" id="setup">
+  <div class="sec-head"><span class="sec-num">§</span><h2>Before you start</h2></div>
+
+  <ol class="steps">
+    <li>Start the API Gateway and all 8 microservices (<code>mvn spring-boot:run</code> in each).</li>
+    <li>Open Postman → <strong>New</strong> → <strong>HTTP Request</strong>.</li>
+    <li>Sanity check first — set method <code>GET</code>, URL <code>http://localhost:9080/api/centers</code>, no headers, no body → <strong>Send</strong>. If you get a list of 7 passport centers, the gateway is up and you can start on section 0.</li>
+  </ol>
+
+  <div class="note tip">
+    <p><strong>How to type a body.</strong> Click the <strong>Body</strong> tab → choose <strong>raw</strong> → in the dropdown on the right pick <strong>JSON</strong> → paste the JSON. If a request says "Body: none", leave that tab on <strong>none</strong>.</p>
+  </div>
+  <div class="note tip">
+    <p><strong>How to type the token.</strong> Click the <strong>Headers</strong> tab, add a row with key <code>Authorization</code> and value <code>Bearer&nbsp;&lt;paste-token-here&gt;</code>. There is one space after "Bearer" and no quotes around the token.</p>
+  </div>
+</section>
+
+<!-- ===================== VARIABLES ===================== -->
+<section class="sec" id="vars">
+  <div class="sec-head"><span class="sec-num">§</span><h2>Values you carry between requests</h2></div>
+  <p>Four values come out of one response and go into the next. Copy them as you go (or let the collection's test scripts save them for you).</p>
+  <div class="tw">
+  <table class="data">
+    <thead><tr><th>Value</th><th>Comes from</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td><code>token</code></td><td>Login – Applicant</td><td>All applicant requests</td></tr>
+      <tr><td><code>officialToken</code></td><td>Login – Official</td><td>Everything marked <em>[Official]</em></td></tr>
+      <tr><td><code>adminToken</code></td><td>Login – Admin</td><td>All Knowledge Base requests</td></tr>
+      <tr><td><code>arn</code></td><td>Create application</td><td>Appointments, PV, grievances, appeals</td></tr>
+      <tr><td><code>appointmentId</code></td><td>Book appointment</td><td>Reschedule, cancel, complete, no-show</td></tr>
+      <tr><td><code>documentId</code></td><td>Ingest KB document</td><td>KB document + chunk requests</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p style="color:var(--ink-2);font-size:13.5px">Sample values used throughout this page: ARN <code>PS1787580143454</code>, appointment id <code>1</code>, center id <code>1</code>, document id <code>e4b88084-581d-4d39-98a5-b48084a22059</code>. Yours will differ — substitute your own.</p>
+</section>
+
+<!-- ===================== AUTHORIZATION ===================== -->
+<section class="sec" id="authz">
+  <div class="sec-head"><span class="sec-num">§</span><h2>Authorization — which token for which request</h2></div>
+
+  <p>Three roles, three different tokens. Every request below is listed with the exact one it needs. Getting this wrong is the difference between <code>200 OK</code> and <code>403 Forbidden</code>.</p>
+
+  <div class="note tip">
+    <p><strong>Typing it the long way (Headers tab):</strong> add key <code>Authorization</code>, value <code>Bearer&nbsp;eyJhbGciOiJIUzUxMiJ9...</code> — one space after "Bearer", no quotes, no angle brackets.</p>
+    <p><strong>Typing it the short way (Auth tab):</strong> click <strong>Authorization</strong> tab → Type = <strong>Bearer Token</strong> → paste only the token into the Token box. Postman writes the header for you. Do not type the word "Bearer" here.</p>
+  </div>
+
+  <div class="tw" style="margin-bottom:22px">
+  <table class="data">
+    <thead><tr><th>Token</th><th>Login with</th><th>Role in JWT</th><th>Unlocks</th></tr></thead>
+    <tbody>
+      <tr><td><code>token</code></td><td>applicant1@example.com<br>Passw0rd!23</td><td><code>APPLICANT</code></td><td>Own applications, appointments, grievances, appeals, fraud reports</td></tr>
+      <tr><td><code>officialToken</code></td><td>official1@example.com<br>OfficerP@ss1</td><td><code>RPO_OFFICIAL</code></td><td>All status updates, PV cases, capacity, escalations, paged lists</td></tr>
+      <tr><td><code>adminToken</code></td><td>admin1@example.com<br>AdminP@ss1</td><td><code>ADMIN</code></td><td>Knowledge Base ingest, documents, chunks, supersede</td></tr>
+      <tr><td><em>none</em></td><td>—</td><td>—</td><td>Public reference endpoints (centers, slots, checklists, matrices)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 style="font-family:'IBM Plex Serif',Georgia,serif;font-size:17px;font-weight:600;margin:0 0 12px">Full authorization map</h3>
+  <div class="tw">
+  <table class="data">
+    <thead><tr><th>Method</th><th>Path</th><th>Authorization header</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/auth/register</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/auth/login</code></td><td>—</td></tr>
+      <tr><td><code>GET</code></td><td><code>/auth/me</code></td><td>Bearer &lt;token&gt;</td></tr>
+
+      <tr><td><code>POST</code></td><td><code>/applications/eligibility/check</code></td><td>—</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications/document-checklist</code></td><td>—</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications/fee-estimate</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/applications</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications/mine</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications/{arn}</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications/{arn}/status</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/applications?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/applications/{arn}/status</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+
+      <tr><td><code>GET</code></td><td><code>/centers</code></td><td>—</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appointments/slots</code></td><td>—</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appointments/capacity</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/appointments/fresh/book</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/appointments/renewal/book</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>PUT</code></td><td><code>/appointments/{id}/reschedule</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>DELETE</code></td><td><code>/appointments/{id}</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appointments/{id}</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appointments/mine</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/appointments/{id}/complete</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/appointments/{id}/no-show</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+
+      <tr><td><code>GET</code></td><td><code>/pv/classification-rules</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/pv/cases</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/pv/cases/{arn}</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/pv/cases?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/pv/cases/{arn}/status</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/pv/sla-breaches/refresh</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+
+      <tr><td><code>POST</code></td><td><code>/grievances</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/grievances/mine</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/grievances?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/grievances/{id}/status</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/grievances/sla-matrix</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/appeals</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appeals/{arn}</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appeals?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/appeals/{id}/decision</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/appeals/authority-chain</code></td><td>—</td></tr>
+
+      <tr><td><code>POST</code></td><td><code>/fraud/reports</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/fraud/reports/mine</code></td><td>Bearer &lt;token&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/fraud/reports?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/fraud/reports/{id}/status</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/fraud/referral-matrix</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/fraud/escalations</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/fraud/escalations/{arn}</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/fraud/escalations?status=</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/fraud/escalations/{id}/status</code></td><td>Bearer &lt;officialToken&gt;</td></tr>
+
+      <tr><td><code>POST</code></td><td><code>/kb/ingest</code></td><td>Bearer &lt;adminToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/kb/documents</code></td><td>Bearer &lt;adminToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/kb/documents/{id}</code></td><td>Bearer &lt;adminToken&gt;</td></tr>
+      <tr><td><code>GET</code></td><td><code>/kb/documents/{id}/chunks</code></td><td>Bearer &lt;adminToken&gt;</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/kb/documents/{id}/supersede</code></td><td>Bearer &lt;adminToken&gt;</td></tr>
+      <tr><td><code>POST</code></td><td><code>/ai/passport/chat/sync</code></td><td>—</td></tr>
+      <tr><td><code>POST</code></td><td><code>/ai/passport/chat/async</code></td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn" style="margin-top:20px">
+    <p><strong>Two mistakes that produce 401 every time:</strong> pasting the token with the surrounding quotes from the JSON response, and forgetting the space after <code>Bearer</code>. The token itself has no spaces — it is three dot-separated chunks.</p>
+    <p><strong>And one that produces 403:</strong> the applicant token on an <em>[Official]</em> route. The token is valid; the role isn't.</p>
+  </div>
+</section>
+
+<!-- ===================== 0. AUTH ===================== -->
+<section class="sec" id="auth">
+  <div class="sec-head"><span class="sec-num">0</span><h2>Auth</h2><span class="sec-count">7 requests</span></div>
+  <div class="note warn"><p><strong>Run this section first.</strong> Nothing else works until you have a token.</p></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/register</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Register — Applicant</h3>
+    <p class="ep-why">Creates the normal citizen account you'll use for almost everything.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/register</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "fullName": "Test Applicant",
+  "email": "applicant1@example.com",
+  "phone": "9876543210",
+  "password": "Passw0rd!23",
+  "role": "APPLICANT"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwi...",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 1,
+    "fullName": "Test Applicant",
+    "email": "applicant1@example.com",
+    "phone": "9876543210",
+    "role": "APPLICANT"
+  }
+}</pre>
+        <div class="alt">
+          <span class="status s-err">409 Conflict</span>
+<pre>{
+  "timestamp": "2026-08-24T14:06:36.353Z",
+  "status": 409,
+  "error": "Conflict",
+  "message": "An account with this email already exists"
+}</pre>
+          <p class="ep-why" style="margin-left:0">Already registered — skip ahead to Login.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/register</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Register — Official (RPO)</h3>
+    <p class="ep-why">Same URL, different <code>role</code>. This account unlocks every <em>[Official]</em> request.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/register</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "fullName": "RPO Officer",
+  "email": "official1@example.com",
+  "phone": "9988776655",
+  "password": "OfficerP@ss1",
+  "role": "RPO_OFFICIAL"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwi...",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 3,
+    "fullName": "RPO Officer",
+    "email": "official1@example.com",
+    "phone": "9988776655",
+    "role": "RPO_OFFICIAL"
+  }
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/register</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Register — Admin</h3>
+    <p class="ep-why">Needed only for the Knowledge Base section.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/register</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "fullName": "KB Admin",
+  "email": "admin1@example.com",
+  "phone": "9111222333",
+  "password": "AdminP@ss1",
+  "role": "ADMIN"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwi...",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 4,
+    "fullName": "KB Admin",
+    "email": "admin1@example.com",
+    "phone": "9111222333",
+    "role": "ADMIN"
+  }
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/login</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Login — Applicant</h3>
+    <p class="ep-why">Copy the <code>token</code> from the response. This is your applicant token.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/login</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "email": "applicant1@example.com",
+  "password": "Passw0rd!23"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1h
+             aWwiOiJhcHBsaWNhbnQxQGV4YW1wbGUuY29tIn0
+             .example-signature",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 1,
+    "fullName": "Test Applicant",
+    "email": "applicant1@example.com",
+    "phone": "9876543210",
+    "role": "APPLICANT"
+  }
+}</pre>
+        <div class="alt">
+          <span class="status s-err">401 Unauthorized</span>
+<pre>{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid email or password"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/login</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Login — Official</h3>
+    <p class="ep-why">Copy this token separately — it is your <em>officialToken</em>.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/login</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "email": "official1@example.com",
+  "password": "OfficerP@ss1"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwi...",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 3,
+    "fullName": "RPO Officer",
+    "email": "official1@example.com",
+    "role": "RPO_OFFICIAL"
+  }
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/auth/login</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Login — Admin</h3>
+    <p class="ep-why">Copy this token as your <em>adminToken</em> for section 6.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/login</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "email": "admin1@example.com",
+  "password": "AdminP@ss1"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwi...",
+  "tokenType": "Bearer",
+  "expiresInMs": 86400000,
+  "user": {
+    "id": 4,
+    "fullName": "KB Admin",
+    "email": "admin1@example.com",
+    "role": "ADMIN"
+  }
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/auth/me</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Get my profile</h3>
+    <p class="ep-why">The quickest way to prove your token header is typed correctly.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/auth/me</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "fullName": "Test Applicant",
+  "email": "applicant1@example.com",
+  "phone": "9876543210",
+  "role": "APPLICANT"
+}</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 1. APPLICATIONS ===================== -->
+<section class="sec" id="apps">
+  <div class="sec-head"><span class="sec-num">1</span><h2>Applications</h2><span class="sec-count">9 requests</span></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/applications/eligibility/check</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Eligibility check</h3>
+    <p class="ep-why">Public. Tells you which application type and validity you qualify for.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/eligibility/check</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Content-Type</td><td>application/json</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "dateOfBirth": "1995-05-20",
+  "existingPassportStatus": "NONE",
+  "addressChangedSinceLastPassport": false,
+  "pagesExhausted": false
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "minor": false,
+  "eligibleApplicationTypes": ["FRESH"],
+  "recommendedApplicationType": "FRESH",
+  "validityYears": 10,
+  "allowedBookletTypes": ["STANDARD_36", "JUMBO_60"],
+  "tatkalEligible": false,
+  "tatkalNote": "Not eligible for Tatkal: provide a
+    qualifying urgency reason with travel/deadline
+    within 30 days.",
+  "recommendedPvType": "PRE_PV",
+  "ecrEcnrGuidance": "ECR applies to holders below
+    matriculation travelling for employment to
+    ECR-designated countries...",
+  "notes": "Adult application. See document checklist
+    for the recommended application type."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications/document-checklist</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Document checklist</h3>
+    <p class="ep-why">Public. Query params go straight in the URL — no Params tab needed.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/document-checklist?applicationType=FRESH&amp;minor=false</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "applicationType": "FRESH",
+  "minor": false,
+  "documents": [
+    { "document": "Proof of Date of Birth",
+      "mandatory": true,
+      "note": "Birth certificate / 10th marksheet" },
+    { "document": "Proof of Identity",
+      "mandatory": true,
+      "note": "Aadhaar / PAN / Voter ID" },
+    { "document": "Proof of Address",
+      "mandatory": true,
+      "note": "Aadhaar / utility bill (&lt;3 months)" },
+    { "document": "Old passport, if any",
+      "mandatory": false,
+      "note": "Mandatory if previously held" },
+    { "document": "2 passport-size photographs",
+      "mandatory": true, "note": "White background" }
+  ],
+  "applicableAnnexures": [
+    { "code": "B", "title": "Affidavit - date of birth",
+      "whenRequired": "DOB discrepancy or correction" },
+    { "code": "A", "title": "Affidavit for name change",
+      "whenRequired": "Legal name change" }
+  ]
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications/fee-estimate</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Fee estimate</h3>
+    <p class="ep-why">Public. Four query params, all required.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/fee-estimate?applicationType=FRESH&amp;serviceScheme=NORMAL&amp;bookletType=STANDARD_36&amp;minor=false</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "feeAmount": 1500,
+  "breakdown": "Standard fee schedule (KB-PASS-001
+    Sec 4.2) for FRESH / NORMAL / STANDARD_36"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/applications</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Create application</h3>
+    <p class="ep-why"><strong>Copy the <code>arn</code> from the response</strong> — half the requests below need it.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "applicationType": "FRESH",
+  "serviceScheme": "NORMAL",
+  "bookletType": "STANDARD_36",
+  "dateOfBirth": "1995-05-20"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "applicantUserId": 1,
+  "applicationType": "FRESH",
+  "serviceScheme": "NORMAL",
+  "bookletType": "STANDARD_36",
+  "minor": false,
+  "status": "SUBMITTED",
+  "pvType": null,
+  "feeAmount": 1500.00,
+  "feePaid": true,
+  "remarks": null,
+  "createdAt": "2026-08-24T14:02:23.567Z",
+  "updatedAt": "2026-08-24T14:02:23.567Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications/mine</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">List my applications</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/mine</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": "PS1787580143454",
+    "applicationType": "FRESH",
+    "serviceScheme": "NORMAL",
+    "bookletType": "STANDARD_36",
+    "minor": false,
+    "status": "SUBMITTED",
+    "feeAmount": 1500.00,
+    "feePaid": true,
+    "createdAt": "2026-08-24T14:02:23.567Z"
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications/{arn}</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Get application by ARN</h3>
+    <p class="ep-why">Paste your own ARN into the URL in place of the sample.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/PS1787580143454</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "applicationType": "FRESH",
+  "status": "PV_CLEARED",
+  "pvType": "PRE_PV",
+  "feeAmount": 1500.00,
+  "feePaid": true,
+  "remarks": "Home visit satisfactory",
+  "updatedAt": "2026-08-24T14:06:35.719Z"
+}</pre>
+        <div class="alt">
+          <span class="status s-err">404 Not Found</span>
+<pre>{
+  "status": 404,
+  "error": "Not Found",
+  "message": "No application found for ARN UNKNOWNARN"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications/{arn}/status</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Track application status</h3>
+    <p class="ep-why">The short, applicant-facing view: where it is and what to do next.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/PS1787580143454/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "arn": "PS1787580143454",
+  "status": "APPOINTMENT_BOOKED",
+  "pvType": null,
+  "applicantNextStep": "Prepare documents per the
+    checklist and visit the PSK on your appointment
+    date.",
+  "updatedAt": "2026-08-24T14:04:12.833Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/applications</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List applications by status</h3>
+    <p class="ep-why">Paged. Response shape is a Spring <code>Page</code>, not a bare array.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications?status=SUBMITTED&amp;page=0&amp;size=10</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 1,
+      "arn": "PS1787580143454",
+      "applicationType": "FRESH",
+      "status": "SUBMITTED",
+      "feeAmount": 1500.00,
+      "feePaid": true
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "size": 10,
+  "first": true,
+  "last": true,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/applications/{arn}/status</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Update application status</h3>
+    <p class="ep-why">Same URL as the tracking GET — the method and the token are what differ.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/applications/PS1787580143454/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "ON_HOLD",
+  "remarks": "Documents need re-verification"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "status": "ON_HOLD",
+  "remarks": "Documents need re-verification",
+  "updatedAt": "2026-08-24T15:00:00.000Z"
+}</pre>
+        <div class="alt">
+          <span class="status s-err">403 Forbidden</span>
+<pre>{
+  "status": 403,
+  "error": "Forbidden",
+  "message": "You do not have permission to perform
+    this action"
+}</pre>
+          <p class="ep-why" style="margin-left:0">You pasted the applicant token instead of the official one.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 2. APPOINTMENTS ===================== -->
+<section class="sec" id="appt">
+  <div class="sec-head"><span class="sec-num">2</span><h2>Appointments</h2><span class="sec-count">11 requests</span></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/centers</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">List centers</h3>
+    <p class="ep-why">The simplest request in the whole API — use it to prove the gateway is up.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/centers</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  { "id": 1, "code": "PSK-BLR-01",
+    "name": "PSK Bengaluru - Koramangala",
+    "type": "PSK", "city": "Bengaluru",
+    "state": "Karnataka", "dailyCapacity": 150,
+    "tatkalCapacityPercent": 12 },
+  { "id": 3, "code": "PSK-MUM-01",
+    "name": "PSK Mumbai - Worli", "type": "PSK",
+    "city": "Mumbai", "dailyCapacity": 180 },
+  { "id": 4, "code": "PSK-DEL-01",
+    "name": "PSK Delhi - Dwarka", "type": "PSK",
+    "city": "New Delhi", "dailyCapacity": 200 },
+  { "id": 6, "code": "POPSK-MYS-01",
+    "name": "POPSK Mysuru Head Post Office",
+    "type": "POPSK", "dailyCapacity": 40 }
+]
+<span style="color:var(--ink-3)">// 7 centers in total</span></pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appointments/slots</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Search slots</h3>
+    <p class="ep-why">Check availability before booking. Use a future date.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/slots?centerId=1&amp;date=2026-09-15&amp;category=NORMAL</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "centerId": 1,
+    "centerName": "PSK Bengaluru - Koramangala",
+    "city": "Bengaluru",
+    "date": "2026-09-15",
+    "category": "NORMAL",
+    "capacity": 132,
+    "booked": 0,
+    "available": 132
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appointments/capacity</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Capacity monitoring</h3>
+    <p class="ep-why">Normal vs Tatkal split for one center on one day.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/capacity?centerId=1&amp;date=2026-09-15</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "centerId": 1,
+  "centerName": "PSK Bengaluru - Koramangala",
+  "date": "2026-09-15",
+  "normalCapacity": 132,
+  "normalBooked": 1,
+  "tatkalCapacity": 18,
+  "tatkalBooked": 0
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/appointments/fresh/book</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Book Fresh appointment</h3>
+    <p class="ep-why"><strong>Copy the <code>id</code></strong> — reschedule, cancel and complete all need it.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/fresh/book</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787580143454",
+  "centerId": 1,
+  "appointmentDate": "2026-09-15",
+  "appointmentTime": "10:30:00",
+  "category": "NORMAL"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "centerId": 1,
+  "centerName": "PSK Bengaluru - Koramangala",
+  "appointmentDate": "2026-09-15",
+  "appointmentTime": "10:30:00",
+  "category": "NORMAL",
+  "status": "BOOKED",
+  "rescheduleCount": 0,
+  "note": "Appointment confirmed. Carry your ARN
+    printout and documents per the checklist."
+}</pre>
+        <div class="alt">
+          <span class="status s-err">409 Conflict</span>
+<pre>{
+  "status": 409,
+  "error": "Conflict",
+  "message": "An active appointment already exists
+    for this ARN"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/appointments/renewal/book</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Book Renewal / Reissue appointment</h3>
+    <p class="ep-why">Identical body to Fresh — only the URL segment changes.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/renewal/book</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787581112233",
+  "centerId": 1,
+  "appointmentDate": "2026-09-15",
+  "appointmentTime": "10:30:00",
+  "category": "NORMAL"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 2,
+  "arn": "PS1787581112233",
+  "centerId": 1,
+  "centerName": "PSK Bengaluru - Koramangala",
+  "appointmentDate": "2026-09-15",
+  "appointmentTime": "10:30:00",
+  "category": "NORMAL",
+  "status": "BOOKED",
+  "rescheduleCount": 0
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-put">PUT</span><span class="path mono">/appointments/{id}/reschedule</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Reschedule appointment</h3>
+    <p class="ep-why">Method is <strong>PUT</strong>, not POST. The <code>1</code> in the URL is the appointment id.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/1/reschedule</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "newAppointmentDate": "2026-09-20",
+  "newAppointmentTime": "11:00:00"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "appointmentDate": "2026-09-20",
+  "appointmentTime": "11:00:00",
+  "status": "RESCHEDULED",
+  "rescheduleCount": 1,
+  "note": "Rescheduled at no additional charge
+    (first reschedule is free)."
+}</pre>
+        <div class="alt">
+          <span class="status s-err">409 Conflict</span>
+<pre>{
+  "status": 409,
+  "error": "Conflict",
+  "message": "Maximum of 2 reschedules already used
+    (KB-PASS-004 Sec 2.3)"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-del">DELETE</span><span class="path mono">/appointments/{id}</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Cancel appointment</h3>
+    <p class="ep-why">Same URL as "Get appointment by id" — only the method differs. Watch that dropdown.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/1</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "appointmentDate": "2026-09-20",
+  "appointmentTime": "11:00:00",
+  "status": "CANCELLED",
+  "rescheduleCount": 1,
+  "note": "Cancelled. The application fee already
+    paid is non-refundable."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appointments/{id}</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Get appointment by id</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/1</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "centerId": 1,
+  "centerName": "PSK Bengaluru - Koramangala",
+  "appointmentDate": "2026-09-10",
+  "appointmentTime": "11:00:00",
+  "category": "NORMAL",
+  "status": "RESCHEDULED",
+  "rescheduleCount": 1
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appointments/mine</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">List my appointments</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/mine</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": "PS1787580143454",
+    "centerName": "PSK Bengaluru - Koramangala",
+    "appointmentDate": "2026-09-10",
+    "appointmentTime": "11:00:00",
+    "category": "NORMAL",
+    "status": "RESCHEDULED",
+    "rescheduleCount": 1
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/appointments/{id}/complete</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Mark appointment completed</h3>
+    <p class="ep-why">POST with no body at all.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/1/complete</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "appointmentDate": "2026-09-10",
+  "status": "COMPLETED",
+  "rescheduleCount": 1,
+  "updatedAt": "2026-08-24T14:30:00.000Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/appointments/{id}/no-show</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Mark no-show</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appointments/2/no-show</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 2,
+  "arn": "PS1787581112233",
+  "appointmentDate": "2026-09-15",
+  "status": "NO_SHOW",
+  "rescheduleCount": 0,
+  "updatedAt": "2026-08-24T14:35:00.000Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 3. PV ===================== -->
+<section class="sec" id="pv">
+  <div class="sec-head"><span class="sec-num">3</span><h2>Police Verification</h2><span class="sec-count">6 requests</span></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/pv/classification-rules</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Classification rules</h3>
+    <p class="ep-why">Public reference table — which case gets Pre-PV, Post-PV or exemption.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/classification-rules</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  { "condition": "Fresh application - adult",
+    "pvType": "PRE_PV",
+    "passportDispatch": "After PV clearance" },
+  { "condition": "Fresh application - minor",
+    "pvType": "POST_PV",
+    "passportDispatch": "Dispatched within 3 days" },
+  { "condition": "Renewal - address changed",
+    "pvType": "PRE_PV" },
+  { "condition": "Lost passport re-issue",
+    "pvType": "PRE_PV" },
+  { "condition": "Government servant (Annexure F)",
+    "pvType": "PV_EXEMPT" },
+  { "condition": "Senior citizen (70+)",
+    "pvType": "POST_PV" },
+  { "condition": "Court-directed applicant",
+    "pvType": "EXPEDITED_PRE_PV" }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/pv/cases</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Dispatch PV case</h3>
+    <p class="ep-why">The service decides <code>pvType</code> from the flags you send.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/cases</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787580143454",
+  "governmentServant": false,
+  "seniorCitizen": false,
+  "courtDirected": false,
+  "addressChangedSinceLastPassport": false,
+  "district": "Bengaluru Urban",
+  "state": "Karnataka"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "pvType": "PRE_PV",
+  "status": "DISPATCHED",
+  "district": "Bengaluru Urban",
+  "state": "Karnataka",
+  "dispatchedAt": "2026-08-24T14:06:05.907Z",
+  "slaDeadline": "2026-10-05",
+  "clearedAt": null,
+  "applicantAction": "No action required; wait for
+    home visit assignment."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/pv/cases/{arn}</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Get PV case by ARN</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/cases/PS1787580143454</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "pvType": "PRE_PV",
+  "status": "CLEARED",
+  "district": "Bengaluru Urban",
+  "slaDeadline": "2026-10-05",
+  "clearedAt": "2026-08-24T14:06:35.708Z",
+  "remarks": "Home visit satisfactory",
+  "applicantAction": "Expect Speed Post delivery
+    within 5-7 working days."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/pv/cases</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List PV cases by status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/cases?status=DISPATCHED</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 2,
+      "arn": "PS1787581112233",
+      "pvType": "PRE_PV",
+      "status": "DISPATCHED",
+      "district": "Bengaluru Urban",
+      "slaDeadline": "2026-10-06",
+      "clearedAt": null
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/pv/cases/{arn}/status</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Update PV case status</h3>
+    <p class="ep-why">Clearing the PV case also advances the application to <code>PV_CLEARED</code>.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/cases/PS1787580143454/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "CLEARED",
+  "remarks": "Home visit satisfactory"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "pvType": "PRE_PV",
+  "status": "CLEARED",
+  "clearedAt": "2026-08-24T14:06:35.708Z",
+  "remarks": "Home visit satisfactory",
+  "applicantAction": "Expect Speed Post delivery
+    within 5-7 working days."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/pv/sla-breaches/refresh</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Refresh SLA breaches</h3>
+    <p class="ep-why">An empty array is the correct, healthy answer — nothing has breached its deadline.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/pv/sla-breaches/refresh</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[]</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 4. GRIEVANCES ===================== -->
+<section class="sec" id="grv">
+  <div class="sec-head"><span class="sec-num">4</span><h2>Grievances &amp; Appeals</h2><span class="sec-count">10 requests</span></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/grievances</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">File a grievance</h3>
+    <p class="ep-why">The SLA in working days is assigned automatically from the <code>type</code>.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/grievances</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787580143454",
+  "type": "STATUS_DELAY",
+  "description": "No update in 35 days"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "type": "STATUS_DELAY",
+  "status": "OPEN",
+  "slaWorkingDays": 7,
+  "description": "No update in 35 days",
+  "resolutionNotes": null,
+  "createdAt": "2026-08-24T14:05:28.486Z",
+  "resolvedAt": null
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/grievances/mine</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">List my grievances</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/grievances/mine</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": "PS1787580143454",
+    "type": "STATUS_DELAY",
+    "status": "OPEN",
+    "slaWorkingDays": 7,
+    "description": "No update in 35 days",
+    "resolvedAt": null
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/grievances</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List grievances by status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/grievances?status=OPEN</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 1,
+      "arn": "PS1787580143454",
+      "type": "STATUS_DELAY",
+      "status": "OPEN",
+      "slaWorkingDays": 7,
+      "description": "No update in 35 days"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/grievances/{id}/status</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Update grievance status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/grievances/1/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "RESOLVED",
+  "resolutionNotes": "Escalated to RPO; status advanced"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "type": "STATUS_DELAY",
+  "status": "RESOLVED",
+  "slaWorkingDays": 7,
+  "resolutionNotes": "Escalated to RPO; status
+    advanced",
+  "resolvedAt": "2026-08-24T14:06:35.963Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/grievances/sla-matrix</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Grievance SLA matrix</h3>
+    <p class="ep-why">Public. All 7 grievance types with their channel, SLA and escalation path.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/grievances/sla-matrix</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  { "grievanceType": "STATUS_DELAY",
+    "primaryChannel": "Passport Seva Portal",
+    "slaWorkingDays": 7,
+    "escalation": "RPO Cell -> Joint Secretary CPV" },
+  { "grievanceType": "PV_DELAY",
+    "slaWorkingDays": 5,
+    "escalation": "RPO -> SP Office via CCTNS" },
+  { "grievanceType": "INCORRECT_REJECTION",
+    "slaWorkingDays": 10 },
+  { "grievanceType": "PASSPORT_NOT_RECEIVED",
+    "slaWorkingDays": 7 },
+  { "grievanceType": "STAFF_MISCONDUCT",
+    "slaWorkingDays": 15 },
+  { "grievanceType": "POLICE_PAYMENT_DEMAND",
+    "slaWorkingDays": 3 },
+  { "grievanceType": "DATA_ENTRY_ERROR",
+    "slaWorkingDays": 7 }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/appeals</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">File an appeal</h3>
+    <p class="ep-why">Always starts at <code>LEVEL_1_DPO</code>. Copy the <code>id</code> for the decision request.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appeals</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787580143454",
+  "groundText": "Rejected due to address mismatch,
+    now corrected"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "level": "LEVEL_1_DPO",
+  "status": "PENDING",
+  "groundText": "Rejected due to address mismatch,
+    now corrected",
+  "decisionNotes": null,
+  "decidedAt": null,
+  "createdAt": "2026-08-24T14:16:08.852Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appeals/{arn}</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">Get appeals for an ARN</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appeals/PS1787580143454</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": "PS1787580143454",
+    "level": "LEVEL_1_DPO",
+    "status": "PENDING",
+    "groundText": "Rejected due to address mismatch",
+    "decidedAt": null,
+    "createdAt": "2026-08-24T14:16:08.852Z"
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appeals</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List appeals by status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appeals?status=PENDING</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 1,
+      "arn": "PS1787580143454",
+      "level": "LEVEL_1_DPO",
+      "status": "PENDING",
+      "decidedAt": null
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/appeals/{id}/decision</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Decide appeal</h3>
+    <p class="ep-why">Send <code>DECIDED</code> to close it, or <code>ESCALATED</code> to auto-create the Level 2 appeal.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appeals/1/decision</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "DECIDED",
+  "decisionNotes": "Appeal upheld; address corrected
+    in records"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "level": "LEVEL_1_DPO",
+  "status": "DECIDED",
+  "decisionNotes": "Appeal upheld; address corrected
+    in records",
+  "decidedAt": "2026-08-24T15:00:00.000Z"
+}</pre>
+        <div class="alt">
+          <p class="ep-why" style="margin-left:0">Send <code>"status": "ESCALATED"</code> instead and you get:</p>
+          <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "level": "LEVEL_1_DPO",
+  "status": "ESCALATED",
+  "decisionNotes": "Needs Passport Officer review",
+  "decidedAt": "2026-08-24T15:00:00.000Z"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/appeals/authority-chain</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Appeal authority chain</h3>
+    <p class="ep-why">Public. Who decides at each level and within what timeline.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/appeals/authority-chain</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  { "level": "LEVEL_1_DPO",
+    "authority": "Deputy Passport Officer at RPO",
+    "timeline": "Within 30 days of rejection" },
+  { "level": "LEVEL_2_PASSPORT_OFFICER",
+    "authority": "Passport Officer at RPO",
+    "timeline": "Within 30 days of Level 1" },
+  { "level": "LEVEL_3_RPO_HEAD",
+    "authority": "Regional Passport Officer",
+    "timeline": "Within 30 days of Level 2" },
+  { "level": "LEVEL_4_JOINT_SECRETARY",
+    "authority": "Joint Secretary (CPV), MEA",
+    "timeline": "Within 60 days of Level 3" },
+  { "level": "LEGAL_RECOURSE",
+    "authority": "High Court / Supreme Court",
+    "timeline": "As per court procedures" }
+]</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 5. FRAUD ===================== -->
+<section class="sec" id="fraud">
+  <div class="sec-head"><span class="sec-num">5</span><h2>Fraud</h2><span class="sec-count">9 requests</span></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/fraud/reports</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">File a fraud report</h3>
+    <p class="ep-why">Severity and referral authority are derived from <code>category</code> — you don't send them.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/reports</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "category": "AGENT_BROKER_FRAUD",
+  "description": "Agent demanded extra cash for
+    faster processing"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": null,
+  "category": "AGENT_BROKER_FRAUD",
+  "severity": "HIGH",
+  "referralAuthority": "PGPortal.gov.in + PSK
+    helpline",
+  "description": "Agent demanded extra cash for
+    faster processing",
+  "status": "REPORTED",
+  "createdAt": "2026-08-24T14:05:28.906Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/fraud/reports/mine</span><span class="tok">applicant token</span></div>
+    <h3 class="ep-name">List my fraud reports</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/reports/mine</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer eyJhbGciOiJIUzUxMiJ9...</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": null,
+    "category": "AGENT_BROKER_FRAUD",
+    "severity": "HIGH",
+    "referralAuthority": "PGPortal.gov.in",
+    "status": "REPORTED",
+    "createdAt": "2026-08-24T14:05:28.906Z"
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/fraud/reports</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List fraud reports by status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/reports?status=REPORTED</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 1,
+      "category": "AGENT_BROKER_FRAUD",
+      "severity": "HIGH",
+      "status": "REPORTED",
+      "createdAt": "2026-08-24T14:05:28.906Z"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/fraud/reports/{id}/status</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Update fraud report status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/reports/1/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "REFERRED"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": null,
+  "category": "AGENT_BROKER_FRAUD",
+  "severity": "HIGH",
+  "referralAuthority": "PGPortal.gov.in + PSK
+    helpline",
+  "status": "REFERRED",
+  "createdAt": "2026-08-24T14:05:28.906Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/fraud/referral-matrix</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">Referral matrix</h3>
+    <p class="ep-why">Public. All 8 fraud categories with severity, authority and outcome.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/referral-matrix</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  { "category": "DOCUMENT_FORGERY",
+    "severity": "CRITICAL",
+    "referralAuthority": "PSK -> RPO -> Police",
+    "outcome": "Cancelled; FIR filed; blacklisted" },
+  { "category": "IDENTITY_IMPERSONATION",
+    "severity": "CRITICAL" },
+  { "category": "SUPPRESSION_OF_INFO",
+    "severity": "HIGH" },
+  { "category": "AGENT_BROKER_FRAUD",
+    "severity": "HIGH" },
+  { "category": "DUPLICATE_PASSPORT",
+    "severity": "CRITICAL" },
+  { "category": "ONLINE_PHISHING",
+    "severity": "HIGH",
+    "referralAuthority": "CERT-In + cyber police" },
+  { "category": "INTERNAL_MISCONDUCT",
+    "severity": "CRITICAL",
+    "referralAuthority": "CVC + State ACB" },
+  { "category": "PV_CORRUPTION",
+    "severity": "CRITICAL" }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/fraud/escalations</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Create escalation case</h3>
+    <p class="ep-why">Officials only — an applicant token gets 403 here.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/escalations</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "arn": "PS1787580143454",
+  "type": "DISPUTED_PARENTAGE",
+  "details": "Both parents dispute authority to
+    apply for minor passport"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "type": "DISPUTED_PARENTAGE",
+  "details": "Both parents dispute authority to
+    apply for minor passport",
+  "status": "OPEN",
+  "createdAt": "2026-08-24T15:00:00.000Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/fraud/escalations/{arn}</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Get escalations for an ARN</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/escalations/PS1787580143454</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "arn": "PS1787580143454",
+    "type": "DISPUTED_PARENTAGE",
+    "status": "OPEN",
+    "createdAt": "2026-08-24T15:00:00.000Z"
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/fraud/escalations</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] List escalations by status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/escalations?status=OPEN</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "id": 1,
+      "arn": "PS1787580143454",
+      "type": "DISPUTED_PARENTAGE",
+      "status": "OPEN"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/fraud/escalations/{id}/status</span><span class="tok">official token</span></div>
+    <h3 class="ep-name">[Official] Update escalation status</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/fraud/escalations/1/status</span></dd>
+          <dt>Headers</dt><dd><table class="hdr">
+            <tr><td>Content-Type</td><td>application/json</td></tr>
+            <tr><td>Authorization</td><td>Bearer &lt;officialToken&gt;</td></tr>
+          </table></dd>
+        </dl>
+        <h4 class="pane-t">Body — raw / JSON</h4>
+<pre>{
+  "status": "RESOLVED"
+}</pre>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "id": 1,
+  "arn": "PS1787580143454",
+  "type": "DISPUTED_PARENTAGE",
+  "status": "RESOLVED",
+  "createdAt": "2026-08-24T15:00:00.000Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== 6. KB ===================== -->
+<section class="sec" id="kb">
+  <div class="sec-head"><span class="sec-num">6</span><h2>Knowledge Base &amp; AI</h2><span class="sec-count">7 requests</span></div>
+  <div class="note warn"><p><strong>All KB requests need the admin token</strong>, not the official one.</p></div>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/kb/ingest</span><span class="tok">admin token</span></div>
+    <h3 class="ep-name">[Admin] Ingest KB document</h3>
+    <p class="ep-why">The only <strong>form-data</strong> request in the API. Body tab → <strong>form-data</strong> (not raw), and add these seven key/value rows, each of type <em>Text</em>. Do not set Content-Type yourself — Postman adds the multipart boundary.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/kb/ingest</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;adminToken&gt;</td></tr></table></dd>
+        </dl>
+        <h4 class="pane-t">Body — form-data</h4>
+        <table class="hdr">
+          <tr><td>title</td><td>Passport Types, Categories &amp; Eligibility</td></tr>
+          <tr><td>docCode</td><td>KB-PASS-001</td></tr>
+          <tr><td>version</td><td>v1.0</td></tr>
+          <tr><td>audience</td><td>applicant|official</td></tr>
+          <tr><td>effectiveDate</td><td>2024-04-01</td></tr>
+          <tr><td>tags</td><td>doc_type=passport_types</td></tr>
+          <tr><td>content</td><td>Ordinary Passport (Type P) is the standard travel document issued to Indian citizens. Validity for adults is 10 years from date of issue.</td></tr>
+        </table>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">201 Created</span>
+<pre>{
+  "documentId": "e4b88084-581d-4d39-98a5-b48084a22059",
+  "chunks_created": 1,
+  "ingestion_time_ms": 0,
+  "metadata": {
+    "docCode": "KB-PASS-001",
+    "version": "v1.0",
+    "audience": "applicant|official",
+    "effectiveDate": "2024-04-01",
+    "tags": "doc_type=passport_types"
+  }
+}</pre>
+        <p class="ep-why" style="margin-left:0"><strong>Copy the <code>documentId</code></strong> for the next three requests.</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/kb/documents</span><span class="tok">admin token</span></div>
+    <h3 class="ep-name">[Admin] List KB documents</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/kb/documents</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;adminToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "content": [
+    {
+      "documentId": "e4b88084-581d-4d39-98a5-b480...",
+      "docCode": "KB-PASS-001",
+      "title": "Passport Types, Categories &amp;
+        Eligibility",
+      "version": "v1.0",
+      "status": "ACTIVE",
+      "chunkCount": 1,
+      "createdAt": "2026-08-24T14:15:35.154Z"
+    }
+  ],
+  "totalElements": 1,
+  "totalPages": 1,
+  "number": 0,
+  "empty": false
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/kb/documents/{id}</span><span class="tok">admin token</span></div>
+    <h3 class="ep-name">[Admin] Get KB document by id</h3>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;adminToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "documentId": "e4b88084-581d-4d39-98a5-b48084a22059",
+  "docCode": "KB-PASS-001",
+  "title": "Passport Types, Categories &amp; Eligibility",
+  "version": "v1.0",
+  "audience": "applicant|official",
+  "effectiveDate": "2024-04-01",
+  "tags": "doc_type=passport_types",
+  "status": "ACTIVE",
+  "chunkCount": 1,
+  "createdAt": "2026-08-24T14:15:35.154Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-get">GET</span><span class="path mono">/kb/documents/{id}/chunks</span><span class="tok">admin token</span></div>
+    <h3 class="ep-name">[Admin] Get chunks for a document</h3>
+    <p class="ep-why"><code>embeddingStatus: PENDING</code> is expected while Azure OpenAI is unconfigured.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059/chunks</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;adminToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>[
+  {
+    "id": 1,
+    "chunkIndex": 0,
+    "content": "Ordinary Passport (Type P) is the
+      standard travel document issued to Indian
+      citizens. Validity for adults is 10 years
+      from date of issue.",
+    "embeddingStatus": "PENDING"
+  }
+]</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-patch">PATCH</span><span class="path mono">/kb/documents/{id}/supersede</span><span class="tok">admin token</span></div>
+    <h3 class="ep-name">[Admin] Supersede document</h3>
+    <p class="ep-why">Retires a version. No body — the URL carries everything.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059/supersede</span></dd>
+          <dt>Headers</dt><dd><table class="hdr"><tr><td>Authorization</td><td>Bearer &lt;adminToken&gt;</td></tr></table></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-ok">200 OK</span>
+<pre>{
+  "documentId": "e4b88084-581d-4d39-98a5-b48084a22059",
+  "docCode": "KB-PASS-001",
+  "title": "Passport Types, Categories &amp; Eligibility",
+  "version": "v1.0",
+  "status": "SUPERSEDED",
+  "chunkCount": 1,
+  "createdAt": "2026-08-24T14:15:35.154Z"
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/ai/passport/chat/sync</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">AI Chat — sync</h3>
+    <p class="ep-why">Not wired up yet. A 501 here is the correct result, not a bug.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/ai/passport/chat/sync</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-warn">501 Not Implemented</span>
+<pre>{
+  "answer": "PassportSahayak AI chat is not yet
+    configured on this deployment.",
+  "escalated": true,
+  "reason": "Azure OpenAI credentials (endpoint,
+    API key, chat + embedding deployments) have
+    not been supplied yet."
+}</pre>
+      </div>
+    </div>
+  </article>
+
+  <article class="ep">
+    <div class="ep-h"><span class="m m-post">POST</span><span class="path mono">/ai/passport/chat/async</span><span class="tok">no token</span></div>
+    <h3 class="ep-name">AI Chat — async</h3>
+    <p class="ep-why">Same story as sync.</p>
+    <div class="cols">
+      <div class="pane">
+        <h4 class="pane-t">Type this</h4>
+        <dl class="f">
+          <dt>URL</dt><dd><span class="val wrap">http://localhost:9080/api/ai/passport/chat/async</span></dd>
+          <dt>Headers</dt><dd><span class="none">none</span></dd>
+          <dt>Body</dt><dd><span class="none">none</span></dd>
+        </dl>
+      </div>
+      <div class="pane">
+        <h4 class="pane-t">You get back</h4>
+        <span class="status s-warn">501 Not Implemented</span>
+<pre>{
+  "answer": "PassportSahayak AI chat is not yet
+    configured on this deployment.",
+  "escalated": true,
+  "reason": "Azure OpenAI credentials have not
+    been supplied yet."
+}</pre>
+      </div>
+    </div>
+  </article>
+</section>
+
+<!-- ===================== TROUBLESHOOTING ===================== -->
+<section class="sec" id="trouble">
+  <div class="sec-head"><span class="sec-num">§</span><h2>When it doesn't work</h2></div>
+  <div class="tw">
+  <table class="data">
+    <thead><tr><th>What you see</th><th>What it means</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>Could not send request</code> / ECONNREFUSED</td><td>Nothing is listening on 9080</td><td>Start the gateway; check the port in <code>application.yml</code></td></tr>
+      <tr><td><code>401 Unauthorized</code></td><td>Missing, mistyped or expired token</td><td>Re-run Login and re-paste. Token lasts 24 hours</td></tr>
+      <tr><td><code>403 Forbidden</code></td><td>Right token, wrong role</td><td>Official endpoints need the RPO token; KB endpoints need the admin token</td></tr>
+      <tr><td><code>404 Not Found</code> on an ARN</td><td>ARN doesn't exist</td><td>Run "Create application" and copy the new ARN</td></tr>
+      <tr><td><code>409 Conflict</code></td><td>Business rule blocked it</td><td>Read <code>message</code> — duplicate email, existing appointment, reschedule limit</td></tr>
+      <tr><td><code>415 Unsupported Media Type</code></td><td>Body sent as text, not JSON</td><td>Body tab → raw → pick <strong>JSON</strong> in the dropdown</td></tr>
+      <tr><td><code>400 Bad Request</code></td><td>Malformed JSON</td><td>Trailing comma or a smart quote — retype the quotes</td></tr>
+      <tr><td><code>501 Not Implemented</code></td><td>AI chat only</td><td>Expected. Azure OpenAI isn't configured</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note tip" style="margin-top:22px">
+    <p><strong>Suggested order for a full pass:</strong> Register + Login (all 3 roles) → Create application → Book appointment → Dispatch PV case → Clear PV case → Track status. Everything else can be tested in any order once you hold an ARN.</p>
+  </div>
+</section>
+
+<footer>
+  PassportSahayak AI · 59 endpoints across 8 microservices · all routed through the API Gateway at <span class="mono">localhost:9080</span>
+</footer>
+
+</main>
+</div>

@@ -1,0 +1,1085 @@
+{
+  "info": {
+    "name": "PassportSahayak AI",
+    "description": "All 56 endpoints across the 8 PassportSahayak AI microservices, called via the API Gateway. Run the requests under '0. Auth' first — they auto-save your token into collection variables so every other request just works. Every request has a saved 'Example' response attached (click the request, then the small clock/example icon, or expand it in the left sidebar) so you can see real sample data without even sending it.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:9080/api" },
+    { "key": "token", "value": "" },
+    { "key": "officialToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "arn", "value": "" },
+    { "key": "appointmentId", "value": "" },
+    { "key": "centerId", "value": "1" },
+    { "key": "grievanceId", "value": "" },
+    { "key": "appealId", "value": "" },
+    { "key": "fraudReportId", "value": "" },
+    { "key": "escalationId", "value": "" },
+    { "key": "documentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0. Auth",
+      "item": [
+        {
+          "name": "Register - Applicant",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Test Applicant\",\n  \"email\": \"applicant1@example.com\",\n  \"phone\": \"9876543210\",\n  \"password\": \"Passw0rd!23\",\n  \"role\": \"APPLICANT\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Test Applicant\",\n  \"email\": \"applicant1@example.com\",\n  \"phone\": \"9876543210\",\n  \"password\": \"Passw0rd!23\",\n  \"role\": \"APPLICANT\"\n}" }, "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwi...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 1,\n    \"fullName\": \"Test Applicant\",\n    \"email\": \"applicant1@example.com\",\n    \"phone\": \"9876543210\",\n    \"role\": \"APPLICANT\"\n  }\n}"
+            },
+            {
+              "name": "Example - 409 Conflict (email already used)",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] } },
+              "status": "Conflict", "code": 409, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:06:36.353Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"An account with this email already exists\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Official (RPO)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"RPO Officer\",\n  \"email\": \"official1@example.com\",\n  \"phone\": \"9988776655\",\n  \"password\": \"OfficerP@ss1\",\n  \"role\": \"RPO_OFFICIAL\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwi...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 3,\n    \"fullName\": \"RPO Officer\",\n    \"email\": \"official1@example.com\",\n    \"phone\": \"9988776655\",\n    \"role\": \"RPO_OFFICIAL\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Register - Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"KB Admin\",\n  \"email\": \"admin1@example.com\",\n  \"phone\": \"9111222333\",\n  \"password\": \"AdminP@ss1\",\n  \"role\": \"ADMIN\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwi...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 4,\n    \"fullName\": \"KB Admin\",\n    \"email\": \"admin1@example.com\",\n    \"phone\": \"9111222333\",\n    \"role\": \"ADMIN\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Applicant (auto-saves token)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('token', body.token);",
+              "pm.test('token saved', () => pm.expect(body.token).to.be.a('string'));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"applicant1@example.com\",\n  \"password\": \"Passw0rd!23\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJhcHBsaWNhbnQxQGV4YW1wbGUuY29tIiwicm9sZSI6IkFQUExJQ0FOVCIsImlhdCI6MTc4NzU4Njg1NywiZXhwIjoxNzg3NjczMjU3fQ.example-signature\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 1,\n    \"fullName\": \"Test Applicant\",\n    \"email\": \"applicant1@example.com\",\n    \"phone\": \"9876543210\",\n    \"role\": \"APPLICANT\"\n  }\n}"
+            },
+            {
+              "name": "Example - 401 Unauthorized (wrong password)",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] } },
+              "status": "Unauthorized", "code": 401, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:06:00.000Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Invalid email or password\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Official (auto-saves officialToken)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('officialToken', body.token);",
+              "pm.test('officialToken saved', () => pm.expect(body.token).to.be.a('string'));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"official1@example.com\",\n  \"password\": \"OfficerP@ss1\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwi...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 3,\n    \"fullName\": \"RPO Officer\",\n    \"email\": \"official1@example.com\",\n    \"phone\": \"9988776655\",\n    \"role\": \"RPO_OFFICIAL\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login - Admin (auto-saves adminToken)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('adminToken', body.token);",
+              "pm.test('adminToken saved', () => pm.expect(body.token).to.be.a('string'));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin1@example.com\",\n  \"password\": \"AdminP@ss1\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0Iiwi...\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInMs\": 86400000,\n  \"user\": {\n    \"id\": 4,\n    \"fullName\": \"KB Admin\",\n    \"email\": \"admin1@example.com\",\n    \"phone\": \"9111222333\",\n    \"role\": \"ADMIN\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get my profile (/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"fullName\": \"Test Applicant\",\n  \"email\": \"applicant1@example.com\",\n  \"phone\": \"9876543210\",\n  \"role\": \"APPLICANT\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Applications",
+      "item": [
+        {
+          "name": "Eligibility check (Public)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"dateOfBirth\": \"1995-05-20\",\n  \"existingPassportStatus\": \"NONE\",\n  \"addressChangedSinceLastPassport\": false,\n  \"pagesExhausted\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/applications/eligibility/check", "host": ["{{baseUrl}}"], "path": ["applications", "eligibility", "check"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/applications/eligibility/check", "host": ["{{baseUrl}}"], "path": ["applications", "eligibility", "check"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"minor\": false,\n  \"eligibleApplicationTypes\": [\"FRESH\"],\n  \"recommendedApplicationType\": \"FRESH\",\n  \"validityYears\": 10,\n  \"allowedBookletTypes\": [\"STANDARD_36\", \"JUMBO_60\"],\n  \"tatkalEligible\": false,\n  \"tatkalNote\": \"Not eligible for Tatkal: provide a qualifying urgency reason with travel/deadline within 30 days.\",\n  \"recommendedPvType\": \"PRE_PV\",\n  \"ecrEcnrGuidance\": \"ECR applies to holders below matriculation (10th standard) travelling for employment to ECR-designated countries. ECNR is granted to matriculates and above, government employees, ITR filers (3+ years) and professional certificate holders (KB-PASS-001 Sec 6).\",\n  \"notes\": \"Adult application. See document checklist for the recommended application type.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Document checklist (Public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/applications/document-checklist?applicationType=FRESH&minor=false", "host": ["{{baseUrl}}"], "path": ["applications", "document-checklist"], "query": [{ "key": "applicationType", "value": "FRESH" }, { "key": "minor", "value": "false" }] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/document-checklist?applicationType=FRESH&minor=false", "host": ["{{baseUrl}}"], "path": ["applications", "document-checklist"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"applicationType\": \"FRESH\",\n  \"minor\": false,\n  \"documents\": [\n    { \"document\": \"Proof of Date of Birth\", \"mandatory\": true, \"note\": \"Birth certificate / 10th marksheet / Aadhaar / Voter ID\" },\n    { \"document\": \"Proof of Identity\", \"mandatory\": true, \"note\": \"Aadhaar / PAN / Voter ID / Driving licence\" },\n    { \"document\": \"Proof of Address\", \"mandatory\": true, \"note\": \"Aadhaar / Voter ID / utility bill (<3 months) / bank passbook\" },\n    { \"document\": \"Old passport, if any (even if expired)\", \"mandatory\": false, \"note\": \"Mandatory if previously held\" },\n    { \"document\": \"2 recent passport-size colour photographs\", \"mandatory\": true, \"note\": \"White background\" }\n  ],\n  \"applicableAnnexures\": [\n    { \"code\": \"B\", \"title\": \"Affidavit - date of birth\", \"whenRequired\": \"DOB discrepancy or correction\" },\n    { \"code\": \"A\", \"title\": \"Affidavit for change of name\", \"whenRequired\": \"Legal name change without gazette notification\" }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Fee estimate (Public)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/applications/fee-estimate?applicationType=FRESH&serviceScheme=NORMAL&bookletType=STANDARD_36&minor=false", "host": ["{{baseUrl}}"], "path": ["applications", "fee-estimate"], "query": [{ "key": "applicationType", "value": "FRESH" }, { "key": "serviceScheme", "value": "NORMAL" }, { "key": "bookletType", "value": "STANDARD_36" }, { "key": "minor", "value": "false" }] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/fee-estimate?applicationType=FRESH&serviceScheme=NORMAL&bookletType=STANDARD_36&minor=false", "host": ["{{baseUrl}}"], "path": ["applications", "fee-estimate"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"feeAmount\": 1500,\n  \"breakdown\": \"Standard fee schedule (KB-PASS-001 Sec 4.2) for FRESH / NORMAL / STANDARD_36\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create application (auto-saves arn)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.arn) { pm.collectionVariables.set('arn', body.arn); }",
+              "pm.test('arn saved', () => pm.expect(body.arn).to.be.a('string'));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"applicationType\": \"FRESH\",\n  \"serviceScheme\": \"NORMAL\",\n  \"bookletType\": \"STANDARD_36\",\n  \"dateOfBirth\": \"1995-05-20\"\n}" },
+            "url": { "raw": "{{baseUrl}}/applications", "host": ["{{baseUrl}}"], "path": ["applications"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/applications", "host": ["{{baseUrl}}"], "path": ["applications"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"applicantUserId\": 1,\n  \"applicationType\": \"FRESH\",\n  \"serviceScheme\": \"NORMAL\",\n  \"bookletType\": \"STANDARD_36\",\n  \"minor\": false,\n  \"status\": \"SUBMITTED\",\n  \"pvType\": null,\n  \"feeAmount\": 1500.00,\n  \"feePaid\": true,\n  \"remarks\": null,\n  \"createdAt\": \"2026-08-24T14:02:23.567Z\",\n  \"updatedAt\": \"2026-08-24T14:02:23.567Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List my applications",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/applications/mine", "host": ["{{baseUrl}}"], "path": ["applications", "mine"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/mine", "host": ["{{baseUrl}}"], "path": ["applications", "mine"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": \"PS1787580143454\",\n    \"applicantUserId\": 1,\n    \"applicationType\": \"FRESH\",\n    \"serviceScheme\": \"NORMAL\",\n    \"bookletType\": \"STANDARD_36\",\n    \"minor\": false,\n    \"status\": \"SUBMITTED\",\n    \"pvType\": null,\n    \"feeAmount\": 1500.00,\n    \"feePaid\": true,\n    \"remarks\": null,\n    \"createdAt\": \"2026-08-24T14:02:23.567Z\",\n    \"updatedAt\": \"2026-08-24T14:02:23.567Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get application by ARN",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/applications/{{arn}}", "host": ["{{baseUrl}}"], "path": ["applications", "{{arn}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/PS1787580143454", "host": ["{{baseUrl}}"], "path": ["applications", "PS1787580143454"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"applicantUserId\": 1,\n  \"applicationType\": \"FRESH\",\n  \"serviceScheme\": \"NORMAL\",\n  \"bookletType\": \"STANDARD_36\",\n  \"minor\": false,\n  \"status\": \"PV_CLEARED\",\n  \"pvType\": \"PRE_PV\",\n  \"feeAmount\": 1500.00,\n  \"feePaid\": true,\n  \"remarks\": \"Home visit satisfactory\",\n  \"createdAt\": \"2026-08-24T14:02:23.567Z\",\n  \"updatedAt\": \"2026-08-24T14:06:35.719Z\"\n}"
+            },
+            {
+              "name": "Example - 404 Not Found",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/UNKNOWNARN", "host": ["{{baseUrl}}"], "path": ["applications", "UNKNOWNARN"] } },
+              "status": "Not Found", "code": 404, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:00:00.000Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"No application found for ARN UNKNOWNARN\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Track application status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/applications/{{arn}}/status", "host": ["{{baseUrl}}"], "path": ["applications", "{{arn}}", "status"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications/PS1787580143454/status", "host": ["{{baseUrl}}"], "path": ["applications", "PS1787580143454", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"arn\": \"PS1787580143454\",\n  \"status\": \"APPOINTMENT_BOOKED\",\n  \"pvType\": null,\n  \"applicantNextStep\": \"Prepare documents per the checklist and visit the PSK on your appointment date.\",\n  \"updatedAt\": \"2026-08-24T14:04:12.833Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List applications by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/applications?status=SUBMITTED&page=0&size=10", "host": ["{{baseUrl}}"], "path": ["applications"], "query": [{ "key": "status", "value": "SUBMITTED" }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/applications?status=PV_CLEARED&page=0&size=5", "host": ["{{baseUrl}}"], "path": ["applications"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"arn\": \"PS1787580143454\",\n      \"applicantUserId\": 1,\n      \"applicationType\": \"FRESH\",\n      \"serviceScheme\": \"NORMAL\",\n      \"bookletType\": \"STANDARD_36\",\n      \"minor\": false,\n      \"status\": \"PV_CLEARED\",\n      \"pvType\": \"PRE_PV\",\n      \"feeAmount\": 1500.00,\n      \"feePaid\": true,\n      \"remarks\": \"Home visit satisfactory\",\n      \"createdAt\": \"2026-08-24T14:02:23.567Z\",\n      \"updatedAt\": \"2026-08-24T14:06:35.719Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"size\": 5,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Update application status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"ON_HOLD\",\n  \"remarks\": \"Documents need re-verification\"\n}" },
+            "url": { "raw": "{{baseUrl}}/applications/{{arn}}/status", "host": ["{{baseUrl}}"], "path": ["applications", "{{arn}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/applications/PS1787580143454/status", "host": ["{{baseUrl}}"], "path": ["applications", "PS1787580143454", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"applicantUserId\": 1,\n  \"applicationType\": \"FRESH\",\n  \"serviceScheme\": \"NORMAL\",\n  \"bookletType\": \"STANDARD_36\",\n  \"minor\": false,\n  \"status\": \"ON_HOLD\",\n  \"pvType\": null,\n  \"feeAmount\": 1500.00,\n  \"feePaid\": true,\n  \"remarks\": \"Documents need re-verification\",\n  \"createdAt\": \"2026-08-24T14:02:23.567Z\",\n  \"updatedAt\": \"2026-08-24T15:00:00.000Z\"\n}"
+            },
+            {
+              "name": "Example - 403 Forbidden (applicant token used)",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/applications/PS1787580143454/status", "host": ["{{baseUrl}}"], "path": ["applications", "PS1787580143454", "status"] } },
+              "status": "Forbidden", "code": 403, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:11:21.833Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"You do not have permission to perform this action\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Appointments",
+      "item": [
+        {
+          "name": "List centers (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/centers", "host": ["{{baseUrl}}"], "path": ["centers"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/centers", "host": ["{{baseUrl}}"], "path": ["centers"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  { \"id\": 1, \"code\": \"PSK-BLR-01\", \"name\": \"PSK Bengaluru - Koramangala\", \"type\": \"PSK\", \"city\": \"Bengaluru\", \"state\": \"Karnataka\", \"address\": \"80 Feet Road, Koramangala 4th Block, Bengaluru 560034\", \"dailyCapacity\": 150, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 2, \"code\": \"PSK-BLR-02\", \"name\": \"PSK Bengaluru - Whitefield\", \"type\": \"PSK\", \"city\": \"Bengaluru\", \"state\": \"Karnataka\", \"address\": \"ITPL Main Road, Whitefield, Bengaluru 560066\", \"dailyCapacity\": 120, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 3, \"code\": \"PSK-MUM-01\", \"name\": \"PSK Mumbai - Worli\", \"type\": \"PSK\", \"city\": \"Mumbai\", \"state\": \"Maharashtra\", \"address\": \"Century Bazar, Worli, Mumbai 400025\", \"dailyCapacity\": 180, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 4, \"code\": \"PSK-DEL-01\", \"name\": \"PSK Delhi - Dwarka\", \"type\": \"PSK\", \"city\": \"New Delhi\", \"state\": \"Delhi\", \"address\": \"Sector 10, Dwarka, New Delhi 110075\", \"dailyCapacity\": 200, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 5, \"code\": \"PSK-CHN-01\", \"name\": \"PSK Chennai - Anna Nagar\", \"type\": \"PSK\", \"city\": \"Chennai\", \"state\": \"Tamil Nadu\", \"address\": \"2nd Avenue, Anna Nagar, Chennai 600040\", \"dailyCapacity\": 140, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 6, \"code\": \"POPSK-MYS-01\", \"name\": \"POPSK Mysuru Head Post Office\", \"type\": \"POPSK\", \"city\": \"Mysuru\", \"state\": \"Karnataka\", \"address\": \"Ashoka Road, Mysuru 570001\", \"dailyCapacity\": 40, \"tatkalCapacityPercent\": 12 },\n  { \"id\": 7, \"code\": \"POPSK-PUN-01\", \"name\": \"POPSK Pune Camp Post Office\", \"type\": \"POPSK\", \"city\": \"Pune\", \"state\": \"Maharashtra\", \"address\": \"MG Road, Pune Camp, Pune 411001\", \"dailyCapacity\": 35, \"tatkalCapacityPercent\": 12 }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Search slots (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/appointments/slots?centerId={{centerId}}&date=2026-09-15&category=NORMAL", "host": ["{{baseUrl}}"], "path": ["appointments", "slots"], "query": [{ "key": "centerId", "value": "{{centerId}}" }, { "key": "date", "value": "2026-09-15" }, { "key": "category", "value": "NORMAL" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appointments/slots?centerId=1&date=2026-09-15&category=NORMAL", "host": ["{{baseUrl}}"], "path": ["appointments", "slots"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"centerId\": 1,\n    \"centerName\": \"PSK Bengaluru - Koramangala\",\n    \"city\": \"Bengaluru\",\n    \"date\": \"2026-09-15\",\n    \"category\": \"NORMAL\",\n    \"capacity\": 132,\n    \"booked\": 0,\n    \"available\": 132\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Capacity monitoring",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/appointments/capacity?centerId={{centerId}}&date=2026-09-15", "host": ["{{baseUrl}}"], "path": ["appointments", "capacity"], "query": [{ "key": "centerId", "value": "{{centerId}}" }, { "key": "date", "value": "2026-09-15" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appointments/capacity?centerId=1&date=2026-09-10", "host": ["{{baseUrl}}"], "path": ["appointments", "capacity"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"date\": \"2026-09-10\",\n  \"normalCapacity\": 132,\n  \"normalBooked\": 1,\n  \"tatkalCapacity\": 18,\n  \"tatkalBooked\": 0\n}"
+            }
+          ]
+        },
+        {
+          "name": "Book Fresh appointment (auto-saves appointmentId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.id) { pm.collectionVariables.set('appointmentId', body.id); }",
+              "pm.test('appointmentId saved', () => pm.expect(body.id).to.not.be.undefined);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"centerId\": {{centerId}},\n  \"appointmentDate\": \"2026-09-15\",\n  \"appointmentTime\": \"10:30:00\",\n  \"category\": \"NORMAL\"\n}" },
+            "url": { "raw": "{{baseUrl}}/appointments/fresh/book", "host": ["{{baseUrl}}"], "path": ["appointments", "fresh", "book"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appointments/fresh/book", "host": ["{{baseUrl}}"], "path": ["appointments", "fresh", "book"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-15\",\n  \"appointmentTime\": \"10:30:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"BOOKED\",\n  \"rescheduleCount\": 0,\n  \"note\": \"Appointment confirmed. Carry your ARN printout and documents per the checklist.\",\n  \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n  \"updatedAt\": \"2026-08-24T14:04:12.739Z\"\n}"
+            },
+            {
+              "name": "Example - 409 Conflict (already booked / no slots)",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appointments/fresh/book", "host": ["{{baseUrl}}"], "path": ["appointments", "fresh", "book"] } },
+              "status": "Conflict", "code": 409, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:00:00.000Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"An active appointment already exists for this ARN\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Book Renewal/Reissue appointment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"centerId\": {{centerId}},\n  \"appointmentDate\": \"2026-09-15\",\n  \"appointmentTime\": \"10:30:00\",\n  \"category\": \"NORMAL\"\n}" },
+            "url": { "raw": "{{baseUrl}}/appointments/renewal/book", "host": ["{{baseUrl}}"], "path": ["appointments", "renewal", "book"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appointments/renewal/book", "host": ["{{baseUrl}}"], "path": ["appointments", "renewal", "book"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 2,\n  \"arn\": \"PS1787581112233\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-15\",\n  \"appointmentTime\": \"10:30:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"BOOKED\",\n  \"rescheduleCount\": 0,\n  \"note\": \"Appointment confirmed. Carry your ARN printout and documents per the checklist.\",\n  \"createdAt\": \"2026-08-24T14:10:00.000Z\",\n  \"updatedAt\": \"2026-08-24T14:10:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reschedule appointment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"newAppointmentDate\": \"2026-09-20\",\n  \"newAppointmentTime\": \"11:00:00\"\n}" },
+            "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}/reschedule", "host": ["{{baseUrl}}"], "path": ["appointments", "{{appointmentId}}", "reschedule"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK (first reschedule, free)",
+              "originalRequest": { "method": "PUT", "url": { "raw": "{{baseUrl}}/appointments/1/reschedule", "host": ["{{baseUrl}}"], "path": ["appointments", "1", "reschedule"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-20\",\n  \"appointmentTime\": \"11:00:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"RESCHEDULED\",\n  \"rescheduleCount\": 1,\n  \"note\": \"Rescheduled at no additional charge (first reschedule is free).\",\n  \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n  \"updatedAt\": \"2026-08-24T14:04:13.239Z\"\n}"
+            },
+            {
+              "name": "Example - 409 Conflict (cutoff / max reschedules)",
+              "originalRequest": { "method": "PUT", "url": { "raw": "{{baseUrl}}/appointments/1/reschedule", "host": ["{{baseUrl}}"], "path": ["appointments", "1", "reschedule"] } },
+              "status": "Conflict", "code": 409, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"timestamp\": \"2026-08-24T14:00:00.000Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Maximum of 2 reschedules already used (KB-PASS-004 Sec 2.3)\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel appointment",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}", "host": ["{{baseUrl}}"], "path": ["appointments", "{{appointmentId}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/appointments/1", "host": ["{{baseUrl}}"], "path": ["appointments", "1"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-20\",\n  \"appointmentTime\": \"11:00:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"CANCELLED\",\n  \"rescheduleCount\": 1,\n  \"note\": \"Cancelled. The application fee already paid is non-refundable.\",\n  \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n  \"updatedAt\": \"2026-08-24T14:20:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get appointment by id",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}", "host": ["{{baseUrl}}"], "path": ["appointments", "{{appointmentId}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appointments/1", "host": ["{{baseUrl}}"], "path": ["appointments", "1"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-10\",\n  \"appointmentTime\": \"11:00:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"RESCHEDULED\",\n  \"rescheduleCount\": 1,\n  \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n  \"updatedAt\": \"2026-08-24T14:04:13.239Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List my appointments",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/appointments/mine", "host": ["{{baseUrl}}"], "path": ["appointments", "mine"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appointments/mine", "host": ["{{baseUrl}}"], "path": ["appointments", "mine"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": \"PS1787580143454\",\n    \"centerId\": 1,\n    \"centerName\": \"PSK Bengaluru - Koramangala\",\n    \"appointmentDate\": \"2026-09-10\",\n    \"appointmentTime\": \"11:00:00\",\n    \"category\": \"NORMAL\",\n    \"status\": \"RESCHEDULED\",\n    \"rescheduleCount\": 1,\n    \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n    \"updatedAt\": \"2026-08-24T14:04:13.239Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Mark appointment completed",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}/complete", "host": ["{{baseUrl}}"], "path": ["appointments", "{{appointmentId}}", "complete"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appointments/1/complete", "host": ["{{baseUrl}}"], "path": ["appointments", "1", "complete"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-10\",\n  \"appointmentTime\": \"11:00:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"COMPLETED\",\n  \"rescheduleCount\": 1,\n  \"createdAt\": \"2026-08-24T14:04:12.739Z\",\n  \"updatedAt\": \"2026-08-24T14:30:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Mark no-show",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/appointments/{{appointmentId}}/no-show", "host": ["{{baseUrl}}"], "path": ["appointments", "{{appointmentId}}", "no-show"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appointments/2/no-show", "host": ["{{baseUrl}}"], "path": ["appointments", "2", "no-show"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 2,\n  \"arn\": \"PS1787581112233\",\n  \"centerId\": 1,\n  \"centerName\": \"PSK Bengaluru - Koramangala\",\n  \"appointmentDate\": \"2026-09-15\",\n  \"appointmentTime\": \"10:30:00\",\n  \"category\": \"NORMAL\",\n  \"status\": \"NO_SHOW\",\n  \"rescheduleCount\": 0,\n  \"createdAt\": \"2026-08-24T14:10:00.000Z\",\n  \"updatedAt\": \"2026-08-24T14:35:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Police Verification",
+      "item": [
+        {
+          "name": "Classification rules (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/pv/classification-rules", "host": ["{{baseUrl}}"], "path": ["pv", "classification-rules"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/pv/classification-rules", "host": ["{{baseUrl}}"], "path": ["pv", "classification-rules"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  { \"condition\": \"Fresh application - adult\", \"pvType\": \"PRE_PV\", \"passportDispatch\": \"After PV clearance received by RPO\" },\n  { \"condition\": \"Fresh application - minor\", \"pvType\": \"POST_PV\", \"passportDispatch\": \"Dispatched within 3 days; PV within 30 days\" },\n  { \"condition\": \"Renewal - same address, no adverse record\", \"pvType\": \"POST_PV\", \"passportDispatch\": \"Dispatched first; PV within 30 days\" },\n  { \"condition\": \"Renewal - address changed\", \"pvType\": \"PRE_PV\", \"passportDispatch\": \"After PV clearance at new address\" },\n  { \"condition\": \"Lost passport re-issue\", \"pvType\": \"PRE_PV\", \"passportDispatch\": \"After PV clearance (mandatory)\" },\n  { \"condition\": \"Government servant (Annexure F)\", \"pvType\": \"PV_EXEMPT\", \"passportDispatch\": \"Dispatched without PV\" },\n  { \"condition\": \"Senior citizen (70+)\", \"pvType\": \"POST_PV\", \"passportDispatch\": \"Dispatched first; PV within 30 days\" },\n  { \"condition\": \"Court-directed applicant\", \"pvType\": \"EXPEDITED_PRE_PV\", \"passportDispatch\": \"15-day PV SLA applies\" }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Dispatch PV case",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"governmentServant\": false,\n  \"seniorCitizen\": false,\n  \"courtDirected\": false,\n  \"addressChangedSinceLastPassport\": false,\n  \"district\": \"Bengaluru Urban\",\n  \"state\": \"Karnataka\"\n}" },
+            "url": { "raw": "{{baseUrl}}/pv/cases", "host": ["{{baseUrl}}"], "path": ["pv", "cases"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/pv/cases", "host": ["{{baseUrl}}"], "path": ["pv", "cases"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"pvType\": \"PRE_PV\",\n  \"status\": \"DISPATCHED\",\n  \"district\": \"Bengaluru Urban\",\n  \"state\": \"Karnataka\",\n  \"dispatchedAt\": \"2026-08-24T14:06:05.907Z\",\n  \"slaDeadline\": \"2026-10-05\",\n  \"clearedAt\": null,\n  \"remarks\": null,\n  \"applicantAction\": \"No action required; wait for home visit assignment.\",\n  \"updatedAt\": \"2026-08-24T14:06:05.920Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get PV case by ARN",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/pv/cases/{{arn}}", "host": ["{{baseUrl}}"], "path": ["pv", "cases", "{{arn}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/pv/cases/PS1787580143454", "host": ["{{baseUrl}}"], "path": ["pv", "cases", "PS1787580143454"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"pvType\": \"PRE_PV\",\n  \"status\": \"CLEARED\",\n  \"district\": \"Bengaluru Urban\",\n  \"state\": \"Karnataka\",\n  \"dispatchedAt\": \"2026-08-24T14:06:05.907Z\",\n  \"slaDeadline\": \"2026-10-05\",\n  \"clearedAt\": \"2026-08-24T14:06:35.708Z\",\n  \"remarks\": \"Home visit satisfactory\",\n  \"applicantAction\": \"Expect Speed Post delivery within 5-7 working days.\",\n  \"updatedAt\": \"2026-08-24T14:06:35.708Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List PV cases by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/pv/cases?status=DISPATCHED", "host": ["{{baseUrl}}"], "path": ["pv", "cases"], "query": [{ "key": "status", "value": "DISPATCHED" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/pv/cases?status=DISPATCHED", "host": ["{{baseUrl}}"], "path": ["pv", "cases"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 2,\n      \"arn\": \"PS1787581112233\",\n      \"pvType\": \"PRE_PV\",\n      \"status\": \"DISPATCHED\",\n      \"district\": \"Bengaluru Urban\",\n      \"state\": \"Karnataka\",\n      \"dispatchedAt\": \"2026-08-24T15:00:00.000Z\",\n      \"slaDeadline\": \"2026-10-06\",\n      \"clearedAt\": null,\n      \"remarks\": null,\n      \"applicantAction\": \"No action required; wait for home visit assignment.\",\n      \"updatedAt\": \"2026-08-24T15:00:00.000Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Update PV case status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"CLEARED\",\n  \"remarks\": \"Home visit satisfactory\"\n}" },
+            "url": { "raw": "{{baseUrl}}/pv/cases/{{arn}}/status", "host": ["{{baseUrl}}"], "path": ["pv", "cases", "{{arn}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/pv/cases/PS1787580143454/status", "host": ["{{baseUrl}}"], "path": ["pv", "cases", "PS1787580143454", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"pvType\": \"PRE_PV\",\n  \"status\": \"CLEARED\",\n  \"district\": \"Bengaluru Urban\",\n  \"state\": \"Karnataka\",\n  \"dispatchedAt\": \"2026-08-24T14:06:05.907Z\",\n  \"slaDeadline\": \"2026-10-05\",\n  \"clearedAt\": \"2026-08-24T14:06:35.708Z\",\n  \"remarks\": \"Home visit satisfactory\",\n  \"applicantAction\": \"Expect Speed Post delivery within 5-7 working days.\",\n  \"updatedAt\": \"2026-08-24T14:06:35.708Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Refresh SLA breaches",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/pv/sla-breaches/refresh", "host": ["{{baseUrl}}"], "path": ["pv", "sla-breaches", "refresh"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK (no breaches)",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/pv/sla-breaches/refresh", "host": ["{{baseUrl}}"], "path": ["pv", "sla-breaches", "refresh"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Grievances & Appeals",
+      "item": [
+        {
+          "name": "File a grievance (auto-saves grievanceId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.id) { pm.collectionVariables.set('grievanceId', body.id); }"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"type\": \"STATUS_DELAY\",\n  \"description\": \"No update in 35 days\"\n}" },
+            "url": { "raw": "{{baseUrl}}/grievances", "host": ["{{baseUrl}}"], "path": ["grievances"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/grievances", "host": ["{{baseUrl}}"], "path": ["grievances"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"type\": \"STATUS_DELAY\",\n  \"status\": \"OPEN\",\n  \"slaWorkingDays\": 7,\n  \"description\": \"No update in 35 days\",\n  \"resolutionNotes\": null,\n  \"createdAt\": \"2026-08-24T14:05:28.486Z\",\n  \"resolvedAt\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "List my grievances",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/grievances/mine", "host": ["{{baseUrl}}"], "path": ["grievances", "mine"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/grievances/mine", "host": ["{{baseUrl}}"], "path": ["grievances", "mine"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": \"PS1787580143454\",\n    \"type\": \"STATUS_DELAY\",\n    \"status\": \"OPEN\",\n    \"slaWorkingDays\": 7,\n    \"description\": \"No update in 35 days\",\n    \"resolutionNotes\": null,\n    \"createdAt\": \"2026-08-24T14:05:28.486Z\",\n    \"resolvedAt\": null\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List grievances by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/grievances?status=OPEN", "host": ["{{baseUrl}}"], "path": ["grievances"], "query": [{ "key": "status", "value": "OPEN" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/grievances?status=OPEN", "host": ["{{baseUrl}}"], "path": ["grievances"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"arn\": \"PS1787580143454\",\n      \"type\": \"STATUS_DELAY\",\n      \"status\": \"OPEN\",\n      \"slaWorkingDays\": 7,\n      \"description\": \"No update in 35 days\",\n      \"resolutionNotes\": null,\n      \"createdAt\": \"2026-08-24T14:05:28.486Z\",\n      \"resolvedAt\": null\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Update grievance status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"RESOLVED\",\n  \"resolutionNotes\": \"Escalated to RPO; status advanced\"\n}" },
+            "url": { "raw": "{{baseUrl}}/grievances/{{grievanceId}}/status", "host": ["{{baseUrl}}"], "path": ["grievances", "{{grievanceId}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/grievances/1/status", "host": ["{{baseUrl}}"], "path": ["grievances", "1", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"type\": \"STATUS_DELAY\",\n  \"status\": \"RESOLVED\",\n  \"slaWorkingDays\": 7,\n  \"description\": \"No update in 35 days\",\n  \"resolutionNotes\": \"Escalated to RPO; status advanced\",\n  \"createdAt\": \"2026-08-24T14:05:28.486Z\",\n  \"resolvedAt\": \"2026-08-24T14:06:35.963Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Grievance SLA matrix (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/grievances/sla-matrix", "host": ["{{baseUrl}}"], "path": ["grievances", "sla-matrix"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/grievances/sla-matrix", "host": ["{{baseUrl}}"], "path": ["grievances", "sla-matrix"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  { \"grievanceType\": \"STATUS_DELAY\", \"primaryChannel\": \"Passport Seva Portal Grievance\", \"slaWorkingDays\": 7, \"escalation\": \"RPO Grievance Cell -> Joint Secretary CPV\" },\n  { \"grievanceType\": \"PV_DELAY\", \"primaryChannel\": \"Portal Grievance / PSK Helpline 1800-258-1800\", \"slaWorkingDays\": 5, \"escalation\": \"RPO -> SP Office follow-up via CCTNS\" },\n  { \"grievanceType\": \"INCORRECT_REJECTION\", \"primaryChannel\": \"PSK Manager -> RPO Grievance Cell\", \"slaWorkingDays\": 10, \"escalation\": \"RPO Deputy Passport Officer (DPO)\" },\n  { \"grievanceType\": \"PASSPORT_NOT_RECEIVED\", \"primaryChannel\": \"Speed Post tracking -> India Post complaint -> RPO\", \"slaWorkingDays\": 7, \"escalation\": \"RPO re-dispatch order\" },\n  { \"grievanceType\": \"STAFF_MISCONDUCT\", \"primaryChannel\": \"PSK Feedback form + PGPortal.gov.in\", \"slaWorkingDays\": 15, \"escalation\": \"CVC / ACB referral\" },\n  { \"grievanceType\": \"POLICE_PAYMENT_DEMAND\", \"primaryChannel\": \"PSK helpline 1800-258-1800 + PGPortal\", \"slaWorkingDays\": 3, \"escalation\": \"CVC / State ACB referral\" },\n  { \"grievanceType\": \"DATA_ENTRY_ERROR\", \"primaryChannel\": \"RPO Data Correction Counter\", \"slaWorkingDays\": 7, \"escalation\": \"RPO Senior Officer review\" }\n]"
+            }
+          ]
+        },
+        {
+          "name": "File an appeal (auto-saves appealId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.id) { pm.collectionVariables.set('appealId', body.id); }"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"groundText\": \"Rejected due to address mismatch, now corrected\"\n}" },
+            "url": { "raw": "{{baseUrl}}/appeals", "host": ["{{baseUrl}}"], "path": ["appeals"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/appeals", "host": ["{{baseUrl}}"], "path": ["appeals"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"level\": \"LEVEL_1_DPO\",\n  \"status\": \"PENDING\",\n  \"groundText\": \"Rejected due to address mismatch, now corrected\",\n  \"decisionNotes\": null,\n  \"decidedAt\": null,\n  \"createdAt\": \"2026-08-24T14:16:08.852Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get appeals for ARN",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/appeals/{{arn}}", "host": ["{{baseUrl}}"], "path": ["appeals", "{{arn}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appeals/PS1787580143454", "host": ["{{baseUrl}}"], "path": ["appeals", "PS1787580143454"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": \"PS1787580143454\",\n    \"level\": \"LEVEL_1_DPO\",\n    \"status\": \"PENDING\",\n    \"groundText\": \"Rejected due to address mismatch, now corrected\",\n    \"decisionNotes\": null,\n    \"decidedAt\": null,\n    \"createdAt\": \"2026-08-24T14:16:08.852Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List appeals by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/appeals?status=PENDING", "host": ["{{baseUrl}}"], "path": ["appeals"], "query": [{ "key": "status", "value": "PENDING" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appeals?status=PENDING", "host": ["{{baseUrl}}"], "path": ["appeals"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"arn\": \"PS1787580143454\",\n      \"level\": \"LEVEL_1_DPO\",\n      \"status\": \"PENDING\",\n      \"groundText\": \"Rejected due to address mismatch, now corrected\",\n      \"decisionNotes\": null,\n      \"decidedAt\": null,\n      \"createdAt\": \"2026-08-24T14:16:08.852Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Decide appeal",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"DECIDED\",\n  \"decisionNotes\": \"Appeal upheld; address corrected in records\"\n}" },
+            "url": { "raw": "{{baseUrl}}/appeals/{{appealId}}/decision", "host": ["{{baseUrl}}"], "path": ["appeals", "{{appealId}}", "decision"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK (DECIDED)",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/appeals/1/decision", "host": ["{{baseUrl}}"], "path": ["appeals", "1", "decision"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"level\": \"LEVEL_1_DPO\",\n  \"status\": \"DECIDED\",\n  \"groundText\": \"Rejected due to address mismatch, now corrected\",\n  \"decisionNotes\": \"Appeal upheld; address corrected in records\",\n  \"decidedAt\": \"2026-08-24T15:00:00.000Z\",\n  \"createdAt\": \"2026-08-24T14:16:08.852Z\"\n}"
+            },
+            {
+              "name": "Example - 200 OK (ESCALATED, auto-creates Level 2)",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/appeals/1/decision", "host": ["{{baseUrl}}"], "path": ["appeals", "1", "decision"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"level\": \"LEVEL_1_DPO\",\n  \"status\": \"ESCALATED\",\n  \"groundText\": \"Rejected due to address mismatch, now corrected\",\n  \"decisionNotes\": \"Needs Passport Officer review\",\n  \"decidedAt\": \"2026-08-24T15:00:00.000Z\",\n  \"createdAt\": \"2026-08-24T14:16:08.852Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Appeal authority chain (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/appeals/authority-chain", "host": ["{{baseUrl}}"], "path": ["appeals", "authority-chain"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/appeals/authority-chain", "host": ["{{baseUrl}}"], "path": ["appeals", "authority-chain"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  { \"level\": \"LEVEL_1_DPO\", \"authority\": \"Deputy Passport Officer (DPO) at RPO\", \"grounds\": \"Documentation issues, minor data errors, address mismatch\", \"timeline\": \"Within 30 days of rejection\" },\n  { \"level\": \"LEVEL_2_PASSPORT_OFFICER\", \"authority\": \"Passport Officer at RPO\", \"grounds\": \"Adverse PV report, PV-related rejection, re-verification\", \"timeline\": \"Within 30 days of Level 1 decision\" },\n  { \"level\": \"LEVEL_3_RPO_HEAD\", \"authority\": \"Regional Passport Officer (RPO Head)\", \"grounds\": \"PV irreversibility, policy interpretation disputes\", \"timeline\": \"Within 30 days of Level 2 decision\" },\n  { \"level\": \"LEVEL_4_JOINT_SECRETARY\", \"authority\": \"Joint Secretary (CPV Division), MEA\", \"grounds\": \"All remaining grounds; final appellate authority\", \"timeline\": \"Within 60 days of Level 3 decision\" },\n  { \"level\": \"LEGAL_RECOURSE\", \"authority\": \"High Court / Supreme Court (Writ Petition)\", \"grounds\": \"Constitutional right to travel; mandamus writ\", \"timeline\": \"As per court procedures\" }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Fraud",
+      "item": [
+        {
+          "name": "File a fraud report (auto-saves fraudReportId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.id) { pm.collectionVariables.set('fraudReportId', body.id); }"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"category\": \"AGENT_BROKER_FRAUD\",\n  \"description\": \"Agent demanded extra cash for faster processing\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fraud/reports", "host": ["{{baseUrl}}"], "path": ["fraud", "reports"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/fraud/reports", "host": ["{{baseUrl}}"], "path": ["fraud", "reports"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": null,\n  \"category\": \"AGENT_BROKER_FRAUD\",\n  \"severity\": \"HIGH\",\n  \"referralAuthority\": \"PGPortal.gov.in + PSK helpline\",\n  \"description\": \"Agent demanded extra cash for faster processing\",\n  \"status\": \"REPORTED\",\n  \"createdAt\": \"2026-08-24T14:05:28.906Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List my fraud reports",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": { "raw": "{{baseUrl}}/fraud/reports/mine", "host": ["{{baseUrl}}"], "path": ["fraud", "reports", "mine"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/reports/mine", "host": ["{{baseUrl}}"], "path": ["fraud", "reports", "mine"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": null,\n    \"category\": \"AGENT_BROKER_FRAUD\",\n    \"severity\": \"HIGH\",\n    \"referralAuthority\": \"PGPortal.gov.in + PSK helpline\",\n    \"description\": \"Agent demanded extra cash for faster processing\",\n    \"status\": \"REPORTED\",\n    \"createdAt\": \"2026-08-24T14:05:28.906Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List fraud reports by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/fraud/reports?status=REPORTED", "host": ["{{baseUrl}}"], "path": ["fraud", "reports"], "query": [{ "key": "status", "value": "REPORTED" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/reports?status=REPORTED", "host": ["{{baseUrl}}"], "path": ["fraud", "reports"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"arn\": null,\n      \"category\": \"AGENT_BROKER_FRAUD\",\n      \"severity\": \"HIGH\",\n      \"referralAuthority\": \"PGPortal.gov.in + PSK helpline\",\n      \"description\": \"Agent demanded extra cash for faster processing\",\n      \"status\": \"REPORTED\",\n      \"createdAt\": \"2026-08-24T14:05:28.906Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Update fraud report status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"REFERRED\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fraud/reports/{{fraudReportId}}/status", "host": ["{{baseUrl}}"], "path": ["fraud", "reports", "{{fraudReportId}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/fraud/reports/1/status", "host": ["{{baseUrl}}"], "path": ["fraud", "reports", "1", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": null,\n  \"category\": \"AGENT_BROKER_FRAUD\",\n  \"severity\": \"HIGH\",\n  \"referralAuthority\": \"PGPortal.gov.in + PSK helpline\",\n  \"description\": \"Agent demanded extra cash for faster processing\",\n  \"status\": \"REFERRED\",\n  \"createdAt\": \"2026-08-24T14:05:28.906Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Referral matrix (Public)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/referral-matrix", "host": ["{{baseUrl}}"], "path": ["fraud", "referral-matrix"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/referral-matrix", "host": ["{{baseUrl}}"], "path": ["fraud", "referral-matrix"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  { \"category\": \"DOCUMENT_FORGERY\", \"severity\": \"CRITICAL\", \"referralAuthority\": \"PSK Manager -> RPO -> Police\", \"outcome\": \"Application cancelled; FIR filed; blacklisted in MEA system\" },\n  { \"category\": \"IDENTITY_IMPERSONATION\", \"severity\": \"CRITICAL\", \"referralAuthority\": \"PSK Staff -> PSK Manager -> Police\", \"outcome\": \"Application cancelled; security footage preserved; FIR filed\" },\n  { \"category\": \"SUPPRESSION_OF_INFO\", \"severity\": \"HIGH\", \"referralAuthority\": \"RPO Review\", \"outcome\": \"Application referred for review; may lead to rejection/prosecution\" },\n  { \"category\": \"AGENT_BROKER_FRAUD\", \"severity\": \"HIGH\", \"referralAuthority\": \"PGPortal.gov.in + PSK helpline\", \"outcome\": \"CVC / ACB referral; agent blacklisted from PSK premises\" },\n  { \"category\": \"DUPLICATE_PASSPORT\", \"severity\": \"CRITICAL\", \"referralAuthority\": \"RPO -> MEA Intelligence Division\", \"outcome\": \"Both passports impounded; criminal proceedings initiated\" },\n  { \"category\": \"ONLINE_PHISHING\", \"severity\": \"HIGH\", \"referralAuthority\": \"CERT-In (cert-in.org.in) + cyber police\", \"outcome\": \"Fraudulent site reported; applicant alerted via MEA advisory\" },\n  { \"category\": \"INTERNAL_MISCONDUCT\", \"severity\": \"CRITICAL\", \"referralAuthority\": \"Central Vigilance Commission (CVC) + State ACB\", \"outcome\": \"Investigation; prosecution under Prevention of Corruption Act 1988\" },\n  { \"category\": \"PV_CORRUPTION\", \"severity\": \"CRITICAL\", \"referralAuthority\": \"State Anti-Corruption Bureau (ACB)\", \"outcome\": \"FIR; departmental inquiry; suspension\" }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Create escalation case (auto-saves escalationId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.id) { pm.collectionVariables.set('escalationId', body.id); }"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"arn\": \"{{arn}}\",\n  \"type\": \"DISPUTED_PARENTAGE\",\n  \"details\": \"Both parents dispute authority to apply for minor passport\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fraud/escalations", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/fraud/escalations", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"type\": \"DISPUTED_PARENTAGE\",\n  \"details\": \"Both parents dispute authority to apply for minor passport\",\n  \"status\": \"OPEN\",\n  \"createdAt\": \"2026-08-24T15:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Get escalations for ARN",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/fraud/escalations/{{arn}}", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations", "{{arn}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/escalations/PS1787580143454", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations", "PS1787580143454"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"arn\": \"PS1787580143454\",\n    \"type\": \"DISPUTED_PARENTAGE\",\n    \"details\": \"Both parents dispute authority to apply for minor passport\",\n    \"status\": \"OPEN\",\n    \"createdAt\": \"2026-08-24T15:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Official] List escalations by status",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{officialToken}}" }], "url": { "raw": "{{baseUrl}}/fraud/escalations?status=OPEN", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations"], "query": [{ "key": "status", "value": "OPEN" }] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/fraud/escalations?status=OPEN", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"arn\": \"PS1787580143454\",\n      \"type\": \"DISPUTED_PARENTAGE\",\n      \"details\": \"Both parents dispute authority to apply for minor passport\",\n      \"status\": \"OPEN\",\n      \"createdAt\": \"2026-08-24T15:00:00.000Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Official] Update escalation status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{officialToken}}" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"RESOLVED\"\n}" },
+            "url": { "raw": "{{baseUrl}}/fraud/escalations/{{escalationId}}/status", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations", "{{escalationId}}", "status"] }
+          },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/fraud/escalations/1/status", "host": ["{{baseUrl}}"], "path": ["fraud", "escalations", "1", "status"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"id\": 1,\n  \"arn\": \"PS1787580143454\",\n  \"type\": \"DISPUTED_PARENTAGE\",\n  \"details\": \"Both parents dispute authority to apply for minor passport\",\n  \"status\": \"RESOLVED\",\n  \"createdAt\": \"2026-08-24T15:00:00.000Z\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Knowledge Base & AI",
+      "item": [
+        {
+          "name": "[Admin] Ingest KB document (auto-saves documentId)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "const body = pm.response.json();",
+              "if (body.documentId) { pm.collectionVariables.set('documentId', body.documentId); }"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "title", "value": "Passport Types, Categories & Eligibility", "type": "text" },
+                { "key": "docCode", "value": "KB-PASS-001", "type": "text" },
+                { "key": "version", "value": "v1.0", "type": "text" },
+                { "key": "audience", "value": "applicant|official", "type": "text" },
+                { "key": "effectiveDate", "value": "2024-04-01", "type": "text" },
+                { "key": "tags", "value": "doc_type=passport_types", "type": "text" },
+                { "key": "content", "value": "Ordinary Passport (Type P) is the standard travel document issued to Indian citizens. Validity for adults is 10 years from date of issue.", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/kb/ingest", "host": ["{{baseUrl}}"], "path": ["kb", "ingest"] }
+          },
+          "response": [
+            {
+              "name": "Example - 201 Created",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/kb/ingest", "host": ["{{baseUrl}}"], "path": ["kb", "ingest"] } },
+              "status": "Created", "code": 201, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"documentId\": \"e4b88084-581d-4d39-98a5-b48084a22059\",\n  \"chunks_created\": 1,\n  \"ingestion_time_ms\": 0,\n  \"metadata\": {\n    \"docCode\": \"KB-PASS-001\",\n    \"version\": \"v1.0\",\n    \"audience\": \"applicant|official\",\n    \"effectiveDate\": \"2024-04-01\",\n    \"tags\": \"doc_type=passport_types\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Admin] List KB documents",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": { "raw": "{{baseUrl}}/kb/documents", "host": ["{{baseUrl}}"], "path": ["kb", "documents"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/kb/documents", "host": ["{{baseUrl}}"], "path": ["kb", "documents"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"content\": [\n    {\n      \"documentId\": \"e4b88084-581d-4d39-98a5-b48084a22059\",\n      \"docCode\": \"KB-PASS-001\",\n      \"title\": \"Passport Types, Categories & Eligibility\",\n      \"version\": \"v1.0\",\n      \"audience\": \"applicant|official\",\n      \"effectiveDate\": \"2024-04-01\",\n      \"tags\": \"doc_type=passport_types\",\n      \"originalFilename\": \"Passport Types, Categories & Eligibility\",\n      \"status\": \"ACTIVE\",\n      \"chunkCount\": 1,\n      \"ingestionTimeMs\": 0,\n      \"createdAt\": \"2026-08-24T14:15:35.154Z\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true,\n  \"empty\": false\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Admin] Get KB document by id",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": { "raw": "{{baseUrl}}/kb/documents/{{documentId}}", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "{{documentId}}"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "e4b88084-581d-4d39-98a5-b48084a22059"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"documentId\": \"e4b88084-581d-4d39-98a5-b48084a22059\",\n  \"docCode\": \"KB-PASS-001\",\n  \"title\": \"Passport Types, Categories & Eligibility\",\n  \"version\": \"v1.0\",\n  \"audience\": \"applicant|official\",\n  \"effectiveDate\": \"2024-04-01\",\n  \"tags\": \"doc_type=passport_types\",\n  \"originalFilename\": \"Passport Types, Categories & Eligibility\",\n  \"status\": \"ACTIVE\",\n  \"chunkCount\": 1,\n  \"ingestionTimeMs\": 0,\n  \"createdAt\": \"2026-08-24T14:15:35.154Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "[Admin] Get chunks for document",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": { "raw": "{{baseUrl}}/kb/documents/{{documentId}}/chunks", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "{{documentId}}", "chunks"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "GET", "url": { "raw": "{{baseUrl}}/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059/chunks", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "e4b88084-581d-4d39-98a5-b48084a22059", "chunks"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "[\n  {\n    \"id\": 1,\n    \"chunkIndex\": 0,\n    \"content\": \"Ordinary Passport (Type P) is the standard travel document issued to Indian citizens. Validity for adults is 10 years from date of issue.\",\n    \"embeddingStatus\": \"PENDING\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "[Admin] Supersede document",
+          "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": { "raw": "{{baseUrl}}/kb/documents/{{documentId}}/supersede", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "{{documentId}}", "supersede"] } },
+          "response": [
+            {
+              "name": "Example - 200 OK",
+              "originalRequest": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/kb/documents/e4b88084-581d-4d39-98a5-b48084a22059/supersede", "host": ["{{baseUrl}}"], "path": ["kb", "documents", "e4b88084-581d-4d39-98a5-b48084a22059", "supersede"] } },
+              "status": "OK", "code": 200, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"documentId\": \"e4b88084-581d-4d39-98a5-b48084a22059\",\n  \"docCode\": \"KB-PASS-001\",\n  \"title\": \"Passport Types, Categories & Eligibility\",\n  \"version\": \"v1.0\",\n  \"audience\": \"applicant|official\",\n  \"effectiveDate\": \"2024-04-01\",\n  \"tags\": \"doc_type=passport_types\",\n  \"originalFilename\": \"Passport Types, Categories & Eligibility\",\n  \"status\": \"SUPERSEDED\",\n  \"chunkCount\": 1,\n  \"ingestionTimeMs\": 0,\n  \"createdAt\": \"2026-08-24T14:15:35.154Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "AI Chat - sync (NOT IMPLEMENTED, expect 501)",
+          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/ai/passport/chat/sync", "host": ["{{baseUrl}}"], "path": ["ai", "passport", "chat", "sync"] } },
+          "response": [
+            {
+              "name": "Example - 501 Not Implemented",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/ai/passport/chat/sync", "host": ["{{baseUrl}}"], "path": ["ai", "passport", "chat", "sync"] } },
+              "status": "Not Implemented", "code": 501, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"answer\": \"PassportSahayak AI chat is not yet configured on this deployment.\",\n  \"escalated\": true,\n  \"reason\": \"Azure OpenAI credentials (endpoint, API key, chat + embedding deployments) have not been supplied yet.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "AI Chat - async (NOT IMPLEMENTED, expect 501)",
+          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/ai/passport/chat/async", "host": ["{{baseUrl}}"], "path": ["ai", "passport", "chat", "async"] } },
+          "response": [
+            {
+              "name": "Example - 501 Not Implemented",
+              "originalRequest": { "method": "POST", "url": { "raw": "{{baseUrl}}/ai/passport/chat/async", "host": ["{{baseUrl}}"], "path": ["ai", "passport", "chat", "async"] } },
+              "status": "Not Implemented", "code": 501, "_postman_previewlanguage": "json",
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"answer\": \"PassportSahayak AI chat is not yet configured on this deployment.\",\n  \"escalated\": true,\n  \"reason\": \"Azure OpenAI credentials (endpoint, API key, chat + embedding deployments) have not been supplied yet.\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

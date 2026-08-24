@@ -1,0 +1,113 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Apply for Passport</h1>
+  <p class="ps-section-subtitle">Complete the steps below to submit your application.</p>
+
+  <div class="ps-card" *ngIf="!createdApplication">
+    <mat-stepper linear #stepper>
+      <mat-step [stepControl]="detailsForm" label="Application Details">
+        <form [formGroup]="detailsForm">
+          <div class="ps-form-grid" style="margin-top:12px;">
+            <mat-form-field appearance="outline">
+              <mat-label>Application type</mat-label>
+              <mat-select formControlName="applicationType">
+                <mat-option *ngFor="let t of applicationTypes" [value]="t.value">{{ t.label }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date of birth</mat-label>
+              <input matInput [matDatepicker]="dobPicker" formControlName="dateOfBirth">
+              <mat-datepicker-toggle matIconSuffix [for]="dobPicker"></mat-datepicker-toggle>
+              <mat-datepicker #dobPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div style="margin-top:6px;">
+            <mat-label style="display:block; margin-bottom:6px; font-size:13px; color:var(--ps-text-muted);">Service scheme</mat-label>
+            <mat-radio-group formControlName="serviceScheme">
+              <mat-radio-button value="NORMAL">Normal</mat-radio-button>
+              <mat-radio-button value="TATKAL" style="margin-left:20px;">Tatkal</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <mat-form-field appearance="outline" style="margin-top:10px; max-width:360px;" *ngIf="isTatkal">
+            <mat-label>Reason for urgency</mat-label>
+            <mat-select formControlName="tatkalReason">
+              <mat-option *ngFor="let r of tatkalReasons" [value]="r.value">{{ r.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div style="margin-top:16px;">
+            <mat-label style="display:block; margin-bottom:6px; font-size:13px; color:var(--ps-text-muted);">Booklet type</mat-label>
+            <mat-radio-group formControlName="bookletType">
+              <mat-radio-button value="STANDARD_36">Standard (36 pages)</mat-radio-button>
+              <mat-radio-button value="JUMBO_60" style="margin-left:20px;" [disabled]="isMinor">Jumbo (60 pages)</mat-radio-button>
+            </mat-radio-group>
+            <div class="ps-hint" *ngIf="isMinor">Jumbo booklet is not available for minor applicants.</div>
+          </div>
+
+          <div style="margin-top:20px;">
+            <button mat-flat-button color="primary" matStepperNext (click)="loadChecklist()">Next: Document Checklist</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step label="Document Checklist">
+        <div *ngIf="loadingChecklist" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner></div>
+        <div *ngIf="checklist && !loadingChecklist" style="margin-top:12px;">
+          <div class="ps-result-label">Mandatory documents</div>
+          <ul class="ps-doc-list">
+            <li *ngFor="let d of checklist.documents" [class.ps-doc-optional]="!d.mandatory">
+              {{ d.document }}<span *ngIf="!d.mandatory"> (if applicable)</span>
+              <div class="ps-hint" *ngIf="d.note">{{ d.note }}</div>
+            </li>
+          </ul>
+          <ng-container *ngIf="checklist.applicableAnnexures?.length">
+            <div class="ps-result-label" style="margin-top:14px;">Applicable annexures</div>
+            <ul class="ps-doc-list">
+              <li *ngFor="let a of checklist.applicableAnnexures">
+                <strong>{{ a.code }}</strong> — {{ a.title }}
+                <div class="ps-hint">{{ a.whenRequired }}</div>
+              </li>
+            </ul>
+          </ng-container>
+        </div>
+        <div style="margin-top:20px; display:flex; gap:10px;">
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-flat-button color="primary" matStepperNext (click)="loadFee()">Next: Fee Estimate</button>
+        </div>
+      </mat-step>
+
+      <mat-step label="Fee &amp; Submit">
+        <div *ngIf="loadingFee" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner></div>
+        <div *ngIf="!loadingFee && fee as f" style="margin-top:12px;">
+          <div class="ps-result-grid">
+            <div class="ps-result-item">
+              <div class="ps-result-label">Total payable</div>
+              <div class="ps-result-value">₹{{ f.feeAmount }}</div>
+            </div>
+          </div>
+          <p class="ps-hint" style="margin-top:10px;">{{ f.breakdown }}</p>
+        </div>
+        <div style="margin-top:20px; display:flex; gap:10px;">
+          <button mat-button matStepperPrevious>Back</button>
+          <button mat-flat-button color="accent" [disabled]="submitting" (click)="submit()">
+            {{ submitting ? 'Submitting...' : 'Submit Application' }}
+          </button>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </div>
+
+  <div class="ps-card ps-success-card" *ngIf="createdApplication">
+    <mat-icon class="ps-success-icon">check_circle</mat-icon>
+    <div class="ps-section-title" style="font-size:18px;">Application submitted successfully</div>
+    <p>Your Application Reference Number (ARN) is:</p>
+    <div class="ps-arn-box">{{ createdApplication.arn }}</div>
+    <ps-status-chip [status]="createdApplication.status"></ps-status-chip>
+    <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+      <a mat-flat-button color="primary" routerLink="/applicant/appointments">Book Appointment</a>
+      <a mat-button routerLink="/applicant/applications">View My Applications</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,126 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Knowledge Base Documents</h1>
+  <p class="ps-section-subtitle">Ingest, review and manage the policy documents that ground the AI assistant.</p>
+
+  <div class="ps-card">
+    <div class="ps-filter-row">
+      <button mat-flat-button color="primary" (click)="showIngestForm = !showIngestForm">
+        <mat-icon>upload_file</mat-icon> {{ showIngestForm ? 'Close' : 'Ingest New Document' }}
+      </button>
+      <button mat-button color="accent" (click)="backfillEmbeddings()" [disabled]="backfilling">
+        <mat-icon>autorenew</mat-icon> {{ backfilling ? 'Backfilling...' : 'Backfill Pending Embeddings' }}
+      </button>
+      <span class="ps-hint" *ngIf="backfillMessage">{{ backfillMessage }}</span>
+    </div>
+
+    <form [formGroup]="ingestForm" (ngSubmit)="submitIngest()" *ngIf="showIngestForm" class="ps-ingest-form">
+      <div class="ps-form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Doc code</mat-label>
+          <input matInput formControlName="docCode" placeholder="KB-PASS-001">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Version</mat-label>
+          <input matInput formControlName="version">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Audience</mat-label>
+          <input matInput formControlName="audience" placeholder="Applicants, Officials...">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Effective date</mat-label>
+          <input matInput [matDatepicker]="edPicker" formControlName="effectiveDate">
+          <mat-datepicker-toggle matIconSuffix [for]="edPicker"></mat-datepicker-toggle>
+          <mat-datepicker #edPicker></mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Tags</mat-label>
+          <input matInput formControlName="tags" placeholder="comma,separated">
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" style="width:100%;">
+        <mat-label>Extracted text content</mat-label>
+        <textarea matInput rows="10" formControlName="content" placeholder="Paste the clean, text-extracted body of the document here..."></textarea>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" [disabled]="ingesting">
+        {{ ingesting ? 'Ingesting...' : 'Ingest Document' }}
+      </button>
+
+      <div class="ps-ingest-result" *ngIf="ingestResult">
+        <mat-icon>check_circle</mat-icon>
+        Ingested successfully &mdash; {{ ingestResult.chunks_created }} chunk(s) created (document ID: {{ ingestResult.documentId }}).
+      </div>
+    </form>
+
+    <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner></div>
+
+    <table mat-table [dataSource]="documents" class="ps-full-width" *ngIf="!loading && documents.length" style="margin-top:8px;">
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef>Title</th>
+        <td mat-cell *matCellDef="let d">{{ d.title }}</td>
+      </ng-container>
+      <ng-container matColumnDef="docCode">
+        <th mat-header-cell *matHeaderCellDef>Doc code</th>
+        <td mat-cell *matCellDef="let d">{{ d.docCode || '—' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="version">
+        <th mat-header-cell *matHeaderCellDef>Version</th>
+        <td mat-cell *matCellDef="let d">{{ d.version }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let d"><ps-status-chip [status]="d.status"></ps-status-chip></td>
+      </ng-container>
+      <ng-container matColumnDef="chunks">
+        <th mat-header-cell *matHeaderCellDef>Chunks</th>
+        <td mat-cell *matCellDef="let d">{{ d.chunkCount }}</td>
+      </ng-container>
+      <ng-container matColumnDef="created">
+        <th mat-header-cell *matHeaderCellDef>Ingested</th>
+        <td mat-cell *matCellDef="let d">{{ d.createdAt | date:'medium' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let d">
+          <button mat-button color="primary" (click)="viewChunks(d)">View Chunks</button>
+          <button mat-button color="warn" *ngIf="d.status === 'ACTIVE'" (click)="supersede(d)">Supersede</button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    <mat-paginator *ngIf="!loading && documents.length" [length]="totalElements" [pageIndex]="pageIndex"
+      [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 50]" (page)="onPage($event)"></mat-paginator>
+
+    <ps-empty-state *ngIf="!loading && !documents.length" icon="library_books" title="No documents ingested yet"
+      subtitle="Use 'Ingest New Document' above to add a knowledge base document."></ps-empty-state>
+  </div>
+
+  <div class="ps-detail-overlay" *ngIf="viewingChunks" (click)="viewingChunks = null">
+    <div class="ps-card ps-chunks-panel" (click)="$event.stopPropagation()">
+      <div class="ps-detail-header">
+        <div class="ps-section-title" style="font-size:16px;">{{ viewingChunks.title }} &mdash; chunks</div>
+        <button mat-icon-button (click)="viewingChunks = null"><mat-icon>close</mat-icon></button>
+      </div>
+
+      <div *ngIf="loadingChunks" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner></div>
+
+      <div class="ps-chunk-list" *ngIf="!loadingChunks">
+        <div class="ps-chunk-item" *ngFor="let c of chunks">
+          <div class="ps-chunk-header">
+            <span>Chunk {{ c.chunkIndex }}</span>
+            <ps-status-chip [status]="c.embeddingStatus"></ps-status-chip>
+          </div>
+          <p class="ps-chunk-content">{{ c.content }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

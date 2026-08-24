@@ -1,0 +1,36 @@
+<div class="ps-auth-page">
+  <mat-card class="ps-auth-card">
+    <div class="ps-auth-brand">
+      <mat-icon>flight_takeoff</mat-icon>
+      <span class="ps-auth-brand-title">PassportSahayak AI</span>
+    </div>
+    <div class="ps-auth-subtitle">Sign in to continue to your account</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="text" inputmode="email" formControlName="email" autocomplete="email" />
+        <mat-error *ngIf="form.controls.email.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="form.controls.email.hasError('email')">Enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="form.controls.password.hasError('required')">Password is required</mat-error>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" class="ps-auth-submit" type="submit" [disabled]="loading">
+        <mat-progress-spinner *ngIf="loading" diameter="20" mode="indeterminate" style="display:inline-block; vertical-align:middle; margin-right:8px;"></mat-progress-spinner>
+        {{ loading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+
+    <div class="ps-auth-switch">
+      New here? <a routerLink="/auth/register">Create an account</a>
+    </div>
+  </mat-card>
+</div>

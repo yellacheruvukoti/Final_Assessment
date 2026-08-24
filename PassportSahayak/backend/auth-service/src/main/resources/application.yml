@@ -1,0 +1,50 @@
+server:
+  port: ${SERVER_PORT:9081}
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:passportsahayak_auth}?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:passportsahayak_app}
+    password: ${DB_PASSWORD:PassSahayak@2026}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+    show-sql: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    # Must be identical across auth-service / appointment-service / kb-service:
+    # auth-service issues the token, the others validate it locally (stateless JWT).
+    secret: ${JWT_SECRET:passport-sahayak-dev-secret-key-change-in-production-min-256-bits-long-0123456789}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:8080}
+
+logging:
+  level:
+    com.passportsahayak.auth: INFO
+    org.springframework.security: WARN

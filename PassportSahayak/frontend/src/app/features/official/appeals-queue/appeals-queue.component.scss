@@ -1,0 +1,10 @@
+.ps-hint {
+  font-size: 13px;
+  color: var(--ps-text-muted);
+}
+.ps-truncate {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,58 @@
+<mat-sidenav-container class="ps-shell">
+  <mat-sidenav mode="side" opened class="ps-sidenav">
+    <div class="ps-brand">
+      <mat-icon class="ps-brand-icon">flight_takeoff</mat-icon>
+      <div>
+        <div class="ps-brand-title">PassportSahayak</div>
+        <div class="ps-brand-sub">AI</div>
+      </div>
+    </div>
+
+    <mat-nav-list *ngIf="isApplicant">
+      <div class="ps-nav-group-label">Applicant</div>
+      <a mat-list-item *ngFor="let item of applicantNav" [routerLink]="item.path"
+         routerLinkActive="ps-nav-active" [routerLinkActiveOptions]="{ exact: item.path === '/applicant' }">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </mat-nav-list>
+
+    <mat-nav-list *ngIf="isOfficialOrAdmin">
+      <div class="ps-nav-group-label">Official</div>
+      <a mat-list-item *ngFor="let item of officialNav" [routerLink]="item.path"
+         routerLinkActive="ps-nav-active" [routerLinkActiveOptions]="{ exact: item.path === '/official' }">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </mat-nav-list>
+
+    <mat-nav-list *ngIf="isAdmin">
+      <div class="ps-nav-group-label">Admin</div>
+      <a mat-list-item *ngFor="let item of adminNav" [routerLink]="item.path" routerLinkActive="ps-nav-active">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="ps-toolbar">
+      <span class="ps-spacer"></span>
+      <button mat-button [matMenuTriggerFor]="userMenu" class="ps-user-btn">
+        <mat-icon>account_circle</mat-icon>
+        <span class="ps-user-name">{{ user?.fullName }}</span>
+        <span class="ps-user-role">{{ roleLabel() }}</span>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item disabled>{{ user?.email }}</button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Log out</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

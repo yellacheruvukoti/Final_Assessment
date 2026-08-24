@@ -1,0 +1,53 @@
+<div class="ps-auth-page">
+  <mat-card class="ps-auth-card">
+    <div class="ps-auth-brand">
+      <mat-icon>flight_takeoff</mat-icon>
+      <span class="ps-auth-brand-title">PassportSahayak AI</span>
+    </div>
+    <div class="ps-auth-subtitle">Create your account</div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Full name</mat-label>
+        <input matInput formControlName="fullName" autocomplete="name" />
+        <mat-error *ngIf="form.controls.fullName.invalid">Enter your full name</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="text" inputmode="email" formControlName="email" autocomplete="email" />
+        <mat-error *ngIf="form.controls.email.invalid">Enter a valid email</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Mobile number</mat-label>
+        <input matInput formControlName="phone" autocomplete="tel" maxlength="10" />
+        <mat-error *ngIf="form.controls.phone.invalid">Enter a valid 10-digit mobile number</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password" />
+        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="form.controls.password.invalid">Minimum 8 characters</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="ps-auth-field" appearance="outline">
+        <mat-label>I am registering as</mat-label>
+        <mat-select formControlName="role">
+          <mat-option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" class="ps-auth-submit" type="submit" [disabled]="loading">
+        {{ loading ? 'Creating account...' : 'Create Account' }}
+      </button>
+    </form>
+
+    <div class="ps-auth-switch">
+      Already have an account? <a routerLink="/auth/login">Sign in</a>
+    </div>
+  </mat-card>
+</div>

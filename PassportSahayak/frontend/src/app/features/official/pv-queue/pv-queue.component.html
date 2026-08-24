@@ -1,0 +1,129 @@
+<div class="ps-page">
+  <h1 class="ps-section-title">Police Verification Queue</h1>
+  <p class="ps-section-subtitle">Dispatch, track and update police verification cases.</p>
+
+  <div class="ps-card">
+    <div class="ps-filter-row">
+      <mat-form-field appearance="outline" class="ps-filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilterChange()">
+          <mat-option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-flat-button color="primary" (click)="showDispatch = !showDispatch">
+        <mat-icon>add</mat-icon> Dispatch New Case
+      </button>
+      <button mat-button (click)="showRules = !showRules">{{ showRules ? 'Hide' : 'View' }} classification rules</button>
+      <button mat-button color="warn" (click)="refreshSlaBreaches()">Refresh SLA breaches</button>
+    </div>
+
+    <div class="ps-rules-table" *ngIf="showRules">
+      <table mat-table [dataSource]="rules" class="ps-full-width">
+        <ng-container matColumnDef="condition">
+          <th mat-header-cell *matHeaderCellDef>Condition</th>
+          <td mat-cell *matCellDef="let r">{{ r.condition }}</td>
+        </ng-container>
+        <ng-container matColumnDef="pvType">
+          <th mat-header-cell *matHeaderCellDef>PV type</th>
+          <td mat-cell *matCellDef="let r">{{ r.pvType }}</td>
+        </ng-container>
+        <ng-container matColumnDef="dispatch">
+          <th mat-header-cell *matHeaderCellDef>Passport dispatch</th>
+          <td mat-cell *matCellDef="let r">{{ r.passportDispatch }}</td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="['condition','pvType','dispatch']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['condition','pvType','dispatch'];"></tr>
+      </table>
+    </div>
+
+    <form [formGroup]="dispatchForm" (ngSubmit)="submitDispatch()" *ngIf="showDispatch" class="ps-dispatch-form">
+      <div class="ps-form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>ARN</mat-label>
+          <input matInput formControlName="arn">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>District</mat-label>
+          <input matInput formControlName="district">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>State</mat-label>
+          <input matInput formControlName="state">
+        </mat-form-field>
+      </div>
+      <div class="ps-checkbox-row">
+        <mat-checkbox formControlName="governmentServant">Government servant</mat-checkbox>
+        <mat-checkbox formControlName="seniorCitizen">Senior citizen</mat-checkbox>
+        <mat-checkbox formControlName="courtDirected">Court directed</mat-checkbox>
+        <mat-checkbox formControlName="addressChangedSinceLastPassport">Address changed</mat-checkbox>
+      </div>
+      <button mat-flat-button color="primary" type="submit" [disabled]="dispatching">
+        {{ dispatching ? 'Dispatching...' : 'Dispatch Case' }}
+      </button>
+    </form>
+
+    <div *ngIf="loading" class="ps-loading-row"><mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner></div>
+
+    <table mat-table [dataSource]="cases" class="ps-full-width" *ngIf="!loading && cases.length" style="margin-top:8px;">
+      <ng-container matColumnDef="arn">
+        <th mat-header-cell *matHeaderCellDef>ARN</th>
+        <td mat-cell *matCellDef="let c">{{ c.arn }}</td>
+      </ng-container>
+      <ng-container matColumnDef="pvType">
+        <th mat-header-cell *matHeaderCellDef>PV type</th>
+        <td mat-cell *matCellDef="let c">{{ c.pvType }}</td>
+      </ng-container>
+      <ng-container matColumnDef="location">
+        <th mat-header-cell *matHeaderCellDef>Location</th>
+        <td mat-cell *matCellDef="let c">{{ c.district }}, {{ c.state }}</td>
+      </ng-container>
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let c"><ps-status-chip [status]="c.status"></ps-status-chip></td>
+      </ng-container>
+      <ng-container matColumnDef="slaDeadline">
+        <th mat-header-cell *matHeaderCellDef>SLA deadline</th>
+        <td mat-cell *matCellDef="let c">{{ c.slaDeadline | date:'mediumDate' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let c">
+          <button mat-button color="primary" (click)="startEdit(c)">Update</button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columns"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+
+    <mat-paginator *ngIf="!loading && cases.length" [length]="totalElements" [pageIndex]="pageIndex"
+      [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 50]" (page)="onPage($event)"></mat-paginator>
+
+    <ps-empty-state *ngIf="!loading && !cases.length" icon="local_police" title="No PV cases in this status"
+      subtitle="Try selecting a different status filter, or dispatch a new case."></ps-empty-state>
+  </div>
+
+  <div class="ps-detail-overlay" *ngIf="editing" (click)="editing = null">
+    <div class="ps-card ps-detail-panel" (click)="$event.stopPropagation()">
+      <div class="ps-detail-header">
+        <div class="ps-section-title" style="font-size:16px;">Update PV case {{ editing.arn }}</div>
+        <button mat-icon-button (click)="editing = null"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="ps-hint" style="margin-bottom:10px;">Applicant action: {{ editing.applicantAction }}</div>
+      <form [formGroup]="editForm" (ngSubmit)="save()">
+        <mat-form-field appearance="outline" style="width:100%;">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let s of statuses" [value]="s">{{ s | titlecase }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" style="width:100%;">
+          <mat-label>Remarks</mat-label>
+          <textarea matInput rows="3" formControlName="remarks"></textarea>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save Status' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,96 @@
+.ps-shell {
+  height: 100vh;
+}
+
+.ps-sidenav {
+  width: 250px;
+  background: var(--ps-primary);
+  color: rgba(255, 255, 255, 0.92);
+  border-right: none;
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+}
+
+.ps-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 20px 20px;
+}
+
+.ps-brand-icon {
+  color: var(--ps-accent);
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}
+
+.ps-brand-title {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.ps-brand-sub {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ps-accent);
+}
+
+.ps-nav-group-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 12px 20px 4px 20px;
+}
+
+::ng-deep .ps-sidenav .mat-mdc-list-item {
+  color: rgba(255, 255, 255, 0.88) !important;
+  border-radius: 0 24px 24px 0;
+  margin-right: 10px;
+}
+
+::ng-deep .ps-sidenav .mat-mdc-list-item .mat-icon {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+::ng-deep .ps-sidenav .ps-nav-active {
+  background: rgba(255, 255, 255, 0.14) !important;
+}
+
+::ng-deep .ps-sidenav .ps-nav-active .mat-icon {
+  color: var(--ps-accent) !important;
+}
+
+.ps-toolbar {
+  background: #fff !important;
+  color: var(--ps-text) !important;
+  border-bottom: 1px solid var(--ps-border);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.ps-spacer { flex: 1 1 auto; }
+
+.ps-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-user-name {
+  font-weight: 500;
+}
+
+.ps-user-role {
+  font-size: 11px;
+  color: var(--ps-text-muted);
+  background: var(--ps-bg);
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 4px;
+}
